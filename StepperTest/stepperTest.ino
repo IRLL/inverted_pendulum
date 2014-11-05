@@ -1,19 +1,22 @@
 #include <AccelStepper.h>
+#include <MsTimer2.h>
 
-#define MAX_X 32000
-#define MAX_SPEED 1000
-#define ACCELERATION 500
-#define STEP_PIN 8
-#define DIR_PIN 12
+#define MAX_SPEED 2000
+#define ACCELERATION 20
+#define STEP_PIN 12
+#define DIR_PIN 8
+
 
 //Init the stepper: 1 says that we are using a Stepper Driver
 AccelStepper myStepper(1,STEP_PIN,DIR_PIN);
-bool done = false;
+
 void setup ()
 {
 	Serial.begin(9600);
-	//Set an interrupt to run a step if needed
-	attachCoreTimerService(runCallback);
+        //Set an interrupt to run a step if needed
+	MsTimer2::set (1, runCallback);
+        MsTimer2::start();
+        
 	myStepper.setMaxSpeed(MAX_SPEED);
 	myStepper.setAcceleration(ACCELERATION);
 	Serial.println("Instructions:");
@@ -22,10 +25,14 @@ void setup ()
 
 void loop()
 {
-	if (Serial.available())
+        myStepper.moveTo(800);
+        delay(20000);
+        myStepper.moveTo (0);
+        delay(20000);
+	/*if (Serial.available())
 	{
 		bool isSpecial = false;
-		int newPos = -1;
+                newPos = 0;
 		for (int i = 0; i < 7; ++i)
 		{
 			char readChar = Serial.read();
@@ -44,23 +51,17 @@ void loop()
 		}
 		Serial.print("Going to: ");
 		Serial.println(newPos, DEC);
-		if (newPos >= 0 && !done)
+		if (newPos >= 0)
 		{
 			myStepper.moveTo(newPos);
 		}
 		else if (newPos == -2)
 		{
-			done = true;
 			returnToZeroPos();
-			//Set up the Enable Here
 		}
-		else if (newPos == -3)
-		{
-			done = false;
-			//Set up the Enable Here
-		}
+
 		else Serial.println("That was not a Valid input!");
-	}
+	}*/
 }
 
 void returnToZeroPos()
@@ -75,12 +76,8 @@ void returnToZeroPos()
 	} 
 }
 
-uint32_t runCallback (uint32_t currentTime)
+void runCallback ()
 {
-	//If the motor still has to get to the target run more often
-	if(myStepper.run()) return (uint32_t) 50;
-
-	//Otherwise save processing interrupts by running less often
-	else return (uint32_t) 100;
+	myStepper.run();
 }
 
