@@ -1,34 +1,36 @@
 #include <AccelStepper.h>
-#include <MsTimer2.h>
+//#include <MsTimer2.h>
+#include <TimerOne.h>
 
-#define MAX_SPEED 2000
-#define ACCELERATION 20
+#define MAX_SPEED 8000
+#define ACCELERATION 300
 #define STEP_PIN 12
 #define DIR_PIN 8
-
+#define INTERRUPT_TIME 100 /* 2=500kHz */
 
 //Init the stepper: 1 says that we are using a Stepper Driver
 AccelStepper myStepper(1,STEP_PIN,DIR_PIN);
 
 void setup ()
 {
-	Serial.begin(9600);
+        Timer1.initialize();
+        Timer1.attachInterrupt(runCallback, INTERRUPT_TIME);
+        Timer1.stop();
         //Set an interrupt to run a step if needed
-	MsTimer2::set (1, runCallback);
-        MsTimer2::start();
+	//MsTimer2::set (1, runCallback);
+        //MsTimer2::start();
         
 	myStepper.setMaxSpeed(MAX_SPEED);
 	myStepper.setAcceleration(ACCELERATION);
-	Serial.println("Instructions:");
-	Serial.println("Use -2 to send the motor back to 0 and -3 to restart.");
+        Timer1.stert();
 }
 
 void loop()
 {
-        myStepper.moveTo(800);
-        delay(20000);
+        myStepper.moveTo(3200);
+        delay(30000);
         myStepper.moveTo (0);
-        delay(20000);
+        delay(30000);
 	/*if (Serial.available())
 	{
 		bool isSpecial = false;
@@ -66,14 +68,7 @@ void loop()
 
 void returnToZeroPos()
 {
-	Serial.println("Returning to Home!");
 	myStepper.moveTo(0);
-	int dist = myStepper.distanceToGo();
-	while(dist > 0)
-	{
-		Serial.print("Steps to Go: ");
-		Serial.println(dist, DEC);
-	} 
 }
 
 void runCallback ()
