@@ -1,0 +1,7 @@
+Hardware needs:
+
+2 - limit switches and mounts (openbuilds)
+A stand system
+Pendulum mount
+Better way to attach belt to slide
+Power supply(>=24V)
