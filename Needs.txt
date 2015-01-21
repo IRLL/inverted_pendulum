@@ -1,8 +1,0 @@
-Hardware needs:
-
-2 - limit switches and mounts (openbuilds)
-A stand system (Portable Saw Horse?)
-Pendulum mount (Machine Shop)
-Potentiometer
-Better way to attach belt to cart (Belt Clips or Zip Ties wrapping belt around screw)
-Power supply(>=24V)
