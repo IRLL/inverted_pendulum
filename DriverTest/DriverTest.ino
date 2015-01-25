@@ -16,7 +16,18 @@ SoftwareSerial smcSerial = SoftwareSerial(rxPin, txPin);
 #define FORWARD_ACCELERATION 5
 #define REVERSE_ACCELERATION 9
 #define DECELERATION 2
- 
+
+enum Commands
+{
+  SAFESTART = 0x83,
+  MOTORFORWARD = 0x85,
+  MOTORREVERSE,
+  MOTORBRAKE = 0x92,
+  GETVAR = 0xA1,
+  SETLIMIT,
+  GETFIRMWAREVERSION = 0xC2,
+  STOPMOTOR = 0xE0
+};
 // read a serial byte (returns -1 if nothing received after the timeout expires)
 int readByte()
 {
@@ -29,7 +40,7 @@ int readByte()
 // must be called when controller restarts and after any error
 void exitSafeStart()
 {
-  smcSerial.write(0x83);
+  smcSerial.write(SAFESTART);
 }
  
 // speed should be a number from -3200 to 3200
@@ -37,12 +48,12 @@ void setMotorSpeed(int speed)
 {
   if (speed < 0)
   {
-    smcSerial.write(0x86);  // motor reverse command
+    smcSerial.write(MOTORREVERSE);  // motor reverse command
     speed = -speed;  // make speed positive
   }
   else
   {
-    smcSerial.write(0x85);  // motor forward command
+    smcSerial.write(MOTORFORWARD);  // motor forward command
   }
   smcSerial.write(speed & 0x1F);
   smcSerial.write(speed >> 5);
