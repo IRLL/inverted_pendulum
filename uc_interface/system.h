@@ -21,6 +21,8 @@ extern "C" {
 #define _SUPPRESS_PLIB_WARNING
 #include <p32xxxx.h>
 #include <peripheral/ports.h>
+#include "UART.h"
+#include "Queue.h"
 /*************************************************************************
  Typedefs
  ************************************************************************/

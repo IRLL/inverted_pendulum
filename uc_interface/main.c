@@ -25,11 +25,15 @@
 /*************************************************************************
  Global Variables
  ************************************************************************/
-
+Queue tx1;
+Queue rx1;
+Queue tx2;
+Queue rx2;
 /*************************************************************************
  Function Declarations
  ************************************************************************/
 void setupChangeNotification(void);
+void setupUART1(void);
 
 /*************************************************************************
  Main Code
@@ -58,6 +62,7 @@ When a CN interrupt occurs, the user should read the PORTx register associated
 int main(void) {
 
     setupChangeNotification();
+    setupUART1();
 
     while (1) {
 
@@ -97,6 +102,16 @@ void setupChangeNotification(void)
 
     INTEnableSystemMultiVectoredInt();
     INTEnableInterrupts();
+}
+
+void setupUART1(void)
+{
+    initialize_UART(1000000, 1500000, UART1, &rx1, 1, &tx1, 50, TRUE, FALSE);
+}
+
+void setupUART2 (void)
+{
+    initialize_UART(1000000, 1500000, UART2, &rx2, 1, &tx2, 50, TRUE, FALSE);
 }
 /*
 void UartStuff(uint speed, uint pb_clk, boolean tx_en, boolean rx_en) {
