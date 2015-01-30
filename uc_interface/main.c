@@ -65,14 +65,45 @@ When a CN interrupt occurs, the user should read the PORTx register associated
  */
 int main (void)
 {
+    int a;
 
+    CNCONbits.ON = 1;
+    CNENbits.CNEN4 = 1;
+    CNENbits.CNEN5 = 1;
+    CNENbits.CNEN6 = 1;
+    CNENbits.CNEN7 = 1;
+    CNENbits.CNEN8 = 1;
+    CNENbits.CNEN10 = 1;
+    a = PORTB;
+    a = PORTG;
+    IPC6bits.CNIP = 1;
+    IFS1bits.CNIF = 0;
+    IEC1bits.CNIE = 1;
+
+    INTEnableSystemMultiVectoredInt();
+    INTEnableInterrupts();
+
+    while (1)
+    {
+
+    }
     
-    
+    return 0;
 }
 
 
+//Setup the callback for a Change notification interrupt
+void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandle(void)
+{
+    asm volatile ("di"); //disable interrupts will processing this function
 
 
 
-#endif	/* SYSTEM_H */
+    IFS1bits.CNIF = 0;
+    asm volatile ("ei"); //reenable interrupts
+}
 
+void UartStuff()
+{
+
+}
