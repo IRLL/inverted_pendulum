@@ -12,8 +12,7 @@
 extern "C" {
 #endif
 
-    /*Include Statements*/
-#include "System.h"
+#include "system.h"
 
     /*Structure Defintions*/
     typedef struct QUEUE {

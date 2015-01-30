@@ -87,14 +87,14 @@ int send_UART(Uart channel, uint8 data_size, uint8 *data_ptr) {
         case UART1:
             status = enqueue(&(u1.Tx_queue), data_ptr, data_size);
             if (u1.Tx_is_idle) { //if the tx is idle, force-start it
-                IEC1bits.U1TXIE = 1;
-                IFS1bits.U1TXIF = 1;
+                IEC0bits.U1TXIE = 1;
+                IFS0bits.U1TXIF = 1;
             }
             break;
         case UART2:
             status = enqueue(&(u2.Tx_queue), data_ptr, data_size);
             if (u2.Tx_is_idle) { ////if the tx is idle, force-start it
-                IEC1bits.U1TXIE = 1;
+                IEC1bits.U2TXIE = 1;
                 IFS1bits.U2TXIF = 1;
             }
             break;
@@ -127,7 +127,7 @@ void __ISR(_UART_1_VECTOR, IPL7AUTO) Uart_1_Handler(void) {
     uint8 received, transmit;
     asm volatile ("di"); //disable interrupt
 
-    if (IFS1bits.U1RXIF) { //if the interrupt flag of RX is set
+    if (IFS0bits.U1RXIF) { //if the interrupt flag of RX is set
 
 
         //we have received information - pop that information off the channel
@@ -140,15 +140,15 @@ void __ISR(_UART_1_VECTOR, IPL7AUTO) Uart_1_Handler(void) {
         }
 
         //now clear the interrupt flag
-        IFS1bits.U1RXIF = 0;
+        IFS0bits.U1RXIF = 0;
     }
-    if (IFS1bits.U1TXIF) { //if the interrupt flag of TX is set
+    if (IFS0bits.U1TXIF) { //if the interrupt flag of TX is set
         u1.Tx_is_idle = 0; //tx is not idle
         //if the transmit queue is empty
         if (u1.Tx_queue.numStored == 0) {
             //our buffer is empty
             //we need to disable the interrupts
-            IEC1bits.U1TXIE = 0;
+            IEC0bits.U1TXIE = 0;
             //and set the queue to idle
             u1.Tx_is_idle = 1;
 
@@ -164,7 +164,7 @@ void __ISR(_UART_1_VECTOR, IPL7AUTO) Uart_1_Handler(void) {
                 uart_1_tx_callback(); //call additional ISR functionality
             }
             //now clear the interrupt flag
-            IFS1bits.U1TXIF = 0;
+            IFS0bits.U1TXIF = 0;
         }
     }
 
