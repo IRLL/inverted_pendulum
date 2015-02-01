@@ -14,7 +14,7 @@ and open the template in the editor.
       <p>This is the start of documentation for The Inverted Pendulum Project.</p>
       <hr/>
       <h3>I. Change Notifications</h3>
-      <p>12.3.3.1 CN CONFIGURATION AND OPERATION</p>
+      <p>CN CONFIGURATION AND OPERATION (Done in the setupChangeNotification function)</p>
       <p>The CN pins are configured as follows:</p>
       <ol>
           <li>Disable CPU interrupts</li>
@@ -27,12 +27,14 @@ and open the template in the editor.
           <li>Enable the CN interrupt enable bit, CNIE (IEC1<0>) = 1.</li>
           <li>Enable CPU interrupts.</li>
       </ol>
-      <blockquote>When a CN interrupt occurs, the user should read the PORTx register associated with the CN pin(s). 
-      This will clear the mismatch condition and set up the CN logic to detect the next pin change.
-      The current PORTx value can be compared to the PORTx read value obtained at the last CN interrupt
-      or during initialization, and used to determine which pin changed.The CN pins have a minimum input
-      pulse-width specification. Refer to the <strong>Electrical Characteristics</strong> chapter of the specific device
-      data sheet to learn more.</blockquote>
+      <blockquote>
+          When a CN interrupt occurs, the user should read the PORTx register associated with the CN pin(s).
+          This will clear the mismatch condition and set up the CN logic to detect the next pin change.
+          The current PORTx value can be compared to the PORTx read value obtained at the last CN interrupt
+          or during initialization, and used to determine which pin changed.The CN pins have a minimum input
+          pulse-width specification. Refer to the <strong>Electrical Characteristics</strong> chapter of the specific device
+          data sheet to learn more.
+      </blockquote>
       <hr/>
       <h3>II. UART Channels</h3>
       <p>The channels are configured as follows: </p>
@@ -56,9 +58,99 @@ and open the template in the editor.
       </table>
       <hr/>
       <h3>III. Motor Controller</h3>
-      <p>Insert Information about the motor controller here.</p>
+      <p>
+          The user manual for the motor controller can be found at 
+          <a href="https://www.pololu.com/docs/0J44">https://www.pololu.com/docs/0J44/1.3</a>.
+          The following table shows the commands that control the motor and their
+         function.
+      </p>
+      <table border="1" cellspacing="1" cellpadding="1">
+          <thead>
+              <tr>
+                  <th>Command</th>
+                  <th>Hex Value</th>
+                  <th>Function</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>Safe Start</td>
+                  <td>0x83</td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td>Motor Forward</td>
+                  <td>0x85</td>
+                  <td>Sets the motor at the specified speed in the "forward" direction</td>
+              </tr>
+              <tr>
+                  <td>Motor Reverse</td>
+                  <td>0x86</td>
+                  <td>Sets the motor at the specified speed in the "reverse" direction</td>
+              </tr>
+              <tr>
+                  <td>Motor Brake</td>
+                  <td>0x92</td>
+                  <td>Brakes the motor at the specified deceleration</td>
+              </tr>
+              <tr>
+                  <td>Get Variable</td>
+                  <td>0xA1</td>
+                  <td>Gets the specified variable from the motor controller</td>
+              </tr>
+              <tr>
+                  <td>Set Limit</td>
+                  <td>0xA2</td>
+                  <td>Sets the max speed the motor can rotate at</td>
+              </tr>
+              <tr>
+                  <td>Get Firmware Version</td>
+                  <td>0xC2</td>
+                  <td>Gets the Controller's firmware version</td>
+              </tr>
+              <tr>
+                  <td>Stop Motor</td>
+                  <td>0xE0</td>
+                  <td>Stops the Motor</td>
+              </tr>
+          </tbody>
+      </table>
       <hr/>
       <h3>IV. Encoders</h3>
-      <p>Insert Information about the Encoder's operation here.</p>
+      <h5>X1 Encoding</h5>
+      <p>
+         The figure below shows a quadrature cycle and the resulting increments and
+         decrements for X1 encoding. When channel A leads channel B, the
+         increment occurs on the rising edge of channel A. When channel B
+         leads channel A, the decrement occurs on the falling edge of channel A.
+      </p>
+      <img src="images/x1encoding.jpg" alt="X1 Encoding"/>
+      <h5>X2 Encoding</h5>
+      <p>
+          The same behavior holds for X2 encoding except the counter increments
+          or decrements on each edge of channel A, depending on which channel
+          leads the other. Each cycle results in two increments or decrements,
+          as shown in the following figure.
+      </p>
+      <img src="images/x2encoding.jpg" alt="X2 Encoding"/>
+      <h5>X4 Encoding</h5>
+      <p>
+          The counter increments or decrements similarly on each edge of
+          channels A and B for X4 encoding. Whether the counter increments
+            or decrements depends on which channel leads the other. Each cycle
+            results in four increments or decrements, as shown in this figure.
+      </p>
+      <img src="images/x4encoding.jpg" alt="X4 Encoding"/>
+      <h5>Finding the Rotational Position</h5>
+      <center>
+          <em>PulseCount * 360 / (xN)</em>
+      </center>
+      <p>x = encoding type</p>
+      <p>N = pulses per revolution</p>
+      <h5>Finding Linear Position</h5>
+      <center>
+          <em>PulseCount / (xN * PPI)</em>
+      </center>
+      <p>PPI = pulses per inch of linear movement</p>
   </body>
 </html>
