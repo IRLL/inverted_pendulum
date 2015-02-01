@@ -33,7 +33,7 @@ Queue rx2;
  Function Declarations
  ************************************************************************/
 void setupChangeNotification(void);
-void setupUART1(void);
+void setupUART(void);
 
 /*************************************************************************
  Main Code
@@ -62,7 +62,7 @@ When a CN interrupt occurs, the user should read the PORTx register associated
 int main(void) {
 
     setupChangeNotification();
-    setupUART1();
+    setupUART();
 
     while (1) {
 
@@ -71,15 +71,24 @@ int main(void) {
     return 0;
 }
 
+//Need interrupt/callback for a received message from the computer
 
 //Setup the callback for a Change notification interrupt
-
 void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandle(void) {
     asm volatile ("di"); //disable interrupts while processing this function
+   
+    int uartstatus = 0;
 
+    uint8 data;
+    data = PORTB; //Read the important bits
 
+    //If a limit is triggered then stop the motor before sending UART signal
 
-    IFS1bits.CNIF = 0;
+    //Send Bits to computer for decoding
+
+    uartstatus = send_UART(UART1, 32, &data); //Send the bits to the computer
+
+    IFS1bits.CNIF = 0; //Reset the Interrupt Flag
     asm volatile ("ei"); //reenable interrupts
 }
 
@@ -104,15 +113,13 @@ void setupChangeNotification(void)
     INTEnableInterrupts();
 }
 
-void setupUART1(void)
+//Not sure if it is correct
+void setupUART(void)
 {
-    initialize_UART(1000000, 1500000, UART1, &rx1, 1, &tx1, 50, TRUE, FALSE);
+    initialize_UART(1000000, 1500000, UART1, &(rx1.buffer), 1, &(tx1.buffer), 50, TRUE, TRUE);
+    initialize_UART(1000000, 1500000, UART2, &(rx2.buffer), 1, &(tx2.buffer), 50, TRUE, TRUE);
 }
 
-void setupUART2 (void)
-{
-    initialize_UART(1000000, 1500000, UART2, &rx2, 1, &tx2, 50, TRUE, FALSE);
-}
 /*
 void UartStuff(uint speed, uint pb_clk, boolean tx_en, boolean rx_en) {
     U1BRG = pb_clk / (16 * speed) - 1; //calculate the proper baud rate
@@ -131,6 +138,5 @@ void UartStuff(uint speed, uint pb_clk, boolean tx_en, boolean rx_en) {
     U1STAbits.URXEN = (rx_en & 0b1); //enable or disable the rx/tx modules
 
     U1MODEbits.ON = 1; //enable the UART
-
 }
- * */
+*/
