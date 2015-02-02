@@ -71,7 +71,10 @@ int main(void) {
     return 0;
 }
 
-//Need interrupt/callback for a received message from the computer
+//Need interrupt/callback for a received message from the computer/motor controller
+void __ISR(_UART1_RX_IRQ, IPL7AUTO) comp_recieve_handler(void)
+{
+}
 
 //Setup the callback for a Change notification interrupt
 void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandle(void) {
@@ -114,10 +117,11 @@ void setupChangeNotification(void)
 }
 
 //Not sure if it is correct
+//May need to
 void setupUART(void)
 {
-    initialize_UART(1000000, 1500000, UART1, &(rx1.buffer), 1, &(tx1.buffer), 50, TRUE, TRUE);
-    initialize_UART(1000000, 1500000, UART2, &(rx2.buffer), 1, &(tx2.buffer), 50, TRUE, TRUE);
+    initialize_UART(1000000, 1500000, UART1, &(rx1.buffer), rx1.buffer_size, &(tx1.buffer), tx1.buffer_size, TRUE, TRUE, NULL, NULL);
+    initialize_UART(1000000, 1500000, UART2, &(rx2.buffer), rx2.buffer_size, &(tx2.buffer), tx2.buffer_size, TRUE, TRUE, NULL, NULL);
 }
 
 /*
