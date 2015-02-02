@@ -72,9 +72,6 @@ int main(void) {
 }
 
 //Need interrupt/callback for a received message from the computer/motor controller
-void __ISR(_UART1_RX_IRQ, IPL7AUTO) comp_recieve_handler(void)
-{
-}
 
 //Setup the callback for a Change notification interrupt
 void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandle(void) {

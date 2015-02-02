@@ -164,5 +164,80 @@ and open the template in the editor.
           <em>PulseCount / (xN * PPI)</em>
       </center>
       <p>PPI = pulses per inch of linear movement</p>
+      <hr/>
+      <h3>V. Used Pins</h3>
+      <table border="1">
+          <thead>
+              <tr>
+                  <th>chipKIT Pin</th>
+                  <th>Microcontroller Port</th>
+                  <th>Register</th>
+                  <th>Use</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>0</td>
+                  <td>UART1</td>
+                  <td>U1RX</td>
+                  <td>UART RX line from the computer</td>
+              </tr>
+              <tr>
+                  <td>1</td>
+                  <td>UART1</td>
+                  <td>U1TX</td>
+                  <td>UART TX line to the computer</td>
+              </tr>
+              <tr>
+                  <td>A0</td>
+                  <td>RB2</td>
+                  <td>CN4</td>
+                  <td>Motor Encoder Ch. A</td>
+              </tr>
+              <tr>
+                  <td>A1</td>
+                  <td>RB4</td>
+                  <td>CN6</td>
+                  <td>Motor Encoder Ch. B</td>
+              </tr>
+              <tr>
+                  <td>A2</td>
+                  <td>RB3</td>
+                  <td>CN5</td>
+                  <td>Pendulum Encoder Ch. A</td>
+              </tr>
+              <tr>
+                  <td>A3</td>
+                  <td>RB5</td>
+                  <td>CN7</td>
+                  <td>Pendulum Encoder Ch. B</td>
+              </tr>
+              <tr>
+                  <td>11</td>
+                  <td>RG8</td>
+                  <td>CN10</td>
+                  <td>Forward limit switch</td>
+              </tr>
+              <tr>
+                  <td>12</td>
+                  <td>RG7</td>
+                  <td>CN8</td>
+                  <td>Backward limit switch</td>
+              </tr>
+              <tr>
+                  <td>39</td>
+                  <td>UART2</td>
+                  <td>U2RX</td>
+                  <td>UART RX line from the motor controller</td>
+              </tr>
+              <tr>
+                  <td>40</td>
+                  <td>UART2</td>
+                  <td>U2TX</td>
+                  <td>UART TX line to the motor controller</td>
+              </tr>
+          </tbody>
+      </table>
+
   </body>
 </html>
