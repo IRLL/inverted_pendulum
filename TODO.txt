@@ -1,5 +1,0 @@
-TO-DO:
-	1. Order new Hardware
-	2. Create enum of Driver Commands for code readability
-	3. Do Basic Testing
-	4. Finish It!
