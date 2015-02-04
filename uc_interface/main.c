@@ -25,11 +25,6 @@
 /*************************************************************************
  Global Variables
  ************************************************************************/
-Queue tx1;
-Queue rx1;
-Queue tx2;
-Queue rx2;
-
 uint8 tx1buff[50] = {0};
 uint8 tx2buff[50] = {0};
 uint8 rx1buff[50] = {0};
@@ -80,19 +75,36 @@ int main(void) {
 //Need interrupt/callback for a received message from the computer/motor controller
 
 //Setup the callback for a Change notification interrupt
-void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandle(void) {
+void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandler(void) {
     asm volatile ("di"); //disable interrupts while processing this function
    
     int uartstatus = 0;
+    uint8 data[1] = {0};
 
-    uint8 data;
-    data = PORTB; //Read the important bits
+    //PORTB bits 2, 3 = Motor encoder
+    //      bits 4, 5 = Arm encoder
+    //PORTG bits 7, 8 = limit switches
+
+    //parse data into a uint8 array
+    data[0] = (PORTB & 0b111100) | ((PORTG & 0b110000000) >> 7);
+
+    //data bits 0, 1 = limit switches
+    //     bits 2, 3 = Motor encoder
+    //     bits 4, 5 = Arm encoder
 
     //If a limit is triggered then stop the motor before sending UART signal
-
+    if (data[0] & 0b1)
+    {
+        uint8 command[1] = {0xE0};
+        send_UART (UART2, 4, command);
+    }
+    else if (data[0] & 0b10)
+    {
+        uint8 command[1] = {0xE0};
+        send_UART (UART2, 4, command);
+    }
     //Send Bits to computer for decoding
-
-    uartstatus = send_UART(UART1, 1, &data); //Send the bits to the computer
+    uartstatus = send_UART(UART1, 1, data); //Send the bits to the computer
 
     IFS1bits.CNIF = 0; //Reset the Interrupt Flag
     asm volatile ("ei"); //reenable interrupts
@@ -122,15 +134,9 @@ void setupChangeNotification(void)
 //Not sure if it is correct
 void setupUART(void)
 {
-    //Initialize the TX and RX queues
-    rx1 = create_queue(rx1buff,50);
-    tx1 = create_queue(tx1buff,50);
-    rx2 = create_queue(rx2buff,50);
-    tx2 = create_queue(tx2buff,50);
-
     //Initialize the UART signals
-    initialize_UART(1000000, 1500000, UART1, rx1.buffer, rx1.buffer_size, tx1.buffer, tx1.buffer_size, TRUE, TRUE, NULL, NULL);
-    initialize_UART(1000000, 1500000, UART2, rx2.buffer, rx2.buffer_size, tx2.buffer, tx2.buffer_size, TRUE, TRUE, NULL, NULL);
+    initialize_UART(1000000, 1500000, UART1, rx1buff, 50, tx1buff, 50, TRUE, TRUE, NULL, NULL);
+    initialize_UART(1000000, 1500000, UART2, rx2buff, 50, tx2buff, 50, TRUE, TRUE, NULL, NULL);
 }
 
 /*
