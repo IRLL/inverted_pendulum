@@ -29,6 +29,12 @@ Queue tx1;
 Queue rx1;
 Queue tx2;
 Queue rx2;
+
+uint8 tx1buff[50] = {0};
+uint8 tx2buff[50] = {0};
+uint8 rx1buff[50] = {0};
+uint8 rx2buff[50] = {0};
+
 /*************************************************************************
  Function Declarations
  ************************************************************************/
@@ -86,7 +92,7 @@ void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandle(void) {
 
     //Send Bits to computer for decoding
 
-    uartstatus = send_UART(UART1, 32, &data); //Send the bits to the computer
+    uartstatus = send_UART(UART1, 1, &data); //Send the bits to the computer
 
     IFS1bits.CNIF = 0; //Reset the Interrupt Flag
     asm volatile ("ei"); //reenable interrupts
@@ -114,11 +120,17 @@ void setupChangeNotification(void)
 }
 
 //Not sure if it is correct
-//May need to
 void setupUART(void)
 {
-    initialize_UART(1000000, 1500000, UART1, &(rx1.buffer), rx1.buffer_size, &(tx1.buffer), tx1.buffer_size, TRUE, TRUE, NULL, NULL);
-    initialize_UART(1000000, 1500000, UART2, &(rx2.buffer), rx2.buffer_size, &(tx2.buffer), tx2.buffer_size, TRUE, TRUE, NULL, NULL);
+    //Initialize the TX and RX queues
+    rx1 = create_queue(rx1buff,50);
+    tx1 = create_queue(tx1buff,50);
+    rx2 = create_queue(rx2buff,50);
+    tx2 = create_queue(tx2buff,50);
+
+    //Initialize the UART signals
+    initialize_UART(1000000, 1500000, UART1, rx1.buffer, rx1.buffer_size, tx1.buffer, tx1.buffer_size, TRUE, TRUE, NULL, NULL);
+    initialize_UART(1000000, 1500000, UART2, rx2.buffer, rx2.buffer_size, tx2.buffer, tx2.buffer_size, TRUE, TRUE, NULL, NULL);
 }
 
 /*

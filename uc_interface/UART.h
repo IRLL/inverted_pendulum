@@ -12,11 +12,10 @@
 extern "C" {
 #endif
 
-    /*Inclues*/
+    /*Includes*/
 #define _SUPPRESS_PLIB_WARNING
 #include <peripheral/ports.h>
 #include "Queue.h"
-#include "system.h"
 
     /*Enum Defintions*/
 

@@ -12,10 +12,18 @@
 extern "C" {
 #endif
 
-#include "system.h"
-
     /*Structure Defintions*/
-    typedef struct QUEUE {
+    typedef unsigned int uint;
+    typedef unsigned short int uint16;
+    typedef unsigned char uint8;
+    typedef signed char sint8;
+
+    typedef enum {
+        FALSE,
+        TRUE
+    } boolean;
+
+    typedef struct QUEUE{
         uint8 *buffer; //pointer to the queue memory
         uint buffer_size; //size of the supplied buffer
         uint QueueStart; //location of first data point (start of queue)

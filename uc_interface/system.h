@@ -22,19 +22,9 @@ extern "C" {
 #include <p32xxxx.h>
 #include <peripheral/ports.h>
 #include "UART.h"
-#include "Queue.h"
 /*************************************************************************
  Typedefs
  ************************************************************************/
-typedef unsigned int uint;
-typedef unsigned short int uint16;
-typedef unsigned char uint8;
-typedef signed char sint8;
-
-typedef enum {
-        FALSE,
-        TRUE
-    } boolean;
 
 
 #ifdef	__cplusplus
