@@ -74,10 +74,11 @@ int main(void) {
 
 //Need interrupt/callback for a received message from the computer/motor controller
 
+
 //Setup the callback for a Change notification interrupt
 void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandler(void) {
     asm volatile ("di"); //disable interrupts while processing this function
-   
+    uint8 command[1] = {0xE0};
     int uartstatus = 0;
     uint8 data[1] = {0};
 
@@ -95,13 +96,11 @@ void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandler(void) {
     //If a limit is triggered then stop the motor before sending UART signal
     if (data[0] & 0b1)
     {
-        uint8 command[1] = {0xE0};
-        send_UART (UART2, 4, command);
+        send_UART (UART2, 1, command);
     }
     else if (data[0] & 0b10)
     {
-        uint8 command[1] = {0xE0};
-        send_UART (UART2, 4, command);
+        send_UART (UART2, 1, command);
     }
     //Send Bits to computer for decoding
     uartstatus = send_UART(UART1, 1, data); //Send the bits to the computer
