@@ -7,6 +7,26 @@
  *
  *********************************************************/
 
+//Clock settings
+
+// PIC32MX340F512H Configuration Bit Settings
+
+// 'C' source line config statements
+
+#include <xc.h>
+
+// DEVCFG3
+// USERID = No Setting
+
+// DEVCFG2
+#pragma config FPLLIDIV = DIV_2         // PLL Input Divider (2x Divider)
+#pragma config FPLLMUL = MUL_20         // PLL Multiplier (20x Multiplier)
+#pragma config FPLLODIV = DIV_1         // System PLL Output Clock Divider (PLL Divide by 1)
+
+// DEVCFG1
+#pragma config FNOSC = FRCPLL           // Oscillator Selection Bits (Primary Osc w/PLL (XT+,HS+,EC+PLL))
+#pragma config FPBDIV = DIV_8           // Peripheral Clock Divisor (Pb_Clk is Sys_Clk/8
+
 //includes
 #include "system.h"
 
@@ -103,7 +123,7 @@ void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandler(void) {
         send_UART (UART2, 1, command);
     }
     //Send Bits to computer for decoding
-    uartstatus = send_UART(UART1, 1, data); //Send the bits to the computer
+    uartstatus = send_UART(UART2, 1, data); //Send the bits to the computer
 
     IFS1bits.CNIF = 0; //Reset the Interrupt Flag
     asm volatile ("ei"); //reenable interrupts
@@ -134,8 +154,8 @@ void setupChangeNotification(void)
 void setupUART(void)
 {
     //Initialize the UART signals
-    initialize_UART(1000000, 1500000, UART1, rx1buff, 50, tx1buff, 50, TRUE, TRUE, NULL, NULL);
-    initialize_UART(1000000, 1500000, UART2, rx2buff, 50, tx2buff, 50, TRUE, TRUE, NULL, NULL);
+    initialize_UART(115200, 10000000, UART1, rx1buff, 50, tx1buff, 50, TRUE, TRUE, NULL, NULL);
+    initialize_UART(115200, 10000000, UART2, rx2buff, 50, tx2buff, 50, TRUE, TRUE, NULL, NULL);
 }
 
 /*
