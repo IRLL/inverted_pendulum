@@ -9,6 +9,7 @@ class Pendulum(threading.Thread):
 	def __init__(self, Port):
 		threading.Thread.__init__(self)
 		self.ser = serial.Serial()
+		self.data_lock = threading.Lock()
 		self.position = 0
 		self.ser.baudrate = 9600
 		if (type(Port) is int):
@@ -30,13 +31,19 @@ class Pendulum(threading.Thread):
 	def Stop(self):
 		self.ser.write("0xE0")
 	def getVariables():
-		threading.lock.acquire()
-		#return a tuple containing all the values
-		threading.lock.release()
+		self.data_lock.acquire()
+		try:
+			#return a tuple containing all the values
+			pass
+		finally:
+			self.data_lock.release()
 	def run():
-		threading.lock.acquire()
-		#run the data acquisition from the microcontroller
-		threading.lock.release()
+		self.data_lock.acquire()
+		try:
+			#run the data acquisition from the microcontroller
+			pass
+		finally:
+			self.data_lock.release()
 	def Reset(self):
 		while(position != 0):
 			MoveLeft(self, getValueFromPercent(10))
