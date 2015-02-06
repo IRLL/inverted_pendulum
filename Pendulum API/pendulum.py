@@ -4,6 +4,10 @@ This is the class that controls the pendulum
 import serial
 import threading
 import time
+import signal
+import sys
+
+p = None
 
 class Pendulum(threading.Thread):
 	
@@ -12,7 +16,7 @@ class Pendulum(threading.Thread):
 		self.ser = serial.Serial()
 		self.data_lock = threading.Lock()
 		self.position = 0
-		self.ser.baudrate = 9600
+		self.ser.baudrate = 115200
 		if (type(Port) is int):
 			self.ser.port = Port - 1
 		elif(type(Port) is str):
@@ -59,10 +63,18 @@ class Pendulum(threading.Thread):
 	def getValueFromPercent(percent):
 		return 3200 * percent / 100
 
+
+def exit_handler(signum, frame):
+	global p
+	p.Stop()
+	print "exiting!"
+	sys.exit()
 def tester():
+	global p
 	p = Pendulum('/dev/ttyACM0')
 	while 1:
-		p.MoveRight(10)
+		p.MoveRight(25)
+		time.sleep(2)
 #		time.sleep(2)
 #		p.MoveLeft(10)
 #		time.sleep(2)
@@ -72,4 +84,5 @@ def tester():
 	
 	
 if __name__ == "__main__":
+	signal.signal(signal.SIGINT, exit_handler)
 	tester()
