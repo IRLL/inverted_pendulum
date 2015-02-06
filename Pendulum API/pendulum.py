@@ -9,11 +9,14 @@ import sys
 
 p = None
 
-class Pendulum(threading.Thread):
+class Pendulum():
 	
 	def __init__(self, Port):
-		threading.Thread.__init__(self)
+		self.alive = 1
+		self.uc_thread = threading.Thread(target=self.microcontroller_process)
+		self.motor_thread = threading.Thread(target=self.motor_variable_process)
 		self.ser = serial.Serial()
+		self.ser.timeout = 1
 		self.data_lock = threading.Lock()
 		self.position = 0
 		self.ser.baudrate = 115200
@@ -24,6 +27,8 @@ class Pendulum(threading.Thread):
 		self.ser.open()
 		print(self.ser.name)
 		self.Enable()
+		self.uc_thread.start()
+		self.motor_thread.start()
 	def __del__(self):
 		self.Stop()
 		self.ser.close()
@@ -46,13 +51,7 @@ class Pendulum(threading.Thread):
 			pass
 		finally:
 			self.data_lock.release()
-	def run():
-		self.data_lock.acquire()
-		try:
-			#run the data acquisition from the microcontroller
-			pass
-		finally:
-			self.data_lock.release()
+	
 	def Reset(self):
 		while(position != 0):
 			MoveLeft(self, getValueFromPercent(10))
@@ -63,9 +62,57 @@ class Pendulum(threading.Thread):
 	def getValueFromPercent(percent):
 		return 3200 * percent / 100
 
+	def motor_variable_process(self):
+		print "motor variable process started"
+		while self.alive:
+			"""
+			byte = self.ser.read(1)
+			if byte != '':
+				print hex(ord(byte))
+			"""
+			self.ReadStatus()
+			self.ReadTemperature()
+			self.ReadSupplyVoltage()
+			time.sleep(2)
+		print "motor variable process exiting"
+
+
+	def microcontroller_process(self):
+		 while self.alive:
+			print "microcontroller process running"
+			self.data_lock.acquire()
+			try:
+				#run the data acquisition from the microcontroller
+				pass
+			finally:
+				self.data_lock.release()
+		 	time.sleep(10)
+		 print "microcontroller process exiting"
+
+	def ReadStatus(self):
+   		self.ser.flushInput()
+		self.ser.write(chr(0xA1) + chr(1))
+		[lbyte, hbyte] = self.ser.read(2)
+		status = (ord(hbyte) << 8) | ord(lbyte)
+		print "status: ", hex(status)
+	
+	def ReadSupplyVoltage(self):
+		self.ser.flushInput()
+		self.ser.write(chr(0xA1) + chr(23))
+		[lbyte, hbyte] = self.ser.read(2)
+		voltage = (ord(hbyte) << 8) | ord(lbyte)
+		print "supply_voltage: ", float(voltage)/1000
+
+	def ReadTemperature(self):
+		self.ser.flushInput()
+		self.ser.write(chr(0xA1) + chr(24))
+		[lbyte, hbyte] = self.ser.read(2)
+		temperature = (ord(hbyte) << 8) | ord(lbyte)
+		print "temperature: ", float(temperature)/10
 
 def exit_handler(signum, frame):
 	global p
+	p.alive = 0
 	p.Stop()
 	print "exiting!"
 	sys.exit()
@@ -74,6 +121,7 @@ def tester():
 	p = Pendulum('/dev/ttyACM0')
 	while 1:
 		p.MoveRight(25)
+		#p.ReadTemperature()
 		time.sleep(2)
 #		time.sleep(2)
 #		p.MoveLeft(10)
