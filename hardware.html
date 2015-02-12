@@ -86,37 +86,104 @@
 	
 
 
-      <!-- ====================== Introduction ============================ -->
+      <!-- ====================== Header ============================ -->
 	<div class="container">
       <div class="bs-docs-section">
         <div class="page-header">
           <div class="row">
             <div class="col-lg-12">
-              <h1 id="intro">Introduction</h1>
+              <h1 id="intro">Hardware</h1>
 			  <p class="lead">The IRLL Inverted Pendulum</p>
-				<p>This is the start of documentation for the Inverted Pendulum Project. The project is based on Feedback's Digital Pendulum system that was previously modified by the WSU Bioengineering Department. For more information on the system go to <a href="http://www.feedback-instruments.com/products/education/control_instrumentation/digital_pendulum">Feedback Instruments</a> website.</p>
-				<p>The following documents are the data sheets used for reference:</p>
-				<a href="Documents/chipKIT_uC32_RM.pdf" class="btn btn-primary">chipKIT uC32 datasheet</a>
-				<a href="Documents/PIC32MX_DataSheet.pdf" class="btn btn-primary">PIC32MX datasheet</a>
-				<a href="Documents/RobosubucLib.pdf" class="btn btn-primary">RoboSub of the Palouse Microcontroller Library Documentation</a>
+			  <p>This is where all information on the Pendulum's hardware will be kept</p>
             </div>
           </div>
         </div>
 
       </div>
       
-
+		<!-- Pin outs -->
+		 <h3></a>Used Pins</h3>
+      <table class="table table-striped table-hover">
+          <thead>
+              <tr>
+                  <th>chipKIT Pin</th>
+                  <th>Microcontroller Port</th>
+                  <th>Register</th>
+                  <th>Use</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>0</td>
+                  <td>UART1</td>
+                  <td>U1RX</td>
+                  <td>UART RX line from the computer</td>
+              </tr>
+              <tr>
+                  <td>1</td>
+                  <td>UART1</td>
+                  <td>U1TX</td>
+                  <td>UART TX line to the computer</td>
+              </tr>
+              <tr>
+                  <td>A0</td>
+                  <td>RB2</td>
+                  <td>CN4</td>
+                  <td>Motor Encoder Ch. A</td>
+              </tr>
+              <tr>
+                  <td>A6</td>
+                  <td>RB3</td>
+                  <td>CN5</td>
+                  <td>Motor Encoder Ch. B</td>
+              </tr>
+              <tr>
+                  <td>A1</td>
+                  <td>RB4</td>
+                  <td>CN6</td>
+                  <td>Pendulum Encoder Ch. A</td>
+              </tr>
+              <tr>
+                  <td>A7</td>
+                  <td>RB5</td>
+                  <td>CN7</td>
+                  <td>Pendulum Encoder Ch. B</td>
+              </tr>
+              <tr>
+                  <td>11</td>
+                  <td>RG8</td>
+                  <td>CN10</td>
+                  <td>Forward limit switch</td>
+              </tr>
+              <tr>
+                  <td>12</td>
+                  <td>RG7</td>
+                  <td>CN8</td>
+                  <td>Backward limit switch</td>
+              </tr>
+              <tr>
+                  <td>39</td>
+                  <td>UART2</td>
+                  <td>U2RX</td>
+                  <td>UART RX line from the motor controller</td>
+              </tr>
+              <tr>
+                  <td>40</td>
+                  <td>UART2</td>
+                  <td>U2TX</td>
+                  <td>UART TX line to the motor controller</td>
+              </tr>
+          </tbody>
+      </table>
       
 
       <footer>
         <div class="row">
           <div class="col-lg-12">
-
             <ul class="list-unstyled">
               <li class="pull-right"><a href="#top">Back to top</a></li>
           </div>
         </div>
-
       </footer>
 
 

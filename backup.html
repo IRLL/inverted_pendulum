@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Bootstrap Stuff -->
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	
+
+    <title>Inverted-pendulum by IRLL</title>
+  </head>
+
+  <body style="padding-top:50px">
+
+    <header>
+      <div class="container">
+        <h1>Inverted-pendulum</h1>
+        <h2></h2>
+		<!-- Menu Listing -->
+		<div class="navbar navbar-inverse navbar-fixed-top">
+		  <div class="container">
+			<div class="navbar-header">
+			  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			  </button>
+			  <a class="navbar-brand" href="#">WSU IRLL</a>
+			</div>
+			<div class="collapse navbar-collapse">
+			  <ul class="nav navbar-nav">
+				<li class="active"><a href="#">Home</a></li>
+				<li><a href="#about">About</a></li>
+				<li><a href="#contact">Contact</a></li>
+			  </ul>
+			</div><!--/.nav-collapse -->
+		  </div>
+		</div>
+	    <a href="https://github.com/IRLL/Inverted-Pendulum/zipball/master" class="btn-success btn-lg">Download as .zip</a>
+	    <a href="https://github.com/IRLL/Inverted-Pendulum/tarball/master" class="btn-success btn-lg">Download as .tar.gz</a>
+	    <a href="https://github.com/IRLL/Inverted-Pendulum" class="btn-info btn-lg">View on GitHub</a>
+      </div>
+    </header>
+
+    <div class="container-fluid">
+      <section id="main_content">
+        <h1>
+<a id="inverted-pendulum-documentation" class="anchor" href="#inverted-pendulum-documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Inverted Pendulum Documentation</h1>
+
+
+
+<h3><a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h3>
+
+<p>This is the start of documentation for the Inverted Pendulum Project.
+The project is based on Feedback's Digital Pendulum system that was
+previously modified by the WSU Bioengineering Department. For more information
+on the system go to <a href="http://www.feedback-instruments.com/products/education/control_instrumentation/digital_pendulum">Feedback Instruments</a> website.
+      </p>
+	  <p>The following documents are the data sheets used for reference:</p>
+	  <ul>
+		<li><a href="Documents/chipKIT_uC32_RM.pdf">chipKIT uC32 datasheet</a></li>
+		<li><a href="Documents/PIC32MX_DataSheet.pdf">PIC32MX datasheet</a></li>
+		<li><a href="Documents/RobosubucLib.pdf">RoboSub of the Palouse Microcontroller Library Documentation</a></li>
+	  </ul>
+	  <hr>
+      <h3>
+<a id="i-change-notifications" class="anchor" href="#i-change-notifications" aria-hidden="true"><span class="octicon octicon-link"></span></a>I. Change Notifications</h3>
+      <p>CN CONFIGURATION AND OPERATION (Done in the setupChangeNotification function)</p>
+      <p>The CN pins are configured as follows:</p>
+      <ol>
+          <li>Disable CPU interrupts</li>
+          <li>Set desired CN I/O pin as input by setting corresponding TRISx register bits = 1.</li>
+          <li>Enable the CN Module ON bit (CNCON) = 1.</li>
+          <li>Enable individual CN input pin(s), enable optional pull up(s) or pull down(s).</li>
+          <li>Read corresponding PORTx registers to clear mismatch condition on CN input pins.</li>
+          <li>Configure the CN interrupt priority bits, CNIP (IPC620:18), and subpriority bits CNIS (IPC617:16).</li>
+          <li>Clear the CN interrupt flag bit, CNIF(IFS1) = 0.</li>
+          <li>Enable the CN interrupt enable bit, CNIE (IEC1) = 1.</li>
+          <li>Enable CPU interrupts.</li>
+      </ol>
+      <blockquote>
+          When a CN interrupt occurs, the user should read the PORTx register associated with the CN pin(s).
+          This will clear the mismatch condition and set up the CN logic to detect the next pin change.
+          The current PORTx value can be compared to the PORTx read value obtained at the last CN interrupt
+          or during initialization, and used to determine which pin changed.The CN pins have a minimum input
+          pulse-width specification. Refer to the <strong>Electrical Characteristics</strong> chapter of the specific device
+          data sheet to learn more.
+      </blockquote>
+      <hr>
+      <h3>
+<a id="ii-uart-channels" class="anchor" href="#ii-uart-channels" aria-hidden="true"><span class="octicon octicon-link"></span></a>II. UART Channels</h3>
+      <p>The channels are configured as follows: </p>
+      <table border="1" cellpadding="1">
+          <thead>
+              <tr>
+                  <th>Channel</th>
+                  <th>Function</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>UART1</td>
+                  <td>Used to communicate with the controlling computer</td>
+              </tr>
+              <tr>
+                  <td>UART2</td>
+                  <td>Used to send commands to the Motor Controller</td>
+              </tr>
+          </tbody>
+      </table>
+      <hr>
+      <h3>
+<a id="iii-motor-controller-pololu-simple-motor-controller-24v23" class="anchor" href="#iii-motor-controller-pololu-simple-motor-controller-24v23" aria-hidden="true"><span class="octicon octicon-link"></span></a>III. Motor Controller (Pololu Simple Motor Controller 24v23)</h3>
+      <p>
+          The user manual for the motor controller can be found at 
+          <a href="https://www.pololu.com/docs/0J44"></a><a href="https://www.pololu.com/docs/0J44/1.3">https://www.pololu.com/docs/0J44/1.3</a>.
+          The following table shows the commands that control the motor and their
+         function.
+      </p>
+      <table border="1" cellspacing="1" cellpadding="1">
+          <thead>
+              <tr>
+                  <th>Command</th>
+                  <th>Hex Value</th>
+                  <th>Function</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>Safe Start</td>
+                  <td>0x83</td>
+                  <td>
+                      Clears the Controller's Safe to start bit that is set on all
+                      errors
+                  </td>
+              </tr>
+              <tr>
+                  <td>Motor Forward</td>
+                  <td>0x85</td>
+                  <td>Sets the motor at the specified speed in the "forward" direction</td>
+              </tr>
+              <tr>
+                  <td>Motor Reverse</td>
+                  <td>0x86</td>
+                  <td>
+                      Sets the motor at the specified speed in the "reverse"
+                      direction
+                  </td>
+              </tr>
+              <tr>
+                  <td>Motor Brake</td>
+                  <td>0x92</td>
+                  <td>Brakes the motor at the specified deceleration</td>
+              </tr>
+              <tr>
+                  <td>Get Variable</td>
+                  <td>0xA1</td>
+                  <td>Gets the specified variable from the motor controller</td>
+              </tr>
+              <tr>
+                  <td>Set Limit</td>
+                  <td>0xA2</td>
+                  <td>Sets the max speed the motor can rotate at</td>
+              </tr>
+              <tr>
+                  <td>Get Firmware Version</td>
+                  <td>0xC2</td>
+                  <td>Gets the Controller's firmware version</td>
+              </tr>
+              <tr>
+                  <td>Stop Motor</td>
+                  <td>0xE0</td>
+                  <td>Stops the Motor until the motor has met Safe-Start conditions</td>
+              </tr>
+          </tbody>
+      </table>
+      <hr>
+      <h3>
+<a id="iv-encoders" class="anchor" href="#iv-encoders" aria-hidden="true"><span class="octicon octicon-link"></span></a>IV. Encoders</h3>
+      <h5>
+<a id="x1-encoding" class="anchor" href="#x1-encoding" aria-hidden="true"><span class="octicon octicon-link"></span></a>X1 Encoding</h5>
+      <p>
+         The figure below shows a quadrature cycle and the resulting increments and
+         decrements for X1 encoding. When channel A leads channel B, the
+         increment occurs on the rising edge of channel A. When channel B
+         leads channel A, the decrement occurs on the falling edge of channel A.
+      </p>
+      <img src="images/x1encoding.jpg" alt="X1 Encoding">
+      <h5>
+<a id="x2-encoding" class="anchor" href="#x2-encoding" aria-hidden="true"><span class="octicon octicon-link"></span></a>X2 Encoding</h5>
+      <p>
+          The same behavior holds for X2 encoding except the counter increments
+          or decrements on each edge of channel A, depending on which channel
+          leads the other. Each cycle results in two increments or decrements,
+          as shown in the following figure.
+      </p>
+      <img src="images/x2encoding.jpg" alt="X2 Encoding">
+      <h5>
+<a id="x4-encoding" class="anchor" href="#x4-encoding" aria-hidden="true"><span class="octicon octicon-link"></span></a>X4 Encoding</h5>
+      <p>
+          The counter increments or decrements similarly on each edge of
+          channels A and B for X4 encoding. Whether the counter increments
+            or decrements depends on which channel leads the other. Each cycle
+            results in four increments or decrements, as shown in this figure.
+      </p>
+      <img src="images/x4encoding.jpg" alt="X4 Encoding">
+      <h5>
+<a id="finding-the-rotational-position" class="anchor" href="#finding-the-rotational-position" aria-hidden="true"><span class="octicon octicon-link"></span></a>Finding the Rotational Position</h5>
+      
+          <em>PulseCount * 360 / (xN)</em>
+      
+      <p>x = encoding type</p>
+      <p>N = pulses per revolution</p>
+      <h5>
+<a id="finding-linear-position" class="anchor" href="#finding-linear-position" aria-hidden="true"><span class="octicon octicon-link"></span></a>Finding Linear Position</h5>
+      
+          <em>PulseCount / (xN * PPI)</em>
+      
+      <p>PPI = pulses per inch of linear movement</p>
+      <hr>
+      <h3>
+<a id="v-used-pins" class="anchor" href="#v-used-pins" aria-hidden="true"><span class="octicon octicon-link"></span></a>V. Used Pins</h3>
+      <table border="1">
+          <thead>
+              <tr>
+                  <th>chipKIT Pin</th>
+                  <th>Microcontroller Port</th>
+                  <th>Register</th>
+                  <th>Use</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>0</td>
+                  <td>UART1</td>
+                  <td>U1RX</td>
+                  <td>UART RX line from the computer</td>
+              </tr>
+              <tr>
+                  <td>1</td>
+                  <td>UART1</td>
+                  <td>U1TX</td>
+                  <td>UART TX line to the computer</td>
+              </tr>
+              <tr>
+                  <td>A0</td>
+                  <td>RB2</td>
+                  <td>CN4</td>
+                  <td>Motor Encoder Ch. A</td>
+              </tr>
+              <tr>
+                  <td>A6</td>
+                  <td>RB3</td>
+                  <td>CN5</td>
+                  <td>Motor Encoder Ch. B</td>
+              </tr>
+              <tr>
+                  <td>A1</td>
+                  <td>RB4</td>
+                  <td>CN6</td>
+                  <td>Pendulum Encoder Ch. A</td>
+              </tr>
+              <tr>
+                  <td>A7</td>
+                  <td>RB5</td>
+                  <td>CN7</td>
+                  <td>Pendulum Encoder Ch. B</td>
+              </tr>
+              <tr>
+                  <td>11</td>
+                  <td>RG8</td>
+                  <td>CN10</td>
+                  <td>Forward limit switch</td>
+              </tr>
+              <tr>
+                  <td>12</td>
+                  <td>RG7</td>
+                  <td>CN8</td>
+                  <td>Backward limit switch</td>
+              </tr>
+              <tr>
+                  <td>39</td>
+                  <td>UART2</td>
+                  <td>U2RX</td>
+                  <td>UART RX line from the motor controller</td>
+              </tr>
+              <tr>
+                  <td>40</td>
+                  <td>UART2</td>
+                  <td>U2TX</td>
+                  <td>UART TX line to the motor controller</td>
+              </tr>
+          </tbody>
+      </table>
+      </section>
+    </div>
+
+    
+  </body>
+</html>

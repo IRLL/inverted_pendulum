@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>IRLL: Inverted Pendulum</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="stylesheets/bootstrap.css" media="screen">
+    <!--<link rel="stylesheet" href="http://bootswatch.com/assets/css/bootswatch.min.css">-->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
+      <script src="../bower_components/respond/dest/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" async="" src="./Bootstrap_files/ga.js"></script><script>
+
+     var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-23019901-1']);
+      _gaq.push(['_setDomainName', "bootswatch.com"]);
+        _gaq.push(['_setAllowLinker', true]);
+      _gaq.push(['_trackPageview']);
+
+     (function() {
+       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+     })();
+
+    </script>
+  </head>
+  <body>
+  <!-- Menu (Copy to every page) -->
+    <div class="navbar navbar-inverse navbar-fixed-top navbar-transparent">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="http://irll.eecs.wsu.edu" class="navbar-brand">WSU IRLL</a>
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">Inverted Pendulum <span class="caret"></span></a>
+              <ul class="dropdown-menu" aria-labelledby="themes">
+				<li><a href="index.html">Home</a></li>
+                <li><a href="code.html">Code</a></li>
+				<li><a href="hardware.html">Hardware</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="http://irll.github.io">Home</a>
+            </li>
+            <li>
+              <a href="http://news.bootswatch.com/">Blog</a>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+			<li><a href="https://github.com/IRLL/Inverted-Pendulum">View on GitHub</a></li>
+            <li><a class="dropdown-toggle" data-toggle="dropdown" href="#" id="download">Downloads <span class="caret"></span></a>
+				<ul class="dropdown-menu" aria-labelledby="download">
+					<li><a href="https://github.com/IRLL/Inverted-Pendulum/zipball/master">Download as .zip</a></li>
+					<li><a href="https://github.com/IRLL/Inverted-Pendulum/tarball/master">Download as .tar.gz</a></li>
+				</ul>
+			</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+	<!-- End of Menu -->
+	
+	<div class="splash">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-3"></div>
+				<div class="col-lg-6 col-md-6 col-sm-6">
+				<h1 class="btn-primary title" width="100" style="color:#ffffff">Inverted Pendulum</h1>
+				</div>
+			  <div class="col-lg-3 col-md-3 col-sm-3"></div>
+			</div>
+			<div class="row"><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+			</div>
+		</div>
+	</div>
+	
+
+
+      <!-- ====================== Header ============================ -->
+	<div class="container">
+      <div class="bs-docs-section">
+        <div class="page-header">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h1 id="intro">Software</h1>
+			  <p class="lead">The IRLL Inverted Pendulum</p>
+				<p>This is where all information on the Pendulum's software will be maintained</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- Change Notifications -->
+		<div class="bs-docs-section">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<h1 id="CNs">Change Notifications</h1>
+						<p>CN CONFIGURATION AND OPERATION (Done in the setupChangeNotification function)</p>
+						  <p>The CN pins are configured as follows:</p>
+						  <ol>
+							  <li>Disable CPU interrupts</li>
+							  <li>Set desired CN I/O pin as input by setting corresponding TRISx register bits = 1.</li>
+							  <li>Enable the CN Module ON bit (CNCON) = 1.</li>
+							  <li>Enable individual CN input pin(s), enable optional pull up(s) or pull down(s).</li>
+							  <li>Read corresponding PORTx registers to clear mismatch condition on CN input pins.</li>
+							  <li>Configure the CN interrupt priority bits, CNIP (IPC620:18), and subpriority bits CNIS (IPC617:16).</li>
+							  <li>Clear the CN interrupt flag bit, CNIF(IFS1) = 0.</li>
+							  <li>Enable the CN interrupt enable bit, CNIE (IEC1) = 1.</li>
+							  <li>Enable CPU interrupts.</li>
+						  </ol>
+						  <blockquote>
+							  When a CN interrupt occurs, the user should read the PORTx register associated with the CN pin(s).
+							  This will clear the mismatch condition and set up the CN logic to detect the next pin change.
+							  The current PORTx value can be compared to the PORTx read value obtained at the last CN interrupt
+							  or during initialization, and used to determine which pin changed.The CN pins have a minimum input
+							  pulse-width specification. Refer to the <strong>Electrical Characteristics</strong> chapter of the specific device
+							  data sheet to learn more.
+						  </blockquote>
+				</div>
+			</div>
+			<hr/>
+		</div>
+      <!-- UART info -->
+	  <div class="bs-docs-section">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<h1 id="CNs">UART Channels</h1>
+					<p>The channels are configured as follows: </p>
+					  <table class="table table-hover">
+						  <thead>
+							  <tr>
+								  <th>Channel</th>
+								  <th>Function</th>
+							  </tr>
+						  </thead>
+						  <tbody>
+							  <tr>
+								  <td>UART1</td>
+								  <td>Used to communicate with the controlling computer</td>
+							  </tr>
+							  <tr>
+								  <td>UART2</td>
+								  <td>Used to send commands to the Motor Controller</td>
+							  </tr>
+						  </tbody>
+					  </table>
+				</div>
+			</div>
+			<hr/>
+		</div>
+		
+		<!-- Motor Control -->
+		<div class="bs-docs-section">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h1 id="mc">Motor Control</h1>
+				<p>
+          The user manual for the motor controller can be found at 
+          <a href="https://www.pololu.com/docs/0J44"></a><a href="https://www.pololu.com/docs/0J44/1.3">https://www.pololu.com/docs/0J44/1.3</a>.
+          The following table shows the commands that control the motor and their
+         function.
+      </p>
+      <table class="table table-striped table-hover">
+          <thead>
+              <tr>
+                  <th>Command</th>
+                  <th>Hex Value</th>
+                  <th>Function</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>Safe Start</td>
+                  <td>0x83</td>
+                  <td>
+                      Clears the Controller's Safe to start bit that is set on all
+                      errors
+                  </td>
+              </tr>
+              <tr>
+                  <td>Motor Forward</td>
+                  <td>0x85</td>
+                  <td>Sets the motor at the specified speed in the "forward" direction</td>
+              </tr>
+              <tr>
+                  <td>Motor Reverse</td>
+                  <td>0x86</td>
+                  <td>
+                      Sets the motor at the specified speed in the "reverse"
+                      direction
+                  </td>
+              </tr>
+              <tr>
+                  <td>Motor Brake</td>
+                  <td>0x92</td>
+                  <td>Brakes the motor at the specified deceleration</td>
+              </tr>
+              <tr>
+                  <td>Get Variable</td>
+                  <td>0xA1</td>
+                  <td>Gets the specified variable from the motor controller</td>
+              </tr>
+              <tr>
+                  <td>Set Limit</td>
+                  <td>0xA2</td>
+                  <td>Sets the max speed the motor can rotate at</td>
+              </tr>
+              <tr>
+                  <td>Get Firmware Version</td>
+                  <td>0xC2</td>
+                  <td>Gets the Controller's firmware version</td>
+              </tr>
+              <tr>
+                  <td>Stop Motor</td>
+                  <td>0xE0</td>
+                  <td>Stops the Motor until the motor has met Safe-Start conditions</td>
+              </tr>
+          </tbody>
+      </table>
+            </div>
+        </div>
+		</div>
+		
+		<!-- Encoding -->
+      <div class="bs-docs-section">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h1 id="encoding">Encoders</h1>
+			  <h3>X1 Encoding</h3>
+			  <p>
+				 The figure below shows a quadrature cycle and the resulting increments and
+				 decrements for X1 encoding. When channel A leads channel B, the
+				 increment occurs on the rising edge of channel A. When channel B
+				 leads channel A, the decrement occurs on the falling edge of channel A.
+			  </p>
+				<div class="col-lg-12 col-md-12 col-sm-12"><img src="images/x1encoding.jpg" alt="X1 Encoding"><hr/></div>
+				<h3>X2 Encoding</h5>
+				<p>
+				  The same behavior holds for X2 encoding except the counter increments
+				  or decrements on each edge of channel A, depending on which channel
+				  leads the other. Each cycle results in two increments or decrements,
+				  as shown in the following figure.
+				</p>
+				<div class="col-lg-12 col-md-12 col-sm-12"><img src="images/x2encoding.jpg" alt="X2 Encoding"><hr/></div>
+				<h3>X4 Encoding</h3>
+				<p>
+					The counter increments or decrements similarly on each edge of
+					channels A and B for X4 encoding. Whether the counter increments
+					or decrements depends on which channel leads the other. Each cycle
+					results in four increments or decrements, as shown in this figure.
+				</p>
+			  <div class="col-lg-12 col-md-12 col-sm-12"><img src="images/x4encoding.jpg" alt="X4 Encoding"><hr/></div>
+			  
+			  <div class="col-lg-6 col-md-6 col-sm-6">
+			  <div class="panel panel-primary">
+			  <div class="panel-heading"><h3>Finding the Rotational Position</h3></div>
+			  <div class="panel-body">PulseCount * 360 / (xN)</div>
+			  <div class="panel-footer">x = encoding type; N = pulses per revolution</div>
+			  </div>
+			  </div>
+			  <div class="col-lg-6 col-md-6 col-sm-6">
+			  <div class="panel panel-primary">
+				<div class="panel-heading">
+				  <h3>Finding Linear Position</h3>
+				</div>
+					  <div class="panel-body">PulseCount / (xN * PPI)</div>
+				  
+				  <div class="panel-footer">PPI = pulses per inch of linear movement</div>
+			  </div>
+			  </div>
+            
+          </div>
+			</div>
+		
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+
+            <ul class="list-unstyled">
+              <li class="pull-right"><a href="#top">Back to top</a></li>
+          </div>
+        </div>
+
+      </footer>
+
+
+    </div>
+
+
+    <script src="./Bootstrap_files/jquery-1.10.2.min.js"></script>
+    <script src="./Bootstrap_files/bootstrap.min.js"></script>
+    <script src="./Bootstrap_files/bootswatch.js"></script>
+  
+
+</body><style type="text/css" id="googleredesignedcss">null</style></html>
