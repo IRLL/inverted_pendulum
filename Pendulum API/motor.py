@@ -18,17 +18,24 @@ class Motor():
 		self.ser.baudrate = baudrate
 		if (type(Port) is int):
 			self.ser.port = Port - 1 #windows numerical port
-		elif(type(Port) is str)
+		elif(type(Port) is str):
 			self.ser.port = Port #linux string port
 		self.ser.open()
 		
 		#Threading setup	
-		print(self.ser.name)self.alive = 1 #tell the thread to stay alive
+		self.alive = 1 #tell the thread to stay alive
 		self.motor_thread = threading.Thread(target=self.motor_variable_process)
+		self.motor_thread.daemon = True #make daemon thread so it exits when program ends
 		self.data_lock = threading.Lock() #mutex for variables
 		self.ser_lock = threading.Lock() #mutex for serial port
 		self.motor_thread.start()
 		
+		self.update_period = .5 #update rate for variables		
+
+		#Motor Variables
+		self.error_codes = 0
+		self.supply_voltage = 0
+		self.temperature = 0	
 	def __del__(self):
 		self.Stop()
 		self.ser.close()
@@ -46,14 +53,17 @@ class Motor():
 		self.ser.write(chr(0x86) + speed1 + speed2)
 	def Stop(self):
 		self.ser.write(chr(0xE0))
-	def getVariables():
+	def getVariables(self):
+		variables = []
 		self.data_lock.acquire()
 		try:
 			#return a tuple containing all the values
-			pass
+			variables.append(self.error_codes)
+			variables.append(self.supply_voltage)
+			variables.append(self.temperature)
 		finally:
 			self.data_lock.release()
-	
+		return variables	
 	def Reset(self):
 		while(position != 0):
 			MoveLeft(self, getValueFromPercent(10))
@@ -68,8 +78,8 @@ class Motor():
 		print "motor variable process started"
 		while self.alive:
 			#aquire mutex locks
-			self.ser_lock.aquire()
-			self.data_lock.aquire()
+			self.ser_lock.acquire()
+			self.data_lock.acquire()
 			try: #try to read the motor variables
 				#get error codes
 				self.error_codes = self.ReadVar(1)
@@ -81,8 +91,8 @@ class Motor():
 				self.temperature = float(tmp)/10
 			finally: #release the locks
 				self.ser_lock.release()
-				self.data_lock.relase()
-			time.sleep(2)
+				self.data_lock.release()
+			time.sleep(self.update_period)
 		print "motor variable process exiting"
 	
 	def ReadVar(self, addr):
