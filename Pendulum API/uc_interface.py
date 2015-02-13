@@ -54,7 +54,7 @@ class ucEncoder():
 			#aquire mutex lock
 			self.data_lock.acquire()
 			try: #update the motor variable
-				self.uc_data = data
+				self.uc_data = ord(data)
 			finally: #release the lock
 				self.data_lock.release()
 		print "microcontroller process exiting"
@@ -67,11 +67,10 @@ def exit_handler(signum, frame):
 	
 	
 def tester():
+	uc = ucEncoder('/dev/ttyUSB0')
 	while 1:
-		uc = ucEncoder(28)
 		data = uc.getVariables()
-		
-		print data[0]
+		print hex(data[0])
 	
 	
 if __name__ == "__main__":
