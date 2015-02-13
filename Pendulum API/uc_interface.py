@@ -19,6 +19,7 @@ class ucEncoder():
 			self.ser.port = Port - 1 #windows numerical port
 		elif(type(Port) is str):
 			self.ser.port = Port #linux string port
+		print "opening port", Port
 		self.ser.open()
 		
 		#Threading setup	
@@ -29,16 +30,16 @@ class ucEncoder():
 		self.ser_lock = threading.Lock() #mutex for serial port
 		self.thread.start()
 		
-
+		self.uc_data = 0;
+		
 	def __del__(self):
-		self.Stop()
 		self.ser.close()
 	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()
 		try:
 			#return a tuple containing all the values
-			pass
+			variables.append(self.uc_data)
 		finally:
 			self.data_lock.release()
 		return variables	
@@ -46,30 +47,35 @@ class ucEncoder():
 	def uc_process(self):
 		print "microcontroller process started"
 		while 1:
-			#aquire mutex locks
-			self.ser_lock.acquire()
+			#read serial byte (this call is blocking)
+			print "reading data"
+			data = self.ser.read(1)
+			print "data read"
+			#aquire mutex lock
 			self.data_lock.acquire()
-			try: #try to read the motor variables
-				#get error codes
-				self.error_codes = self.ReadVar(1)
-				#get supply voltage
-				tmp = self.ReadVar(23)
-				self.supply_voltage = float(tmp)/1000
-				#get motor temperature
-				tmp = self.ReadVar(24)
-				self.temperature = float(tmp)/10
-			finally: #release the locks
-				self.ser_lock.release()
+			try: #update the motor variable
+				self.uc_data = data
+			finally: #release the lock
 				self.data_lock.release()
-			time.sleep(self.update_period)
-		print "motor variable process exiting"
+		print "microcontroller process exiting"
+		
+		
+		
+def exit_handler(signum, frame):
+	print "exiting!"
+	sys.exit()
 	
-	def ReadVar(self, addr):
-		#read variable at motor address
-		self.ser.flushInput()
-		self.ser.write(chr(0xA1) + chr(addr))
-		[lbyte, hbyte] = self.ser.read(2)
-		result = (ord(hbyte) << 8) | ord(lbyte)
-		return result
+	
+def tester():
+	while 1:
+		uc = ucEncoder(28)
+		data = uc.getVariables()
+		
+		print data[0]
+	
+	
+if __name__ == "__main__":
+	signal.signal(signal.SIGINT, exit_handler)
+	tester()
 
 	

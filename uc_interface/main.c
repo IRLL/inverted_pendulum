@@ -53,7 +53,6 @@ uint8 rx2buff[50] = {0};
 /*************************************************************************
  Function Declarations
  ************************************************************************/
-void setupChangeNotification(void);
 void setupUART(void);
 
 /*************************************************************************
@@ -81,12 +80,21 @@ When a CN interrupt occurs, the user should read the PORTx register associated
  * device data sheet to learn more
  */
 int main(void) {
+    uint8 data;
+    uint8 prev_data;
 
-    setupChangeNotification();
     setupUART();
 
-    while (1) {
+    INTEnableSystemMultiVectoredInt();
+    INTEnableInterrupts();
 
+    while (1) {
+        data = (PORTB & 0b111100) | ((PORTG & 0b110000000) >> 7);
+        
+        if(data ^ prev_data){
+            send_UART(UART1, 1, &data);
+        }
+        prev_data = data;
     }
 
     return 0;
@@ -96,66 +104,57 @@ int main(void) {
 
 
 //Setup the callback for a Change notification interrupt
-void __ISR(_CHANGE_NOTICE_VECTOR, IPL1AUTO) cnHandler(void) {
+void __ISR(_CHANGE_NOTICE_VECTOR, IPL7AUTO) cnHandler(void) {
+    int command;
+    int data;
+    int t;
+    
+    
     asm volatile ("di"); //disable interrupts while processing this function
-    uint8 command[1] = {0xE0};
-    int uartstatus = 0;
-    uint8 data[1] = {0};
+
+    command = 0xE0;
 
     //PORTB bits 2, 3 = Motor encoder
     //      bits 4, 5 = Arm encoder
     //PORTG bits 7, 8 = limit switches
 
     //parse data into a uint8 array
-    data[0] = (PORTB & 0b111100) | ((PORTG & 0b110000000) >> 7);
+    data = (PORTB & 0b111100) | ((PORTG & 0b110000000) >> 7);
+    t = PORTB;
+    t = PORTG;
 
     //data bits 0, 1 = limit switches
     //     bits 2, 3 = Motor encoder
     //     bits 4, 5 = Arm encoder
 
     //If a limit is triggered then stop the motor before sending UART signal
-    if (data[0] & 0b1)
+    if ((data & 0b1) == 0b1)
     {
-        send_UART (UART2, 1, command);
+       // send_UART (UART2, 1, command);
+        U2TXREG = command;
     }
-    else if (data[0] & 0b10)
+    else if ((data & 0b10) == 0b10)
     {
-        send_UART (UART2, 1, command);
+        //send_UART (UART2, 1, command);
+        U2TXREG = command;
     }
+
+    //U2TXREG = 'c';
     //Send Bits to computer for decoding
-    uartstatus = send_UART(UART2, 1, data); //Send the bits to the computer
+    //uartstatus = send_UART(UART2, 1, data); //Send the bits to the computer
+    //U2TXREG = data[0];
 
     IFS1bits.CNIF = 0; //Reset the Interrupt Flag
     asm volatile ("ei"); //reenable interrupts
 }
 
-void setupChangeNotification(void)
-{
-    int a;
-
-    CNCONbits.ON = 1;
-    CNENbits.CNEN4 = 1;
-    CNENbits.CNEN5 = 1;
-    CNENbits.CNEN6 = 1;
-    CNENbits.CNEN7 = 1;
-    CNENbits.CNEN8 = 1;
-    CNENbits.CNEN10 = 1;
-    a = PORTB;
-    a = PORTG;
-    IPC6bits.CNIP = 1;
-    IFS1bits.CNIF = 0;
-    IEC1bits.CNIE = 1;
-
-    INTEnableSystemMultiVectoredInt();
-    INTEnableInterrupts();
-}
 
 //Not sure if it is correct
 void setupUART(void)
 {
     //Initialize the UART signals
     initialize_UART(115200, 10000000, UART1, rx1buff, 50, tx1buff, 50, TRUE, TRUE, NULL, NULL);
-    initialize_UART(115200, 10000000, UART2, rx2buff, 50, tx2buff, 50, TRUE, TRUE, NULL, NULL);
+    initialize_UART(1500000, 10000000, UART2, rx2buff, 50, tx2buff, 50, TRUE, TRUE, NULL, NULL);
 }
 
 /*
