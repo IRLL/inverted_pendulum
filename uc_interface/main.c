@@ -60,24 +60,17 @@ void setupUART(void);
  ************************************************************************/
 
 /*
-12.3.3.1CN CONFIGURATION AND OPERATION
-The CN pins are configured as follows:
-1.Disable CPU interrupts.
-2.Set desired CN I/O pin as input by setting corresponding TRISx register bits = 1.
-3.Enable the CN Module ON bit (CNCON<15>) = 1.
-4.Enable individual CN input pin(s), enable optional pull up(s) or pull down(s).
-5.Read corresponding PORTx registers to clear mismatch condition on CN input pins.
-6.Configure the CN interrupt priority bits, CNIP<2:0> (IPC6<20:18>), and subpriority bits CNIS<1:0> (IPC6<17:16>).
-7.Clear the CN interrupt flag bit, CNIF(IFS1<0>) = 0.
-8.Enable the CN interrupt enable bit, CNIE (IEC1<0>) = 1.
-9.Enable CPU interrupts.
-When a CN interrupt occurs, the user should read the PORTx register associated
- * with the CN pin(s). This will clear the mismatch condition and set up the CN
- * logic to detect the next pin change. The current PORTx value can be compared
- * to the PORTx read value obtained at the last CN interrupt or during initialization,
- * and used to determine which pin changed.The CN pins have a minimum input pulse-width
- * specification. Refer to the ?Electrical Characteristics? chapter of the specific
- * device data sheet to learn more
+    uint8 command = 0xE0;
+    if ((data & 0b1) == 0b1)
+    {
+       // send_UART (UART2, 1, command);
+        U2TXREG = command;
+    }
+    else if ((data & 0b10) == 0b10)
+    {
+        //send_UART (UART2, 1, command);
+        U2TXREG = command;
+    }
  */
 int main(void) {
     uint8 data;
@@ -100,56 +93,6 @@ int main(void) {
     return 0;
 }
 
-//Need interrupt/callback for a received message from the computer/motor controller
-
-
-//Setup the callback for a Change notification interrupt
-void __ISR(_CHANGE_NOTICE_VECTOR, IPL7AUTO) cnHandler(void) {
-    int command;
-    int data;
-    int t;
-    
-    
-    asm volatile ("di"); //disable interrupts while processing this function
-
-    command = 0xE0;
-
-    //PORTB bits 2, 3 = Motor encoder
-    //      bits 4, 5 = Arm encoder
-    //PORTG bits 7, 8 = limit switches
-
-    //parse data into a uint8 array
-    data = (PORTB & 0b111100) | ((PORTG & 0b110000000) >> 7);
-    t = PORTB;
-    t = PORTG;
-
-    //data bits 0, 1 = limit switches
-    //     bits 2, 3 = Motor encoder
-    //     bits 4, 5 = Arm encoder
-
-    //If a limit is triggered then stop the motor before sending UART signal
-    if ((data & 0b1) == 0b1)
-    {
-       // send_UART (UART2, 1, command);
-        U2TXREG = command;
-    }
-    else if ((data & 0b10) == 0b10)
-    {
-        //send_UART (UART2, 1, command);
-        U2TXREG = command;
-    }
-
-    //U2TXREG = 'c';
-    //Send Bits to computer for decoding
-    //uartstatus = send_UART(UART2, 1, data); //Send the bits to the computer
-    //U2TXREG = data[0];
-
-    IFS1bits.CNIF = 0; //Reset the Interrupt Flag
-    asm volatile ("ei"); //reenable interrupts
-}
-
-
-//Not sure if it is correct
 void setupUART(void)
 {
     //Initialize the UART signals
