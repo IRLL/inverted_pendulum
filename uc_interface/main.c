@@ -15,17 +15,16 @@
 
 #include <xc.h>
 
-// DEVCFG3
-// USERID = No Setting
+/* Oscillator Settings
+*/
+#pragma config FNOSC = PRIPLL // Oscillator selection
+#pragma config POSCMOD = EC // Primary oscillator mode
+#pragma config FPLLIDIV = DIV_2 // PLL input divider
+#pragma config FPLLMUL = MUL_20 // PLL multiplier
+#pragma config FPLLODIV = DIV_1 // PLL output divider
+#pragma config FPBDIV = DIV_2 // Peripheral bus clock divider
+#pragma config FSOSCEN = OFF // Secondary oscillator enable
 
-// DEVCFG2
-#pragma config FPLLIDIV = DIV_2         // PLL Input Divider (2x Divider)
-#pragma config FPLLMUL = MUL_20         // PLL Multiplier (20x Multiplier)
-#pragma config FPLLODIV = DIV_1         // System PLL Output Clock Divider (PLL Divide by 1)
-
-// DEVCFG1
-#pragma config FNOSC = FRCPLL           // Oscillator Selection Bits (Primary Osc w/PLL (XT+,HS+,EC+PLL))
-#pragma config FPBDIV = DIV_8           // Peripheral Clock Divisor (Pb_Clk is Sys_Clk/8
 
 //includes
 #include "system.h"
