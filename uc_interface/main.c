@@ -18,7 +18,7 @@
 /* Oscillator Settings
 */
 #pragma config FNOSC = PRIPLL // Oscillator selection
-#pragma config POSCMOD = EC // Primary oscillator mode
+#pragma config POSCMOD = HS // Primary oscillator mode
 #pragma config FPLLIDIV = DIV_2 // PLL input divider
 #pragma config FPLLMUL = MUL_20 // PLL multiplier
 #pragma config FPLLODIV = DIV_1 // PLL output divider
