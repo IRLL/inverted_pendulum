@@ -9,13 +9,11 @@ from kivy.uix.textinput import TextInput
 
 class LoginScreen(GridLayout):
 	def __init__(self, **kwargs):
+		self.p = Pendulum('/dev/ACMtty0', '/dev/ACMtty1')
 		super(LoginScreen, self).__init__(**kwargs)
 		self.cols = 2
-		self.add_widget(Label(text='User Name'))
-		self.username = TextInput(multiline=False)
-		self.add_widget(self.username)
-		self.add_widget(Label(text='password'))
-		self.add_widget(TextInput(password=True, multiline=False))
+		self.add_widget(Label(text='Bytes: '))
+		self.add_widget(Label(text=self.p.uc.getVariables()))
 
 class MyApp(App):
 	def build(self):
