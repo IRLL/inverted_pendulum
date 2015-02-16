@@ -48,9 +48,9 @@ class ucEncoder():
 		print "microcontroller process started"
 		while 1:
 			#read serial byte (this call is blocking)
-			print "reading data"
+			print "reading data..."
 			data = self.ser.read(1)
-			print "data read"
+			print "data read, pushing to variables..."
 			#aquire mutex lock
 			self.data_lock.acquire()
 			try: #update the motor variable

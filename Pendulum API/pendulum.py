@@ -8,33 +8,36 @@ import time
 import signal
 import sys
 from motor import Motor
-
+from uc_interface import ucEncoder
 
 p = None
 
 class Pendulum():
 	
-	def __init__(self, Port):
-		self.motor = Motor(Port)
+	def __init__(self, motorPort, ucPort):
+		self.motor = Motor(motorPort)
+		self.uc = ucEncoder(ucPort, 155200)
 		self.alive = 1
 		self.position = 0
 	def __del__(self):
+		Reset()
 		self.motor.Stop()
 	
 	def Reset(self):
 		while(position != 0):
-			MoveLeft(self, getValueFromPercent(10))
+			self.motor.MoveLeft(self, getValueFromPercent(10))
 
 
 def exit_handler(signum, frame):
 	global p
+	p.Reset()
 	p.motor.Stop()
 	print "exiting!"
 	sys.exit()
 
 def tester():
 	global p
-	p = Pendulum('/dev/ttyACM0')
+	p = Pendulum('/dev/ttyACM0', '/dev/ttyACM1')
 	
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
