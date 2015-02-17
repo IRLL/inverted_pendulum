@@ -75,7 +75,16 @@ int main(void) {
     uint8 data;
     uint8 prev_data;
 
+    AD1PCFGSET = 0xFF;
     setupUART();
+
+    //Timer setup
+//    TRISDbits.TRISD0 = 0;
+//    T1CONbits.TCKPS = 0;
+//    PR1 = 1;
+//    T1CONbits.ON = 1;
+//    IEC0bits.T1IE =1;
+//    IPC1bits.T1IP = 7;
 
     INTEnableSystemMultiVectoredInt();
     INTEnableInterrupts();
@@ -84,7 +93,8 @@ int main(void) {
         data = (PORTB & 0b111100) | ((PORTG & 0b110000000) >> 7);
         
         if(data ^ prev_data){
-            send_UART(UART1, 1, &data);
+            U1TXREG = data;
+            //send_UART(UART1, 1, &data);
         }
         prev_data = data;
     }
@@ -95,8 +105,17 @@ int main(void) {
 void setupUART(void)
 {
     //Initialize the UART signals
-    initialize_UART(115200, 10000000, UART1, rx1buff, 50, tx1buff, 50, TRUE, TRUE, NULL, NULL);
-    initialize_UART(1500000, 10000000, UART2, rx2buff, 50, tx2buff, 50, TRUE, TRUE, NULL, NULL);
+    initialize_UART(2000000, 40000000, UART1, rx1buff, 50, tx1buff, 50, TRUE, TRUE, NULL, NULL);
+    initialize_UART(9600, 40000000, UART2, rx2buff, 50, tx2buff, 50, TRUE, TRUE, NULL, NULL);
+}
+
+void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
+    asm volatile ("di"); //disable interrupt
+
+    LATDbits.LATD0 = ~LATDbits.LATD0;
+
+    IFS0bits.T1IF = 0; //clear the interrupt flag
+    asm volatile ("ei"); //reenable interrupts
 }
 
 /*

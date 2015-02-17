@@ -10,7 +10,7 @@ import argparse
 
 class ucEncoder():
 	
-	def __init__(self, Port, baudrate=115200):
+	def __init__(self, Port, baudrate=2000000):
 		
 		##Serial port setup	
 		self.ser = serial.Serial()
@@ -48,9 +48,9 @@ class ucEncoder():
 		print "microcontroller process started"
 		while 1:
 			#read serial byte (this call is blocking)
-			print "reading data..."
+			#print "reading data..."
 			data = self.ser.read(1)
-			print "data read, pushing to variables..."
+			#print "data read, pushing to variables..."
 			#aquire mutex lock
 			self.data_lock.acquire()
 			try: #update the motor variable
@@ -67,10 +67,11 @@ def exit_handler(signum, frame):
 	
 	
 def tester():
-	uc = ucEncoder('/dev/ttyUSB0')
+	uc = ucEncoder('/dev/ttyUSB1')
 	while 1:
 		data = uc.getVariables()
-		print hex(data[0])
+		print hex(data[0]), data[0] & 0b1, ((data[0] & 0b10) >> 1)
+		time.sleep(.2)
 	
 	
 if __name__ == "__main__":
