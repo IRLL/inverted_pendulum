@@ -8,12 +8,15 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 
 class LoginScreen(GridLayout):
-	def __init__(self, **kwargs):
-		self.p = Pendulum('/dev/ACMtty0', '/dev/ACMtty1')
-		super(LoginScreen, self).__init__(**kwargs)
+	i = StringProperty('')
+	def __init__(self, *args, **kwargs):
+		super(LoginScreen, self).__init__(*args, **kwargs)
 		self.cols = 2
 		self.add_widget(Label(text='Bytes: '))
-		self.add_widget(Label(text=self.p.uc.getVariables()))
+		self.bind(i=self.incI())
+		self.add_widget(Label(text=self.i))
+	def incI(self, instance)
+		self.i = self.i + 1
 
 class MyApp(App):
 	def build(self):
