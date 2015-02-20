@@ -46,33 +46,7 @@ class ucEncoder():
 	
 	def encoder_process(self, byte):
 		#Encoder processing
-		'''
-			Theory (in c State is (CHA, CHB) (bit1 = CHA, bit0 = CHB)):
-				switch (currentState)
-				{
-					case 0: //current state = 00
-						//if LastState=01, increment Count (CW)
-						//else LastState=10, decrement Count (CCW)
-						LastState==1 ? Count++ : Count--;
-						break;
-					case 1: //current state = 01
-						//if LastState=11, increment Count (CW)
-						//else LastState=00, decrement Count (CCW)
-						LastState==3 ? Count++ : Count--;
-						break;
-					case 2: //current state = 10
-						//if LastState=00, increment Count (CW)
-						//else LastState=11, decrement Count (CCW)
-						LastState==0 ? Count++ : Count--;
-						break;
-					case 3: //current state = 11
-						//if LastState=10, increment Count (CW)
-						//else LastState=01, decrement Count (CCW)
-						LastState==2 ? Count++ : Count--;
-						break;
-				}
-				LastState = currentState;
-		'''
+		#pass new encoder channel values to the appropriate encoder
 		
 	def uc_process(self):
 		print "microcontroller process started"
@@ -90,7 +64,6 @@ class ucEncoder():
 			#start encoder process
 			encoder_process(self.getVariables())
 		print "microcontroller process exiting"
-
 
 def exit_handler(signum, frame):
 	print "exiting!"
