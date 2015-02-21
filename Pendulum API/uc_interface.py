@@ -7,6 +7,7 @@ import time
 import signal
 import sys
 import argparse
+from encoder import Encoder
 
 class ucEncoder():
 	
@@ -31,6 +32,8 @@ class ucEncoder():
 		self.thread.start()
 		
 		self.uc_data = 0;
+		self.mEncoder = Encoder(90, 10)
+		self.aEncoder = Encoder(500, 1)
 		
 	def __del__(self):
 		self.ser.close()
@@ -47,6 +50,8 @@ class ucEncoder():
 	def encoder_process(self, byte):
 		#Encoder processing
 		#pass new encoder channel values to the appropriate encoder
+		self.mEncoder.setNextState((byte & 0b1100) >> 2)
+		self.aEncoder.setNextState(byte >> 4)
 		
 	def uc_process(self):
 		print "microcontroller process started"
@@ -62,7 +67,7 @@ class ucEncoder():
 			finally: #release the lock
 				self.data_lock.release()
 			#start encoder process
-			encoder_process(self.getVariables())
+			encoder_process(data)
 		print "microcontroller process exiting"
 
 def exit_handler(signum, frame):
