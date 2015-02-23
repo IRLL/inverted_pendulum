@@ -82,60 +82,14 @@
         </div>
 
       </div>
-      <!-- Change Notifications -->
-		<div class="bs-docs-section">
-			<div class="row">
-				<div class="col-lg-12 col-md-12 col-sm-12">
-					<h1 id="CNs">Change Notifications</h1>
-						<p>CN CONFIGURATION AND OPERATION (Done in the setupChangeNotification function)</p>
-						  <p>The CN pins are configured as follows:</p>
-						  <ol>
-							  <li>Disable CPU interrupts</li>
-							  <li>Set desired CN I/O pin as input by setting corresponding TRISx register bits = 1.</li>
-							  <li>Enable the CN Module ON bit (CNCON) = 1.</li>
-							  <li>Enable individual CN input pin(s), enable optional pull up(s) or pull down(s).</li>
-							  <li>Read corresponding PORTx registers to clear mismatch condition on CN input pins.</li>
-							  <li>Configure the CN interrupt priority bits, CNIP (IPC620:18), and subpriority bits CNIS (IPC617:16).</li>
-							  <li>Clear the CN interrupt flag bit, CNIF(IFS1) = 0.</li>
-							  <li>Enable the CN interrupt enable bit, CNIE (IEC1) = 1.</li>
-							  <li>Enable CPU interrupts.</li>
-						  </ol>
-						  <blockquote>
-							  When a CN interrupt occurs, the user should read the PORTx register associated with the CN pin(s).
-							  This will clear the mismatch condition and set up the CN logic to detect the next pin change.
-							  The current PORTx value can be compared to the PORTx read value obtained at the last CN interrupt
-							  or during initialization, and used to determine which pin changed.The CN pins have a minimum input
-							  pulse-width specification. Refer to the <strong>Electrical Characteristics</strong> chapter of the specific device
-							  data sheet to learn more.
-						  </blockquote>
-				</div>
-			</div>
-			<hr/>
-		</div>
       <!-- UART info -->
 	  <div class="bs-docs-section">
 			<div class="row">
 				<div class="col-lg-12 col-md-12 col-sm-12">
-					<h1 id="CNs">UART Channels</h1>
-					<p>The channels are configured as follows: </p>
-					  <table class="table table-hover">
-						  <thead>
-							  <tr>
-								  <th>Channel</th>
-								  <th>Function</th>
-							  </tr>
-						  </thead>
-						  <tbody>
-							  <tr>
-								  <td>UART1</td>
-								  <td>Used to communicate with the controlling computer</td>
-							  </tr>
-							  <tr>
-								  <td>UART2</td>
-								  <td>Used to send commands to the Motor Controller</td>
-							  </tr>
-						  </tbody>
-					  </table>
+					<h1 id="UART">UART Channels</h1>
+					<p>The UART channel on the chipKIT uC32 is used to communicate with the computer. 
+					This currently only sends the bit pattern to the computer every time it changes.
+					The baud rate is set to 2000000 MHz</p>
 				</div>
 			</div>
 			<hr/>
@@ -148,7 +102,7 @@
               <h1 id="mc">Motor Control</h1>
 				<p>
           The user manual for the motor controller can be found at 
-          <a href="https://www.pololu.com/docs/0J44"></a><a href="https://www.pololu.com/docs/0J44/1.3">https://www.pololu.com/docs/0J44/1.3</a>.
+          <a href="https://www.pololu.com/docs/0J44/">Pololu</a>.
           The following table shows the commands that control the motor and their
          function.
       </p>
@@ -255,9 +209,9 @@
 				<div class="panel-heading">
 				  <h3>Finding Linear Position</h3>
 				</div>
-					  <div class="panel-body">PulseCount / (xN * PPI)</div>
+					  <div class="panel-body">PulseCount / (xN * PPU)</div>
 				  
-				  <div class="panel-footer">PPI = pulses per inch of linear movement</div>
+				  <div class="panel-footer">PPU = pulses per unit of linear movement</div>
 			  </div>
 			  </div>
             
