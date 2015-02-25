@@ -9,6 +9,7 @@ import signal
 import sys
 from motor import Motor
 from uc_interface import ucEncoder
+from test import Ui_MainWindow
 
 p = None
 
@@ -53,12 +54,21 @@ def tester():
 	
 def print_status():
 	global p
+	self.app = QtGui.QApplication(sys.argv)
+	self.MainWindow = QtGui.QMainWindow()
+	self.ui = Ui_MainWindow()
+	ui.setupUi(MainWindow)
+	MainWindow.show()
+	sys.exit(app.exec_())
 	while 1:
 		stats = p.motor.getVariables()
-		print "status", hex(stats[0])
-		print "voltage", stats[1]
-		print "temperature", stats[2]
-		print ""
+		ui.eCode.setText(hex(status[0]))
+		#print "status", hex(stats[0])
+		ui.voltage.display(stats[1])
+		#print "voltage", stats[1]
+		ui.temp.display(stats[2])
+		#print "temperature", stats[2]
+		#print ""
 		time.sleep(1)
 
 
