@@ -35,7 +35,8 @@ class Motor():
 		#Motor Variables
 		self.error_codes = 0
 		self.supply_voltage = 0
-		self.temperature = 0	
+		self.temperature = 0
+		self.speed = 0
 	def __del__(self):
 		self.Stop()
 		self.ser.close()
@@ -53,6 +54,7 @@ class Motor():
 		self.ser.write(chr(0x86) + speed1 + speed2)
 	def Stop(self):
 		self.ser.write(chr(0xE0))
+		self.data_lock.acquire()
 	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()
@@ -61,6 +63,7 @@ class Motor():
 			variables.append(self.error_codes)
 			variables.append(self.supply_voltage)
 			variables.append(self.temperature)
+			variables.append(self.speed)
 		finally:
 			self.data_lock.release()
 		return variables	
@@ -89,6 +92,9 @@ class Motor():
 				#get motor temperature
 				tmp = self.ReadVar(24)
 				self.temperature = float(tmp)/10
+				#get motor speed
+				tmp = self.ReadVar(21)
+				self.speed = tmp
 			finally: #release the locks
 				self.ser_lock.release()
 				self.data_lock.release()
