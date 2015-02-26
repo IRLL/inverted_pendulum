@@ -10,6 +10,7 @@ import sys
 from motor import Motor
 from uc_interface import ucEncoder
 from test import Ui_MainWindow
+from PyQt4 import QtGui
 
 p = None
 
@@ -23,7 +24,6 @@ class Pendulum():
 	def __del__(self):
 		Reset()
 		self.motor.Stop()
-	
 	def Reset(self):
 		while(position != 0):
 			self.motor.MoveLeft(self, getValueFromPercent(10))
