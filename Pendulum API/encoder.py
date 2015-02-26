@@ -37,7 +37,8 @@ class Encoder():
 			variables.append(self.position)
 			variables.append(self.angle)
 			variables.append(self.tickCount)
-	
+		finally:
+			self.data_lock.release()	
 	def encoder_process(self):
 		print "Encoder initialized"
 		while 1:

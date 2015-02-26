@@ -37,6 +37,7 @@ class ucEncoder():
 		
 	def __del__(self):
 		self.ser.close()
+
 	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()
@@ -46,7 +47,6 @@ class ucEncoder():
 			#get the encoder values
 			mE = self.mEncoder.getVariables()
 			aE = self.aEncoder.getVariables()
-			
 		finally:
 			self.data_lock.release()
 		#1 is the angle of the encoder
@@ -55,8 +55,7 @@ class ucEncoder():
 		variables.append(mE[0])
 		#2 is the number of counts seen
 		variables.append(mE[2])
-		
-		return variables	
+		return variables
 	
 	def encoder_process(self, byte):
 		#Encoder processing
