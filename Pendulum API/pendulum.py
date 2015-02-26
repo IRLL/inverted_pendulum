@@ -62,13 +62,17 @@ def print_status():
 	sys.exit(app.exec_())
 	while 1:
 		stats = p.motor.getVariables()
-		ui.eCode.setText(hex(status[0]))
+		stats1 = p.uc.getVariables()
+		ui.eCode.setText(hex(stats[0]))
 		#print "status", hex(stats[0])
 		ui.voltage.display(stats[1])
 		#print "voltage", stats[1]
 		ui.temp.display(stats[2])
 		#print "temperature", stats[2]
 		#print ""
+		ui.armAngle.display(stats1[1])
+		ui.position.display(stats1[2])
+		ui.position.speed.display(stats1[3])
 		time.sleep(1)
 
 

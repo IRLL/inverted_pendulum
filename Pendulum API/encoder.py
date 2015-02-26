@@ -28,7 +28,16 @@ class Encoder():
 		self.thread.daemon = True #make daemon thread so it exits when program ends
 		self.data_lock = threading.Lock() #mutex for variables
 		self.thread.start()
-		
+	
+	def getVariables():
+		variables = []
+		self.data_lock.acquire()
+		try:
+			#return a tuple containing all of the values
+			variables.append(self.position)
+			variables.append(self.angle)
+			variables.append(self.tickCount)
+	
 	def encoder_process(self):
 		print "Encoder initialized"
 		while 1:

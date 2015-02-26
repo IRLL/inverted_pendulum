@@ -43,8 +43,19 @@ class ucEncoder():
 		try:
 			#return a tuple containing all the values
 			variables.append(self.uc_data)
+			#get the encoder values
+			mE = self.mEncoder.getVariables()
+			aE = self.aEncoder.getVariables()
+			
 		finally:
 			self.data_lock.release()
+		#1 is the angle of the encoder
+		variables.append (aE[1])
+		#0 is the linear position of the encoder
+		variables.append(mE[0])
+		#2 is the number of counts seen
+		variables.append(mE[2])
+		
 		return variables	
 	
 	def encoder_process(self, byte):
