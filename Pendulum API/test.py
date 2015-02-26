@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'pendulum.ui'
 #
-# Created: Wed Feb 25 13:57:15 2015
+# Created: Thu Feb 26 09:03:14 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,21 +26,21 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(200, 215)
+        MainWindow.resize(220, 215)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMinimumSize(QtCore.QSize(200, 215))
-        MainWindow.setMaximumSize(QtCore.QSize(200, 215))
+        MainWindow.setMinimumSize(QtCore.QSize(220, 215))
+        MainWindow.setMaximumSize(QtCore.QSize(220, 215))
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet(_fromUtf8("background-color: rgb(0,0,0); color: rgb(255,255,255);"))
         MainWindow.setTabShape(QtGui.QTabWidget.Rounded)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayoutWidget = QtGui.QWidget(self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 168, 163))
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 201, 163))
         self.gridLayoutWidget.setObjectName(_fromUtf8("gridLayoutWidget"))
         self.gridLayout = QtGui.QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setMargin(0)
@@ -122,7 +122,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.position, 5, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 200, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 220, 21))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
