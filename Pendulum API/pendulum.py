@@ -72,7 +72,7 @@ def print_status():
 		#print ""
 		ui.armAngle.display(stats1[1])
 		ui.position.display(stats1[2])
-		ui.position.speed.display(stats1[3])
+		ui.speed.display(stats1[3])
 		time.sleep(1)
 
 
