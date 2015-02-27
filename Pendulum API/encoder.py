@@ -29,7 +29,7 @@ class Encoder():
 		self.data_lock = threading.Lock() #mutex for variables
 		self.thread.start()
 	
-	def getVariables():
+	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()
 		try:
@@ -38,7 +38,8 @@ class Encoder():
 			variables.append(self.angle)
 			variables.append(self.tickCount)
 		finally:
-			self.data_lock.release()	
+			self.data_lock.release()
+		return variables
 	def encoder_process(self):
 		print "Encoder initialized"
 		while 1:
@@ -73,25 +74,25 @@ class Encoder():
 				if self.currState == 0:
 					self.data_lock.acquire()
 					try:
-						self.tickCount += 1 if self.lastState == 1 else -1
+						self.tickCount = (self.tickCount + 1 if self.lastState == 1 else self.tickCount - 1)
 					finally:
 						self.data_lock.release()
 				elif self.currState == 1:
 					self.data_lock.acquire()
 					try:
-						self.tickCount += 1 if self.lastState == 3 else -1
+						self.tickCount = (self.tickCount + 1 if self.lastState == 3 else self.tickCount - 1)
 					finally:
 						self.data_lock.release()
 				elif self.currState == 2:
 					self.data_lock.acquire()
 					try:
-						self.tickCount += 1 if self.lastState == 0 else -1
+						self.tickCount = (self.tickCount + 1 if self.lastState == 0 else self.tickCount - 1)
 					finally:
 						self.data_lock.release()
 				elif self.currState == 3:
 					self.data_lock.acquire()
 					try:
-						self.tickCount += 1 if self.lastState == 2 else -1
+						self.tickCount = (self.tickCount + 1 if self.lastState == 2 else self.tickCount - 1)
 					finally:
 						self.data_lock.release()
 			

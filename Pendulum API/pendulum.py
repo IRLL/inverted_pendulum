@@ -38,7 +38,7 @@ def exit_handler(signum, frame):
 
 def tester():
 	global p
-	p = Pendulum('/dev/ttyACM0', '/dev/ttyACM1')
+	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
 	
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
@@ -54,16 +54,16 @@ def tester():
 	
 def print_status():
 	global p
-	self.app = QtGui.QApplication(sys.argv)
-	self.MainWindow = QtGui.QMainWindow()
-	self.ui = Ui_MainWindow()
+	'''app = QtGui.QApplication(sys.argv)
+	MainWindow = QtGui.QMainWindow()
+	ui = Ui_MainWindow()
 	ui.setupUi(MainWindow)
 	MainWindow.show()
-	sys.exit(app.exec_())
+	sys.exit(app.exec_())'''
 	while 1:
 		stats = p.motor.getVariables()
 		stats1 = p.uc.getVariables()
-		ui.eCode.setText(hex(stats[0]))
+		'''ui.eCode.setText(hex(stats[0]))
 		#print "status", hex(stats[0])
 		ui.voltage.display(stats[1])
 		#print "voltage", stats[1]
@@ -72,7 +72,10 @@ def print_status():
 		#print ""
 		ui.armAngle.display(stats1[1])
 		ui.position.display(stats1[2])
-		ui.speed.display(stats1[3])
+		ui.speed.display(stats1[3])'''
+		print "Angle: ", stats1[1]
+		print "Position: ", stats1[2]
+		print "Ticks: ", stats1[3]
 		time.sleep(1)
 
 

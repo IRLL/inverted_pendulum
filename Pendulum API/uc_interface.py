@@ -22,6 +22,10 @@ class ucEncoder():
 			self.ser.port = Port #linux string port
 		print "opening port", Port
 		self.ser.open()
+
+		self.uc_data = 0;
+		self.mEncoder = Encoder(90, 10)
+		self.aEncoder = Encoder(500, 1)
 		
 		#Threading setup	
 		self.alive = 1 #tell the thread to stay alive
@@ -31,9 +35,6 @@ class ucEncoder():
 		self.ser_lock = threading.Lock() #mutex for serial port
 		self.thread.start()
 		
-		self.uc_data = 0;
-		self.mEncoder = Encoder(90, 10)
-		self.aEncoder = Encoder(500, 1)
 		
 	def __del__(self):
 		self.ser.close()
@@ -77,7 +78,7 @@ class ucEncoder():
 			finally: #release the lock
 				self.data_lock.release()
 			#start encoder process
-			encoder_process(data)
+			self.encoder_process(ord(data))
 		print "microcontroller process exiting"
 
 def exit_handler(signum, frame):
