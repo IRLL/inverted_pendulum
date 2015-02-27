@@ -42,7 +42,7 @@ class Encoder():
 	def encoder_process(self):
 		print "Encoder initialized"
 		while 1:
-			if currState == lastState:
+			if self.currState == self.lastState:
 				'''
 					Theory (in c State is (CHA, CHB) (bit1 = CHA, bit0 = CHB)):
 						switch (currentState)
@@ -70,34 +70,32 @@ class Encoder():
 						}
 						LastState = currentState;
 				'''
-				if currState == 0:
+				if self.currState == 0:
 					self.data_lock.acquire()
 					try:
-						tickCount += 1 if lastState == 1 else -1
+						self.tickCount += 1 if self.lastState == 1 else -1
 					finally:
 						self.data_lock.release()
-				elif currState == 1:
+				elif self.currState == 1:
 					self.data_lock.acquire()
 					try:
-						tickCount += 1 if lastState == 3 else -1
+						self.tickCount += 1 if self.lastState == 3 else -1
 					finally:
 						self.data_lock.release()
-				elif currState == 2:
+				elif self.currState == 2:
 					self.data_lock.acquire()
 					try:
-						tickCount += 1 if lastState == 0 else -1
+						self.tickCount += 1 if self.lastState == 0 else -1
 					finally:
 						self.data_lock.release()
-				elif currState == 3:
+				elif self.currState == 3:
 					self.data_lock.acquire()
 					try:
-						tickCount += 1 if lastState == 2 else -1
+						self.tickCount += 1 if self.lastState == 2 else -1
 					finally:
 						self.data_lock.release()
-				
-				print str(tickCount)
 			
-				lastState = currState
+				self.lastState = self.currState
 		print "Encoder Process Died"
 		
 	def setNextState(self, state):
@@ -118,11 +116,11 @@ class Encoder():
 	def updateCalculations(self):
 		#first calculate position
 		#tickCount / (4CPR * PPC)
-		pos = tickCount / (4 * self.cpr * self.ppc)
+		pos = self.tickCount / (4 * self.cpr * self.ppc)
 		
 		#then calculate angle
 		#tickCount * 360 / (4CPR)
-		ang = tickCount * 360 / (4 * self.cpr)
+		ang = self.tickCount * 360 / (4 * self.cpr)
 		
 		#Update variables
 		self.data_lock.acquire()
