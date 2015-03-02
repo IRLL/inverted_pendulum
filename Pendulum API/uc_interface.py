@@ -53,9 +53,9 @@ class ucEncoder():
 		#1 is the angle of the encoder
 		variables.append (aE[1])
 		#0 is the linear position of the encoder
-		variables.append(mE[0])
-		#2 is the number of counts seen
-		variables.append(mE[2])
+		variables.append (mE[0])
+		#2 is the number of counts seen by motor
+		variables.append (mE[2])
 		return variables
 	
 	def encoder_process(self, byte):
@@ -87,10 +87,10 @@ def exit_handler(signum, frame):
 	
 	
 def tester():
-	uc = ucEncoder('/dev/ttyUSB1')
+	uc = ucEncoder('/dev/ttyUSB0')
 	while 1:
 		data = uc.getVariables()
-		print hex(data[0]), data[0] & 0b1, ((data[0] & 0b10) >> 1)
+		print hex(data[0]), data[0] & 0b1, ((data[0] & 0b10) >> 1), data[3]
 		time.sleep(.2)
 	
 	
