@@ -51,6 +51,8 @@ uint8 rx1buff[50] = {0};
  Function Declarations
  ************************************************************************/
 void setupUART(void);
+void setupPorts(void);
+void updateTicks(uint8 data, uint8 *prev_data, int *armData, int *motorData);
 
 /*************************************************************************
  Main Code
@@ -73,8 +75,10 @@ int main(void) {
     uint8 data;
     uint8 prev_data;
 
+
     AD1PCFGSET = 0xFF;
     setupUART();
+    setupPorts();
 
     //Timer setup
 //    TRISDbits.TRISD0 = 0;
@@ -98,6 +102,72 @@ int main(void) {
     }
 
     return 0;
+}
+
+void setupPorts()
+{
+    TRISB = TRISB | 0b111100;
+    TRISG = TRISG | 0b110000000;
+}
+
+//Function that computes ticks
+void updateTicks(uint8 data, uint8 *prev_data, int *armData, int *motorData)
+{
+    //Arm Encoder Data
+    uint8 LastState = *(prev_data) >> 4;
+        
+    switch (data >> 4)
+    {
+            case 0: //current state = 00
+                    //if LastState=01, increment Count (CW)
+                    //else LastState=10, decrement Count (CCW)
+                    LastState==1 ? *armData++ : *armData--;
+                    break;
+            case 1: //current state = 01
+                    //if LastState=11, increment Count (CW)
+                    //else LastState=00, decrement Count (CCW)
+                    LastState==3 ? *armData++ : *armData--;
+                    break;
+            case 2: //current state = 10
+                    //if LastState=00, increment Count (CW)
+                    //else LastState=11, decrement Count (CCW)
+                    LastState==0 ? *armData++ : *armData--;
+                    break;
+            case 3: //current state = 11
+                    //if LastState=10, increment Count (CW)
+                    //else LastState=01, decrement Count (CCW)
+                    LastState==2 ? *armData++ : *armData--;
+                    break;
+    }
+
+    //Motor Encoder Data
+    uint8 LastState = *(prev_data) & 0b1100 >> 2;
+    
+    switch (data & 0b1100 >> 2)
+    {
+            case 0: //current state = 00
+                    //if LastState=01, increment Count (CW)
+                    //else LastState=10, decrement Count (CCW)
+                    LastState==1 ? *motorData++ : *motorData--;
+                    break;
+            case 1: //current state = 01
+                    //if LastState=11, increment Count (CW)
+                    //else LastState=00, decrement Count (CCW)
+                    LastState==3 ? *motorData++ : *motorData--;
+                    break;
+            case 2: //current state = 10
+                    //if LastState=00, increment Count (CW)
+                    //else LastState=11, decrement Count (CCW)
+                    LastState==0 ? *motorData++ : *motorData--;
+                    break;
+            case 3: //current state = 11
+                    //if LastState=10, increment Count (CW)
+                    //else LastState=01, decrement Count (CCW)
+                    LastState==2 ? *motorData++ : *motorData--;
+                    break;
+    }
+    
+    *prev_data = data;
 }
 
 void setupUART(void)
