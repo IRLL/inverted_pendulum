@@ -15,6 +15,7 @@ extern "C" {
     /*Structure Defintions*/
     typedef unsigned int uint;
     typedef unsigned short int uint16;
+    typedef signed short int sint16;
     typedef unsigned char uint8;
     typedef signed char sint8;
 

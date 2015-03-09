@@ -44,8 +44,9 @@
 /*************************************************************************
  Global Variables
  ************************************************************************/
-uint8 tx1buff[50] = {0};
+uint8 tx1buff[100] = {0};
 uint8 rx1buff[50] = {0};
+uint8 packet[6] = {0};
 
 /*************************************************************************
  Function Declarations
@@ -53,6 +54,7 @@ uint8 rx1buff[50] = {0};
 void setupUART(void);
 void setupPorts(void);
 void updateTicks(uint8 data, uint8 *prev_data, int *armData, int *motorData);
+void packetize(uint8 data, sint16 ArmCount, sint16 MotorCount);
 
 /*************************************************************************
  Main Code
@@ -74,19 +76,21 @@ void updateTicks(uint8 data, uint8 *prev_data, int *armData, int *motorData);
 int main(void) {
     uint8 data;
     uint8 prev_data;
-
-
-    AD1PCFGSET = 0xFF;
+    sint16 ArmCount = 0;
+    sint16 MotorCount = 0;
+    
+    
     setupUART();
     setupPorts();
 
     //Timer setup
-//    TRISDbits.TRISD0 = 0;
-//    T1CONbits.TCKPS = 0;
-//    PR1 = 1;
-//    T1CONbits.ON = 1;
-//    IEC0bits.T1IE =1;
-//    IPC1bits.T1IP = 7;
+    //Need the timer for periodic transmission of data ot the computer
+    TRISDbits.TRISD0 = 0;
+    T1CONbits.TCKPS = 0;
+    PR1 = 1;
+    T1CONbits.ON = 1;
+    IEC0bits.T1IE =1;
+    IPC1bits.T1IP = 7;
 
     INTEnableSystemMultiVectoredInt();
     INTEnableInterrupts();
@@ -95,7 +99,10 @@ int main(void) {
         data = (PORTB & 0b111100) | ((PORTG & 0b110000000) >> 7);
         
         if(data ^ prev_data){
-            U1TXREG = data;
+            //update the counters
+            updateTicks(data, &prev_data, &ArmCount, &MotorCount);
+            packetize(packet, data, ArmCount, MotorCount);
+            //U1TXREG = data;
             //send_UART(UART1, 1, &data);
         }
         prev_data = data;
@@ -104,16 +111,24 @@ int main(void) {
     return 0;
 }
 
+//setup the required ports for digital inputs
 void setupPorts()
 {
-    TRISB = TRISB | 0b111100;
-    TRISG = TRISG | 0b110000000;
+    //Ensure the Analog Pins are set to digital inputs
+    AD1PCFGSET = 0xFF;
+
+    TRISBSET = 0b111100;
+    TRISGSET = 0b110000000;
 }
 
 //Function that computes ticks
-void updateTicks(uint8 data, uint8 *prev_data, int *armData, int *motorData)
+void updateTicks(uint8 data, uint8 *prev_data, sint16 *armData, sint16 *motorData)
 {
-    //Arm Encoder Data
+    /*
+     * Arm Encoder Data
+     */
+
+    //save the previous state of the arm
     uint8 LastState = *(prev_data) >> 4;
         
     switch (data >> 4)
@@ -140,7 +155,11 @@ void updateTicks(uint8 data, uint8 *prev_data, int *armData, int *motorData)
                     break;
     }
 
-    //Motor Encoder Data
+    /*
+     * Motor Encoder Data Processing
+     */
+
+    //save the previous state of the motor
     uint8 LastState = *(prev_data) & 0b1100 >> 2;
     
     switch (data & 0b1100 >> 2)
@@ -166,20 +185,36 @@ void updateTicks(uint8 data, uint8 *prev_data, int *armData, int *motorData)
                     LastState==2 ? *motorData++ : *motorData--;
                     break;
     }
-    
+
+    //update the previous data for next update
     *prev_data = data;
 }
 
+//Setup the UART communication
 void setupUART(void)
 {
     //Initialize the UART signals
-    initialize_UART(2000000, 40000000, UART1, rx1buff, 50, tx1buff, 50, TRUE, TRUE, NULL, NULL);
+    initialize_UART(2000000, 40000000, UART1, rx1buff, 50, tx1buff, 100, TRUE, TRUE, NULL, NULL);
+}
+
+void packetize(uint8 data, sint16 ArmCount, sint16 MotorCount)
+{
+    //Packetize the data to send
+    packet[0] = 0x0A;
+    packet[1] = ArmCount >> 8; //High data of ArmCount
+    packet[2] = ArmCount & 0xFF00; //Low data of ArmCount
+    packet[3] = MotorCount >> 8;
+    packet[4] = MotorCount & 0xFF00;
+    packet[5] = data & 3;
 }
 
 void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
     asm volatile ("di"); //disable interrupt
 
-    LATDbits.LATD0 = ~LATDbits.LATD0;
+    //LATDbits.LATD0 = ~LATDbits.LATD0;
+
+    //Send the latest values to the computer
+    send_UART(UART1, 6, packet);
 
     IFS0bits.T1IF = 0; //clear the interrupt flag
     asm volatile ("ei"); //reenable interrupts
