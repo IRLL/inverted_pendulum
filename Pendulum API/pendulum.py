@@ -7,18 +7,20 @@ import threading
 import time
 import signal
 import sys
+import platform
+import os
 from motor import Motor
 from uc_interface import ucEncoder
-from test import Ui_MainWindow
-from PyQt4 import QtGui
 
 p = None
+LINUX = False
+WINDOWS = False
 
 class Pendulum():
 	
 	def __init__(self, motorPort, ucPort):
 		self.motor = Motor(motorPort)
-		self.uc = ucEncoder(ucPort, 155200)
+		self.uc = ucEncoder(ucPort, 2000000)
 		self.alive = 1
 		self.position = 0
 	def __del__(self):
@@ -30,11 +32,10 @@ class Pendulum():
 			
 def exit_handler(signum, frame):
 	global p
-	global app
 	p.Reset()
 	p.motor.Stop()
 	print "exiting!"
-	sys.exit(app.exec_())
+	sys.exit()
 
 def tester():
 	global p
@@ -54,34 +55,37 @@ def tester():
 	
 def print_status():
 	global p
-	global app
+	global LINUX
+	global WINDOWS
+	
+	#Check to see what OS is running
+	if (platform.system() == "Linux"):
+		LINUX = True
+	elif (platform.system() == "Windows"):
+		WINDOWS = True
+		
+	#Endlessly update the console
+	while True:
+		if (WINDOWS):
+			os.system('cls')
+		elif(LINUX):
+			os.system('clear')
+		console_update()
+	
+def console_update():
+	global p
 	stats = p.motor.getVariables()
 	stats1 = p.uc.getVariables()
-	app = QtGui.QApplication(sys.argv)
-	MainWindow = QtGui.QMainWindow()
-	ui = Ui_MainWindow()
-	ui.setupUi(MainWindow)
-	MainWindow.show()
-	sys.exit(app.exec_())
-	while 1:
-		stats = p.motor.getVariables()
-		stats1 = p.uc.getVariables()
-		ui.eCode.setText(hex(stats[0]))
-		#print "status", hex(stats[0])
-		ui.voltage.display(stats[1])
-		#print "voltage", stats[1]
-		ui.temp.display(stats[2])
-		#print "temperature", stats[2]
-		#print ""
-		ui.armAngle.display(stats1[1])
-		ui.position.display(stats1[2])
-		ui.speed.display(stats1[3])
-		#print "Angle: ", stats1[1]
-		#print "Position: ", stats1[2]
-		#print "Ticks: ", stats1[3]
-		time.sleep(1)
-
-
+	print "Status: ", hex(stats[0])
+	print "Voltage: ", stats[1]
+	print "Temperature: ", stats[2]
+	print "Motor Speed: ", stats[3]
+	print "Angle: ", stats1[1]
+	print "Arm Ticks: ", stats[2]
+	print "Position: ", stats1[3]
+	print "Motor Ticks: ", stats1[4]
+	print ""
+	
 if __name__ == "__main__":
 	signal.signal(signal.SIGINT, exit_handler)
 	tester()

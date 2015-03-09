@@ -45,9 +45,7 @@
  Global Variables
  ************************************************************************/
 uint8 tx1buff[50] = {0};
-uint8 tx2buff[50] = {0};
 uint8 rx1buff[50] = {0};
-uint8 rx2buff[50] = {0};
 
 /*************************************************************************
  Function Declarations
@@ -106,7 +104,6 @@ void setupUART(void)
 {
     //Initialize the UART signals
     initialize_UART(2000000, 40000000, UART1, rx1buff, 50, tx1buff, 50, TRUE, TRUE, NULL, NULL);
-    initialize_UART(9600, 40000000, UART2, rx2buff, 50, tx2buff, 50, TRUE, TRUE, NULL, NULL);
 }
 
 void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {

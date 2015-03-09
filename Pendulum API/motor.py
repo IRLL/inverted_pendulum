@@ -68,8 +68,8 @@ class Motor():
 			self.data_lock.release()
 		return variables	
 	def Reset(self):
-		while(position != 0):
-			MoveLeft(self, getValueFromPercent(10))
+		while(self.position != 0):
+			self.MoveLeft(self, getValueFromPercent(10))
 
 	def Enable(self):	
 		self.ser.write(chr(0x83))

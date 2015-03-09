@@ -12,7 +12,6 @@ from encoder import Encoder
 class ucEncoder():
 	
 	def __init__(self, Port, baudrate=2000000):
-		
 		##Serial port setup	
 		self.ser = serial.Serial()
 		self.ser.baudrate = baudrate
@@ -52,10 +51,13 @@ class ucEncoder():
 			self.data_lock.release()
 		#1 is the angle of the encoder
 		variables.append (aE[1])
-		#0 is the linear position of the encoder
+		#2 is the counts seen by the arm
+		variables.append (aE[2])
+		#0 is the linear position of the Cart
 		variables.append (mE[0])
 		#2 is the number of counts seen by motor
 		variables.append (mE[2])
+		
 		return variables
 	
 	def encoder_process(self, byte):
