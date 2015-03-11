@@ -118,35 +118,40 @@ void setupTimer(void)
 void updateTicks(void)
 {
     uint8 LastState;
+    uint8 CurrentState;
     /*
      * Arm Encoder Data
      */
 
     //save the previous state of the arm
     LastState = prev_data >> 4;
-        
-    switch (data >> 4)
+    CurrentState = data >> 4;
+
+    if (CurrentState != LastState)
     {
-            case 0: //current state = 00
-                    //if LastState=01, increment Count (CW)
-                    //else LastState=10, decrement Count (CCW)
-                    LastState==1 ? ArmCount++ : ArmCount--;
-                    break;
-            case 1: //current state = 01
-                    //if LastState=11, increment Count (CW)
-                    //else LastState=00, decrement Count (CCW)
-                    LastState==3 ? ArmCount++ : ArmCount--;
-                    break;
-            case 2: //current state = 10
-                    //if LastState=00, increment Count (CW)
-                    //else LastState=11, decrement Count (CCW)
-                    LastState==0 ? ArmCount++ : ArmCount--;
-                    break;
-            case 3: //current state = 11
-                    //if LastState=10, increment Count (CW)
-                    //else LastState=01, decrement Count (CCW)
-                    LastState==2 ? ArmCount++ : ArmCount--;
-                    break;
+        switch (CurrentState)
+        {
+                case 0: //current state = 00
+                        //if LastState=01, increment Count (CW)
+                        //else LastState=10, decrement Count (CCW)
+                        LastState==1 ? ArmCount++ : ArmCount--;
+                        break;
+                case 1: //current state = 01
+                        //if LastState=11, increment Count (CW)
+                        //else LastState=00, decrement Count (CCW)
+                        LastState==3 ? ArmCount++ : ArmCount--;
+                        break;
+                case 2: //current state = 10
+                        //if LastState=00, increment Count (CW)
+                        //else LastState=11, decrement Count (CCW)
+                        LastState==0 ? ArmCount++ : ArmCount--;
+                        break;
+                case 3: //current state = 11
+                        //if LastState=10, increment Count (CW)
+                        //else LastState=01, decrement Count (CCW)
+                        LastState==2 ? ArmCount++ : ArmCount--;
+                        break;
+        }
     }
 
     /*
@@ -155,29 +160,33 @@ void updateTicks(void)
 
     //save the previous state of the motor
     LastState = (prev_data & 0b1100) >> 2;
-    
-    switch ((data & 0b1100) >> 2)
+    CurrentState = (data & 0b1100) >> 2;
+
+    if (CurrentState != LastState)
     {
-            case 0: //current state = 00
-                    //if LastState=01, increment Count (CW)
-                    //else LastState=10, decrement Count (CCW)
-                    LastState==1 ? MotorCount++ : MotorCount--;
-                    break;
-            case 1: //current state = 01
-                    //if LastState=11, increment Count (CW)
-                    //else LastState=00, decrement Count (CCW)
-                    LastState==3 ? MotorCount++ : MotorCount--;
-                    break;
-            case 2: //current state = 10
-                    //if LastState=00, increment Count (CW)
-                    //else LastState=11, decrement Count (CCW)
-                    LastState==0 ? MotorCount++ : MotorCount--;
-                    break;
-            case 3: //current state = 11
-                    //if LastState=10, increment Count (CW)
-                    //else LastState=01, decrement Count (CCW)
-                    LastState==2 ? MotorCount++ : MotorCount--;
-                    break;
+        switch (CurrentState)
+        {
+                case 0: //current state = 00
+                        //if LastState=01, increment Count (CW)
+                        //else LastState=10, decrement Count (CCW)
+                        LastState==1 ? MotorCount++ : MotorCount--;
+                        break;
+                case 1: //current state = 01
+                        //if LastState=11, increment Count (CW)
+                        //else LastState=00, decrement Count (CCW)
+                        LastState==3 ? MotorCount++ : MotorCount--;
+                        break;
+                case 2: //current state = 10
+                        //if LastState=00, increment Count (CW)
+                        //else LastState=11, decrement Count (CCW)
+                        LastState==0 ? MotorCount++ : MotorCount--;
+                        break;
+                case 3: //current state = 11
+                        //if LastState=10, increment Count (CW)
+                        //else LastState=01, decrement Count (CCW)
+                        LastState==2 ? MotorCount++ : MotorCount--;
+                        break;
+        }
     }
 
     //update the previous data for next update
