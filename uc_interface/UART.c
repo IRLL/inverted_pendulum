@@ -16,7 +16,7 @@ Uart_Data* initialize_UART(uint speed, uint pb_clk, Uart which_uart, uint8 *rx_b
 
     switch (which_uart) {
         case UART1:
-            U1BRG = pb_clk / (4 * speed) - 1; //calculate the proper baud rate
+            U1BRG = pb_clk / (16 * speed) - 1; //calculate the proper baud rate
 
             U1MODEbits.PDSEL = 0; //parity and data size selection bits (no parity, 8bit)
 
@@ -27,8 +27,6 @@ Uart_Data* initialize_UART(uint speed, uint pb_clk, Uart which_uart, uint8 *rx_b
             IEC0bits.U1TXIE = (tx_en & 0b1); //enable or disable the rx/tx interrupts
             IEC0bits.U1RXIE = (rx_en & 0b1);
             IPC6bits.U1IP = 7; //set interrupt priority to 7
-
-            U1MODEbits.BRGH = 1; //set for high-speed mode
 
             U1STAbits.UTXISEL = 2; //set tx interrupt to fire when the tx buffer is empty
             U1STAbits.URXISEL = 0; //set rx interrupt to fire whenever a new byte is received
@@ -157,7 +155,7 @@ void __ISR(_UART_1_VECTOR, IPL7AUTO) Uart_1_Handler(void) {
         } else {
             //we have data to transmit - pop that data off the queue
             //store popped data into the transmit registry
-            while (!dequeue(&(u1.Tx_queue), &transmit, 1) && !U1STAbits.UTXBF) { //while we are dequeuing data AND the transmit buffer is not full
+            while (!U1STAbits.UTXBF && !dequeue(&(u1.Tx_queue), &transmit, 1)) { //while we are dequeuing data AND the transmit buffer is not full
                 //write the data to the buffer
                 U1TXREG = transmit;
             } //write data until the queue is empty or the registry is full
@@ -206,7 +204,7 @@ void __ISR(_UART_2_VECTOR, IPL7AUTO) Uart_2_Handler(void) {
         } else {
             //we have data to transmit - pop that data off the queue
             //store popped data into the transmit registry
-            while (!dequeue(&(u2.Tx_queue), &transmit, 1) && !U2STAbits.UTXBF) { //while we are dequeuing data AND the transmit buffer is not full
+            while (!U2STAbits.UTXBF && !dequeue(&(u2.Tx_queue), &transmit, 1)) { //while we are dequeuing data AND the transmit buffer is not full
                 //write the data to the buffer
                 U2TXREG = transmit;
             } //write data until the queue is empty or the registry is full

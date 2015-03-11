@@ -44,8 +44,7 @@
 /*************************************************************************
  Global Variables
  ************************************************************************/
-uint8 tx1buff[100] = {0};
-uint8 rx1buff[50] = {0};
+uint8 tx1buff[10] = {0};
 uint8 packet[6] = {0};
 sint16 ArmCount = 0;
 sint16 MotorCount = 0;
@@ -59,36 +58,20 @@ void setupUART(void);
 void setupPorts(void);
 void updateTicks(void);
 void packetize(void);
+void setupTimer(void);
 
 /*************************************************************************
  Main Code
  ************************************************************************/
-
-/*
-    uint8 command = 0xE0;
-    if ((data & 0b1) == 0b1)
-    {
-       // send_UART (UART2, 1, command);
-        U2TXREG = command;
-    }
-    else if ((data & 0b10) == 0b10)
-    {
-        //send_UART (UART2, 1, command);
-        U2TXREG = command;
-    }
- */
 int main(void) {
+
     setupUART();
     setupPorts();
 
     //Timer setup
     //Need the timer for periodic transmission of data ot the computer
-    TRISDbits.TRISD0 = 0;
-    T1CONbits.TCKPS = 0;
-    PR1 = 1;
-    T1CONbits.ON = 1;
-    IEC0bits.T1IE =1;
-    IPC1bits.T1IP = 7;
+    setupTimer();
+    
 
     INTEnableSystemMultiVectoredInt();
     INTEnableInterrupts();
@@ -99,15 +82,16 @@ int main(void) {
         if(data ^ prev_data){
             //update the counters
             updateTicks();
-            
-            //U1TXREG = data;
-            //send_UART(UART1, 1, &data);
         }
         prev_data = data;
     }
 
     return 0;
 }
+
+/*************************************************************************
+ Function Definitions
+ ************************************************************************/
 
 //setup the required ports for digital inputs
 void setupPorts(void)
@@ -119,15 +103,27 @@ void setupPorts(void)
     TRISGSET = 0b110000000;
 }
 
+void setupTimer(void)
+{
+    TRISDbits.TRISD0 = 0;
+    T1CONbits.TCKPS = 0b11; //0b11 is 1:256 clock prescale
+    PR1 = 5000;
+    T1CONbits.ON = 1;
+    IEC0bits.T1IE =1;
+    IPC1bits.T1IP = 7;
+
+}
+
 //Function that computes ticks
 void updateTicks(void)
 {
+    uint8 LastState;
     /*
      * Arm Encoder Data
      */
 
     //save the previous state of the arm
-    uint8 LastState = prev_data >> 4;
+    LastState = prev_data >> 4;
         
     switch (data >> 4)
     {
@@ -158,9 +154,9 @@ void updateTicks(void)
      */
 
     //save the previous state of the motor
-    uint8 LastState = prev_data & 0b1100 >> 2;
+    LastState = (prev_data & 0b1100) >> 2;
     
-    switch (data & 0b1100 >> 2)
+    switch ((data & 0b1100) >> 2)
     {
             case 0: //current state = 00
                     //if LastState=01, increment Count (CW)
@@ -192,7 +188,7 @@ void updateTicks(void)
 void setupUART(void)
 {
     //Initialize the UART signals
-    initialize_UART(2000000, 40000000, UART1, rx1buff, 50, tx1buff, 100, TRUE, TRUE, NULL, NULL);
+    initialize_UART(115200, 40000000, UART1, 0, 0, tx1buff, sizeof(tx1buff), TRUE, FALSE, NULL, NULL);
 }
 
 void packetize(void)
@@ -212,29 +208,8 @@ void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
     //LATDbits.LATD0 = ~LATDbits.LATD0;
     packetize();
     //Send the latest values to the computer
-    send_UART(UART1, 6, packet);
+    send_UART(UART1, sizeof(packet), packet);
 
     IFS0bits.T1IF = 0; //clear the interrupt flag
     asm volatile ("ei"); //reenable interrupts
 }
-
-/*
-void UartStuff(uint speed, uint pb_clk, boolean tx_en, boolean rx_en) {
-    U1BRG = pb_clk / (16 * speed) - 1; //calculate the proper baud rate
-
-    U1MODEbits.PDSEL = 0; //parity and data size selection bits (no parity, 8bit)
-
-
-    IEC0bits.U1TXIE = (tx_en & 0b1); //enable or disable the rx/tx interrupts
-    IEC0bits.U1RXIE = (rx_en & 0b1);
-    IPC6bits.U1IP = 7; //set interrupt priority to 7
-
-    U1STAbits.UTXISEL = 2; //set tx interrupt to fire when the tx buffer is empty
-    U1STAbits.URXISEL = 0; //set rx interrupt to fire whenever a new byte is received
-
-    U1STAbits.UTXEN = (tx_en & 0b1); //enable or disable the rx/tx modules
-    U1STAbits.URXEN = (rx_en & 0b1); //enable or disable the rx/tx modules
-
-    U1MODEbits.ON = 1; //enable the UART
-}
-*/
