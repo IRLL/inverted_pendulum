@@ -11,7 +11,19 @@ from encoder import Encoder
 
 class ucEncoder():
 	
-	def __init__(self, Port, baudrate=2000000):
+	def __init__(self, Port, baudrate=115200):
+
+		self.start_byte = 0x0A
+		self.ppc = 10
+		self.acpr = 500
+		self.mcpr = 500
+
+
+		self.arm_count = 0
+		self.motor_count = 0
+		self.switches = 0
+		
+
 		##Serial port setup	
 		self.ser = serial.Serial()
 		self.ser.baudrate = baudrate
@@ -22,10 +34,6 @@ class ucEncoder():
 		print "opening port", Port
 		self.ser.open()
 
-		self.uc_data = 0;
-		self.mEncoder = Encoder(90, 10)
-		self.aEncoder = Encoder(500, 1)
-		
 		#Threading setup	
 		self.alive = 1 #tell the thread to stay alive
 		self.thread = threading.Thread(target=self.uc_process)
@@ -37,6 +45,22 @@ class ucEncoder():
 		
 	def __del__(self):
 		self.ser.close()
+
+	def getAngle(self):
+		angle = float(self.arm_count) * 360 / (4*self.acpr)
+		
+		return angle;
+	
+	def getPosition(self):
+		position = float(self.motor_count) / (4 * self.mcpr * self.ppc)
+		
+		return position;
+
+	def getSwitches(self):
+		temp = []
+		temp.append(self.switches & 0b01)
+		temp.append( (self.switches & 0b10) >> 1 )
+		return temp
 
 	def getVariables(self):
 		variables = []
@@ -68,20 +92,87 @@ class ucEncoder():
 		
 	def uc_process(self):
 		print "microcontroller process started"
+		self.get_lock()
 		while 1:
 			#read serial byte (this call is blocking)
 			#print "reading data..."
-			data = self.ser.read(1)
+			packet = self.get_packet()
 			#print "data read, pushing to variables..."
 			#aquire mutex lock
+			
 			self.data_lock.acquire()
 			try: #update the motor variable
-				self.uc_data = ord(data)
+				self.arm_count = (packet[1] << 8) | packet[2]
+				self.motor_count = (packet[3] << 8) | packet[4]
+				self.switches = packet[5]
 			finally: #release the lock
 				self.data_lock.release()
-			#start encoder process
-			self.encoder_process(ord(data))
+
 		print "microcontroller process exiting"
+
+	def get_lock(self):
+		#variables for the sync loop
+		current_byte = '\0'
+		packet_array = []
+		in_sync = False
+
+		#reset the serial port
+		self.ser.close()
+		self.ser.open()
+
+		print "Acquiring stream sync"
+
+		while in_sync == False:
+			#read a packet from the serial port
+			current_byte = ord(self.ser.read())
+
+			#if the byte is the control_byte, then receive several packets
+			#otherwise, we will jump back to the top of the loop and get another byte
+			if current_byte == self.start_byte:
+				packet_array = [] # clear out the array
+				packet_array.append(current_byte)  # add the byte to the array
+
+				#receive several packets
+				while len(packet_array) != 7:
+					packet_array.append(ord(self.ser.read()))
+				
+				#x000000x000000x000000
+				#check to see if the control byte is in the proper location in the received packets
+				if  packet_array[0] == self.start_byte and \
+					packet_array[6] == self.start_byte:
+
+					#throw away rest of last packet
+					self.ser.read(5)
+
+					#say we are in sync so we can break out of the loop
+					in_sync = True
+					print "sync locked"
+	#end get_lock()
+
+	def get_packet(self):
+
+		success = False
+
+		while success == False:
+
+			#read 6 bytes from the serial port
+			packet = self.ser.read(6)
+
+			#ensure we are in sync by checking that the control byte is in the correct place
+			if ord(packet[0]) != self.start_byte:
+				print "Error: lost sync"
+				self.ser.flushInput() #flushes the serial rx buffer
+				self.get_lock() #get back into sync
+			else : #if we are in sync, break out of loop
+				success = True
+
+		num_packet = []
+		for i in packet:
+			num_packet.append(ord(i))
+
+		return num_packet
+	#end get_packet()
+
 
 def exit_handler(signum, frame):
 	print "exiting!"
@@ -91,8 +182,14 @@ def exit_handler(signum, frame):
 def tester():
 	uc = ucEncoder('/dev/ttyUSB0')
 	while 1:
-		data = uc.getVariables()
-		print hex(data[0]), data[0] & 0b1, ((data[0] & 0b10) >> 1), data[3]
+		angle= uc.getAngle()
+		position = uc.getPosition()
+		switches = uc.getSwitches()
+		print "buffer: ", uc.ser.inWaiting()
+		print "angle: ", angle
+		print "position: ", position
+		print "left switch: ", switches[1], "right switch: ", switches[0]
+		print ""
 		time.sleep(.2)
 	
 	
