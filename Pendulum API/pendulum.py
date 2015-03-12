@@ -41,9 +41,26 @@ class Pendulum():
 			switches = self.uc.getSwitches()
 			left_switch = switches[1]
 		
-		#put dynamic sleeping here
-		time.sleep(45) #wait this long for arm to settle
+		#wait for arm to settle
+		current = 0
+		previous = 1
+		count = 3 #must be constant for this many seconds
+		self.status = "waiting for arm to settle"
+		while count > 0: 
+			previous = current
+			time.sleep(1)
+			current = self.uc.getAngle()
+			if (previous == current):
+				count -= 1
+		
 		self.uc.send_reset()
+		time.sleep(.5)
+
+		self.status = "moving to zero position"
+		while self.uc.getPosition() < -12:
+			self.motor.MoveRight(speed)
+		self.motor.Stop()
+		
 		self.status = "done resetting!"
 		time.sleep(1)
 			

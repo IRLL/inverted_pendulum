@@ -14,9 +14,8 @@ class ucEncoder():
 	def __init__(self, Port, baudrate=115200):
 
 		self.start_byte = 0x0A
-		self.ppc = 10
 		self.acpr = 500
-		self.mcpr = 90
+		self.mconst = 127.92*90 #cpr * pulses per count (all wrapped together)
 
 
 		self.arm_count = 0
@@ -49,13 +48,11 @@ class ucEncoder():
 
 	def getAngle(self):
 		angle = float(self.arm_count) * 360 / (4*self.acpr)
-		return self.arm_count
 		return angle
 	
 	def getPosition(self):
-		position = float(self.motor_count) / (4 * self.mcpr * self.ppc)
-		return self.motor_count
-		return position
+		position = float(self.motor_count-7059) / (self.mconst)
+		return position*100
 
 	def getSwitches(self):
 		temp = []

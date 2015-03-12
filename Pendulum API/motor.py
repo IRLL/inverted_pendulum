@@ -57,8 +57,8 @@ class Motor():
 		self.ser.write(chr(0x86) + speed1 + speed2)
 	def Stop(self):
 		self.status = "Stopping"
-		self.ser.write(chr(0xE0))
-		self.data_lock.acquire()
+		self.ser.write(chr(0x92))
+		self.ser.write(chr(32))
 	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()
