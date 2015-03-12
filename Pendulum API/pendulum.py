@@ -20,22 +20,45 @@ class Pendulum():
 	
 	def __init__(self, motorPort, ucPort):
 		self.motor = Motor(motorPort)
-		self.uc = ucEncoder(ucPort, 2000000)
+		self.uc = ucEncoder(ucPort)
 		self.alive = 1
-		self.position = 0
 	def __del__(self):
-		Reset()
 		self.motor.Stop()
 	def Reset(self):
-		while(position != 0):
-			self.motor.MoveLeft(self, getValueFromPercent(10))
+		print "resetting pendulum!"
+		left_switch = 0
+		right_switch = 0
+		while(not right_switch):
+			self.motor.MoveRight(20)
+			switches = self.uc.getSwitches()
+			right_switch = switches[0]
+			time.sleep(1)
+		while(not left_switch):
+			self.motor.MoveLeft(20)
+			switches = self.uc.getSwitches()
+			left_switch = switches[1]
+			time.sleep(1)
+
+
+		time.sleep(5)
+		self.uc.send_reset()
+		print "done!"
 			
 def exit_handler(signum, frame):
 	global p
-	p.Reset()
 	p.motor.Stop()
 	print "exiting!"
 	sys.exit()
+
+def temp():
+	global p
+	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
+	
+	status_thread = threading.Thread(target=print_status)
+	status_thread.daemon = True
+	#status_thread.start()	
+	p.Reset()
+	
 
 def tester():
 	global p
@@ -43,7 +66,7 @@ def tester():
 	
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
-	status_thread.start()	
+	#status_thread.start()	
 	
 	while 1:	
 		p.motor.MoveRight(25)
@@ -71,21 +94,24 @@ def print_status():
 		elif(LINUX):
 			os.system('clear')
 		console_update()
+		time.sleep(.1)
 	
 def console_update():
 	global p
 	stats = p.motor.getVariables()
-	stats1 = p.uc.getVariables()
+	angle = p.uc.getAngle()
+	position = p.uc.getPosition()
+	switches = p.uc.getSwitches()
 	print "Status: ", hex(stats[0])
 	print "Voltage: ", stats[1]
 	print "Temperature: ", stats[2]
 	print "Motor Speed: ", stats[3]
-	print "Angle: ", stats1[1]
-	print "Arm Ticks: ", stats[2]
-	print "Position: ", stats1[3]
-	print "Motor Ticks: ", stats1[4]
+	print "Angle: ", angle
+	print "Position: ", position
+	print "left switch: ", switches[1], "right switch: ", switches[0]
 	print ""
 	
 if __name__ == "__main__":
 	signal.signal(signal.SIGINT, exit_handler)
-	tester()
+	#tester()
+	temp()

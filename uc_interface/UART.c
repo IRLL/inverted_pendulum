@@ -1,3 +1,4 @@
+#include "system.h"
 #include "UART.h"
 
 //callback functions
@@ -123,8 +124,9 @@ int receive_UART(Uart channel, uint8 data_size, uint8 *data_ptr) {
     return status; //return success
 }
 
-void __ISR(_UART_1_VECTOR, IPL7AUTO) Uart_1_Handler(void) {
+void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
     uint8 received, transmit;
+    extern sint16 ArmCount, MotorCount;
     asm volatile ("di"); //disable interrupt
 
     if (IFS0bits.U1RXIF) { //if the interrupt flag of RX is set
@@ -133,7 +135,14 @@ void __ISR(_UART_1_VECTOR, IPL7AUTO) Uart_1_Handler(void) {
         //we have received information - pop that information off the channel
         //push that data onto our received queue
         received = U1RXREG;
-        enqueue(&(u1.Rx_queue), &received, 1);
+
+        if (received == RESET_BYTE)
+        {
+            ArmCount = 0;
+            MotorCount = 500;
+        }
+
+        //enqueue(&(u1.Rx_queue), &received, 1);
 
         if (uart_1_rx_callback != NULL) {
             uart_1_rx_callback(); //call additional ISR functionality

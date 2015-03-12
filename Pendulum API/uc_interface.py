@@ -48,12 +48,12 @@ class ucEncoder():
 
 	def getAngle(self):
 		angle = float(self.arm_count) * 360 / (4*self.acpr)
-		
+		return self.arm_count
 		return angle;
 	
 	def getPosition(self):
 		position = float(self.motor_count) / (4 * self.mcpr * self.ppc)
-		
+		return self.motor_count
 		return position;
 
 	def getSwitches(self):
@@ -83,6 +83,9 @@ class ucEncoder():
 		variables.append (mE[2])
 		
 		return variables
+
+	def send_reset(self):
+		self.ser.write(chr(0x0A))
 	
 	def encoder_process(self, byte):
 		#Encoder processing
@@ -190,7 +193,7 @@ def tester():
 		print "position: ", position
 		print "left switch: ", switches[1], "right switch: ", switches[0]
 		print ""
-		time.sleep(.2)
+		time.sleep(.1)
 	
 	
 if __name__ == "__main__":
