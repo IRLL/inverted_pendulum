@@ -160,7 +160,7 @@ int main(void) {
             //update the counters
             //updateTicks();
         }
-        prev_data = data;
+        //prev_data = data;
     }
 
     return 0;

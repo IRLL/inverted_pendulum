@@ -7,7 +7,7 @@ import time
 import signal
 import sys
 import argparse
-from encoder import Encoder
+#from encoder import Encoder
 
 class ucEncoder():
 	
@@ -16,13 +16,13 @@ class ucEncoder():
 		self.start_byte = 0x0A
 		self.ppc = 10
 		self.acpr = 500
-		self.mcpr = 500
+		self.mcpr = 90
 
 
 		self.arm_count = 0
 		self.motor_count = 0
 		self.switches = 0
-		
+		self.status = "Idle"
 
 		##Serial port setup	
 		self.ser = serial.Serial()
@@ -31,7 +31,7 @@ class ucEncoder():
 			self.ser.port = Port - 1 #windows numerical port
 		elif(type(Port) is str):
 			self.ser.port = Port #linux string port
-		print "opening port", Port
+		self.status = "opening port", Port
 		self.ser.open()
 
 		#Threading setup	
@@ -41,7 +41,7 @@ class ucEncoder():
 		self.data_lock = threading.Lock() #mutex for variables
 		self.ser_lock = threading.Lock() #mutex for serial port
 		self.thread.start()
-		
+		self.status = "Spawned Process"
 		
 	def __del__(self):
 		self.ser.close()
@@ -49,19 +49,20 @@ class ucEncoder():
 	def getAngle(self):
 		angle = float(self.arm_count) * 360 / (4*self.acpr)
 		return self.arm_count
-		return angle;
+		return angle
 	
 	def getPosition(self):
 		position = float(self.motor_count) / (4 * self.mcpr * self.ppc)
 		return self.motor_count
-		return position;
+		return position
 
 	def getSwitches(self):
 		temp = []
 		temp.append(self.switches & 0b01)
 		temp.append( (self.switches & 0b10) >> 1 )
 		return temp
-
+		
+	'''
 	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()
@@ -83,18 +84,21 @@ class ucEncoder():
 		variables.append (mE[2])
 		
 		return variables
-
+	'''
+	
 	def send_reset(self):
+		self.status = "Zeroing Counters"
 		self.ser.write(chr(0x0A))
 	
+	'''
 	def encoder_process(self, byte):
 		#Encoder processing
 		#pass new encoder channel values to the appropriate encoder
 		self.mEncoder.setNextState((byte & 0b1100) >> 2)
 		self.aEncoder.setNextState(byte >> 4)
-		
+	'''	
 	def uc_process(self):
-		print "microcontroller process started"
+		self.status = "Process Started"
 		self.get_lock()
 		while 1:
 			#read serial byte (this call is blocking)
@@ -111,7 +115,7 @@ class ucEncoder():
 			finally: #release the lock
 				self.data_lock.release()
 
-		print "microcontroller process exiting"
+		self.status = "Process Exiting"
 
 	def get_lock(self):
 		#variables for the sync loop
@@ -123,7 +127,7 @@ class ucEncoder():
 		self.ser.close()
 		self.ser.open()
 
-		print "Acquiring stream sync"
+		self.status = "Acquiring stream sync"
 
 		while in_sync == False:
 			#read a packet from the serial port
@@ -149,7 +153,7 @@ class ucEncoder():
 
 					#say we are in sync so we can break out of the loop
 					in_sync = True
-					print "sync locked"
+					self.status = "sync locked"
 	#end get_lock()
 
 	def get_packet(self):
@@ -163,7 +167,7 @@ class ucEncoder():
 
 			#ensure we are in sync by checking that the control byte is in the correct place
 			if ord(packet[0]) != self.start_byte:
-				print "Error: lost sync"
+				self.status = "Error: lost sync"
 				self.ser.flushInput() #flushes the serial rx buffer
 				self.get_lock() #get back into sync
 			else : #if we are in sync, break out of loop

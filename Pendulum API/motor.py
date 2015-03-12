@@ -37,22 +37,26 @@ class Motor():
 		self.supply_voltage = 0
 		self.temperature = 0
 		self.speed = 0
+		self.status = "Idle"
 	def __del__(self):
 		self.Stop()
 		self.ser.close()
 	def MoveRight(self, percent):
+		self.status = "Moving Right"
 		self.Enable() #enable the motor
 		speed = self.getValueFromPercent(percent)
 		speed1 = chr(speed & 0x1F)
 		speed2 = chr(speed >> 5)
 		self.ser.write(chr(0x85) + speed1 + speed2)
 	def MoveLeft(self, percent):
+		self.status = "Moving Left"
 		self.Enable() #enable the motor
 		speed = self.getValueFromPercent(percent)
 		speed1 = chr(speed & 0x1F)
 		speed2 = chr(speed >> 5)
 		self.ser.write(chr(0x86) + speed1 + speed2)
 	def Stop(self):
+		self.status = "Stopping"
 		self.ser.write(chr(0xE0))
 		self.data_lock.acquire()
 	def getVariables(self):
@@ -78,12 +82,13 @@ class Motor():
 		return 3200 * percent / 100
 
 	def motor_variable_process(self):
-		print "motor variable process started"
+		self.status = "Process Started"
 		while self.alive:
 			#aquire mutex locks
 			self.ser_lock.acquire()
 			self.data_lock.acquire()
 			try: #try to read the motor variables
+				self.status = "Updating Variables"
 				#get error codes
 				self.error_codes = self.ReadVar(1)
 				#get supply voltage
@@ -99,7 +104,7 @@ class Motor():
 				self.ser_lock.release()
 				self.data_lock.release()
 			time.sleep(self.update_period)
-		print "motor variable process exiting"
+		self.status = "Process Exiting"
 	
 	def ReadVar(self, addr):
 		#read variable at motor address

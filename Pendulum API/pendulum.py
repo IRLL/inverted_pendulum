@@ -19,13 +19,15 @@ WINDOWS = False
 class Pendulum():
 	
 	def __init__(self, motorPort, ucPort):
+		self.status = "Booting..."
 		self.motor = Motor(motorPort)
 		self.uc = ucEncoder(ucPort)
 		self.alive = 1
+		self.status = "Booted"
 	def __del__(self):
 		self.motor.Stop()
 	def Reset(self):
-		print "resetting pendulum!"
+		self.status = "resetting pendulum!"
 		left_switch = 0
 		right_switch = 0
 		while(not right_switch):
@@ -38,35 +40,37 @@ class Pendulum():
 			switches = self.uc.getSwitches()
 			left_switch = switches[1]
 			time.sleep(1)
-
+		
+		#put dynamic sleeping here
 
 		time.sleep(5)
 		self.uc.send_reset()
-		print "done!"
+		self.status = "done resetting!"
 			
 def exit_handler(signum, frame):
 	global p
 	p.motor.Stop()
-	print "exiting!"
+	p.status = "Exiting, Goodbye!"
 	sys.exit()
 
+#Tests the Pendulum Reset function
 def temp():
 	global p
 	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
-	
+	p.status = "Running..."
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
-	#status_thread.start()	
+	status_thread.start()
 	p.Reset()
 	
-
+#Tests Motor movement
 def tester():
 	global p
 	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
 	
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
-	#status_thread.start()	
+	status_thread.start()	
 	
 	while 1:	
 		p.motor.MoveRight(25)
@@ -75,7 +79,8 @@ def tester():
 		time.sleep(2)
 #p.motor.Stop()
 #		time.sleep(.5)
-	
+
+#Continuously print the status of the Pendulum	
 def print_status():
 	global p
 	global LINUX
@@ -86,7 +91,13 @@ def print_status():
 		LINUX = True
 	elif (platform.system() == "Windows"):
 		WINDOWS = True
-		
+	
+	print "Inverted Pendulum API by Brandon Kallaher and James Irwin"
+	print "Running on ", platform.system()
+	print "Python Version: ", platform.python_version()
+	print "Clear the Path of the arm or suffer the consequences!"
+	time.sleep(5)
+	
 	#Endlessly update the console
 	while True:
 		if (WINDOWS):
@@ -95,20 +106,23 @@ def print_status():
 			os.system('clear')
 		console_update()
 		time.sleep(.1)
-	
+
+#Does all the printing for the print_status() thread		
 def console_update():
 	global p
 	stats = p.motor.getVariables()
-	angle = p.uc.getAngle()
-	position = p.uc.getPosition()
 	switches = p.uc.getSwitches()
-	print "Status: ", hex(stats[0])
-	print "Voltage: ", stats[1]
-	print "Temperature: ", stats[2]
-	print "Motor Speed: ", stats[3]
-	print "Angle: ", angle
-	print "Position: ", position
-	print "left switch: ", switches[1], "right switch: ", switches[0]
+	print "Pendulum Status: ", 			p.status
+	print "uC Process Status: ", 		p.uc.status
+	print "Motor Process Status: ", 	p.motor.status
+	print "Motor Controller Status: ", 	hex(stats[0])
+	print "Voltage: ", 					stats[1]
+	print "Temperature: ", 				stats[2]
+	print "Motor Speed: ", 				stats[3]
+	print "Angle: ", 					p.uc.getAngle()
+	print "Position: ", 				p.uc.getPosition()
+	print "Left Switch: ", 				switches[1]
+	print "Right Switch: ", 			switches[0]
 	print ""
 	
 if __name__ == "__main__":
