@@ -28,24 +28,24 @@ class Pendulum():
 		self.motor.Stop()
 	def Reset(self):
 		self.status = "resetting pendulum!"
+		speed = 23
 		left_switch = 0
 		right_switch = 0
 		while(not right_switch):
-			self.motor.MoveRight(20)
+			self.motor.MoveRight(speed)
 			switches = self.uc.getSwitches()
 			right_switch = switches[0]
-			time.sleep(1)
+			time.sleep(.1)
 		while(not left_switch):
-			self.motor.MoveLeft(20)
+			self.motor.MoveLeft(speed)
 			switches = self.uc.getSwitches()
 			left_switch = switches[1]
-			time.sleep(1)
 		
 		#put dynamic sleeping here
-
-		time.sleep(5)
+		time.sleep(45) #wait this long for arm to settle
 		self.uc.send_reset()
 		self.status = "done resetting!"
+		time.sleep(1)
 			
 def exit_handler(signum, frame):
 	global p
@@ -61,6 +61,7 @@ def temp():
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
 	status_thread.start()
+	time.sleep(5)
 	p.Reset()
 	
 #Tests Motor movement
@@ -96,7 +97,7 @@ def print_status():
 	print "Running on ", platform.system()
 	print "Python Version: ", platform.python_version()
 	print "Clear the Path of the arm or suffer the consequences!"
-	time.sleep(5)
+	time.sleep(3)
 	
 	#Endlessly update the console
 	while True:

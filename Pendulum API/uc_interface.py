@@ -33,7 +33,7 @@ class ucEncoder():
 			self.ser.port = Port #linux string port
 		self.status = "opening port", Port
 		self.ser.open()
-
+		
 		#Threading setup	
 		self.alive = 1 #tell the thread to stay alive
 		self.thread = threading.Thread(target=self.uc_process)
@@ -42,6 +42,7 @@ class ucEncoder():
 		self.ser_lock = threading.Lock() #mutex for serial port
 		self.thread.start()
 		self.status = "Spawned Process"
+		time.sleep(.1)
 		
 	def __del__(self):
 		self.ser.close()
@@ -187,7 +188,8 @@ def exit_handler(signum, frame):
 	
 	
 def tester():
-	uc = ucEncoder('/dev/ttyUSB0')
+	uc = ucEncoder('/dev/ttyUSB0')	
+	uc.send_reset()
 	while 1:
 		angle= uc.getAngle()
 		position = uc.getPosition()
