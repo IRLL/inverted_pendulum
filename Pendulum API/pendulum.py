@@ -26,9 +26,9 @@ class Pendulum():
 		self.status = "Booted"
 	def __del__(self):
 		self.motor.Stop()
-	def Reset(self):
+	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
-		speed = 23
+		speed = 19
 		left_switch = 0
 		right_switch = 0
 		while(not right_switch):
@@ -57,13 +57,77 @@ class Pendulum():
 		time.sleep(.5)
 
 		self.status = "moving to zero position"
-		while self.uc.getPosition() < -12:
+		while True:
+			position = self.uc.getPosition()
+			if (position > -12 + start):
+				break;
 			self.motor.MoveRight(speed)
 		self.motor.Stop()
 		
 		self.status = "done resetting!"
 		time.sleep(1)
-			
+	def getState(self):
+		'''
+		returns (x cm, degrees, L switch, R switch)
+		'''
+		position = self.uc.getPosition()
+		angle = self.uc.getAngle()
+		switches = self.uc.getSwitches()
+		return (position, angle, switches[1], switches[0])
+	def moveRight(self, percent, threshold=30):
+		if (percent > threshold):
+			percent = threshold
+		self.motor.MoveRight(percent)
+	def moveLeft(self, percent, threshold=30):
+		if (percent > threshold):
+			percent = threshold
+		self.motor.MoveLeft(percent)
+	def stop(self):
+		self.motor.Stop()
+	def print_status():
+		global LINUX
+		global WINDOWS
+		
+		#Check to see what OS is running
+		if (platform.system() == "Linux"):
+			LINUX = True
+		elif (platform.system() == "Windows"):
+			WINDOWS = True
+		
+		print "Inverted Pendulum API by Brandon Kallaher and James Irwin"
+		print "Running on ", platform.system()
+		print "Python Version: ", platform.python_version()
+		print "Clear the Path of the arm or suffer the consequences!"
+		time.sleep(3)
+		
+		#Endlessly update the console
+		while True:
+			if (WINDOWS):
+				os.system('cls')
+			elif(LINUX):
+				os.system('clear')
+			self.console_update()
+			time.sleep(.1)
+
+	#Does all the printing for the print_status() thread		
+	def console_update():
+		stats = self.motor.getVariables()
+		switches = self.uc.getSwitches()
+		print "Pendulum Status: ", 			self.status
+		print "uC Process Status: ", 		self.uc.status
+		print "Motor Process Status: ", 	self.motor.status
+		print "Motor Controller Status: ", 	hex(stats[0])
+		print "Voltage: ", 					stats[1]
+		print "Temperature: ", 				stats[2]
+		print "Motor Speed: ", 				stats[3]
+		print "Angle: ", 					self.uc.getAngle()
+		print "Position: ", 				self.uc.getPosition()
+		print "Left Switch: ", 				switches[1]
+		print "Right Switch: ", 			switches[0]
+		print ""
+
+
+
 def exit_handler(signum, frame):
 	global p
 	p.motor.Stop()
@@ -79,7 +143,7 @@ def temp():
 	status_thread.daemon = True
 	status_thread.start()
 	time.sleep(5)
-	p.Reset()
+	p.Reset(-20)
 	
 #Tests Motor movement
 def tester():
