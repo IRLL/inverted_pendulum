@@ -22,7 +22,6 @@ class Pendulum():
 		self.status = "Booting..."
 		self.motor = Motor(motorPort)
 		self.uc = ucEncoder(ucPort)
-		self.alive = 1
 		self.status = "Booted"
 	def __del__(self):
 		self.motor.Stop()

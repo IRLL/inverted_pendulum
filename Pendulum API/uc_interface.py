@@ -38,7 +38,6 @@ class ucEncoder():
 		self.thread = threading.Thread(target=self.uc_process)
 		self.thread.daemon = True #make daemon thread so it exits when program ends
 		self.data_lock = threading.Lock() #mutex for variables
-		self.ser_lock = threading.Lock() #mutex for serial port
 		self.thread.start()
 		self.status = "Spawned Process"
 		time.sleep(.1)
@@ -60,41 +59,11 @@ class ucEncoder():
 		temp.append( (self.switches & 0b10) >> 1 )
 		return temp
 		
-	'''
-	def getVariables(self):
-		variables = []
-		self.data_lock.acquire()
-		try:
-			#return a tuple containing all the values
-			variables.append(self.uc_data)
-			#get the encoder values
-			mE = self.mEncoder.getVariables()
-			aE = self.aEncoder.getVariables()
-		finally:
-			self.data_lock.release()
-		#1 is the angle of the encoder
-		variables.append (aE[1])
-		#2 is the counts seen by the arm
-		variables.append (aE[2])
-		#0 is the linear position of the Cart
-		variables.append (mE[0])
-		#2 is the number of counts seen by motor
-		variables.append (mE[2])
-		
-		return variables
-	'''
 	
 	def send_reset(self):
 		self.status = "Zeroing Counters"
 		self.ser.write(chr(0x0A))
 	
-	'''
-	def encoder_process(self, byte):
-		#Encoder processing
-		#pass new encoder channel values to the appropriate encoder
-		self.mEncoder.setNextState((byte & 0b1100) >> 2)
-		self.aEncoder.setNextState(byte >> 4)
-	'''	
 	def uc_process(self):
 		self.status = "Process Started"
 		self.get_lock()
