@@ -23,7 +23,6 @@ class Pendulum():
 		self.status = "Booting..."
 		self.motor = Motor(motorPort)
 		self.uc = ucEncoder(ucPort)
-		self.alive = 1
 		self.status = "Booted"
 	def __del__(self):
 		self.motor.Stop()
@@ -45,7 +44,8 @@ class Pendulum():
 		#wait for arm to settle
 		current = 0
 		previous = 1
-		count = 3 #must be constant for this many seconds
+		wait = 3
+		count = wait #must be constant for this many seconds
 		self.status = "waiting for arm to settle"
 		while count > 0: 
 			previous = current
@@ -53,6 +53,8 @@ class Pendulum():
 			current = self.uc.getAngle()
 			if (previous == current):
 				count -= 1
+			else:
+				count = wait
 		
 		self.uc.send_reset()
 		time.sleep(.5)
@@ -69,7 +71,7 @@ class Pendulum():
 		time.sleep(1)
 	def getState(self):
 		'''
-		returns (x cm, degrees, L switch, R switch)
+		returns (meters, radians)
 		'''
         mPose = self.uc.getXm() # meters
 		angle = self.uc.getRadians()

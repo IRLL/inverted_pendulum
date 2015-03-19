@@ -51,61 +51,30 @@ class ucEncoder():
 		angle = float(self.arm_count) * 360 / (4*self.acpr)
 		return angle
 
-    def getRadians(self):
-        radians = self.getAngle() * (math.pi / 180.0)
-        return radians
+	def getRadians(self):
+		radians = float(self.arm_count) * 2 * math.pi / (4*self.acpr)
+		return radians
 	
 	def getPosition(self):
 		position = float(self.motor_count-7059) / (self.mconst)
 		return position*100
 
-    def getXcm(self):
-        return self.getPosition()
+	def getXcm(self):
+		return self.getPosition()
 
-    def getXm(self):
-        return self.getPosition() / 100.0
+	def getXm(self):
+		return self.getPosition() / 100.0
 
 	def getSwitches(self):
 		temp = []
 		temp.append(self.switches & 0b01)
 		temp.append( (self.switches & 0b10) >> 1 )
 		return temp
-		
-	'''
-	def getVariables(self):
-		variables = []
-		self.data_lock.acquire()
-		try:
-			#return a tuple containing all the values
-			variables.append(self.uc_data)
-			#get the encoder values
-			mE = self.mEncoder.getVariables()
-			aE = self.aEncoder.getVariables()
-		finally:
-			self.data_lock.release()
-		#1 is the angle of the encoder
-		variables.append (aE[1])
-		#2 is the counts seen by the arm
-		variables.append (aE[2])
-		#0 is the linear position of the Cart
-		variables.append (mE[0])
-		#2 is the number of counts seen by motor
-		variables.append (mE[2])
-		
-		return variables
-	'''
 	
 	def send_reset(self):
 		self.status = "Zeroing Counters"
 		self.ser.write(chr(0x0A))
 	
-	'''
-	def encoder_process(self, byte):
-		#Encoder processing
-		#pass new encoder channel values to the appropriate encoder
-		self.mEncoder.setNextState((byte & 0b1100) >> 2)
-		self.aEncoder.setNextState(byte >> 4)
-	'''	
 	def uc_process(self):
 		self.status = "Process Started"
 		self.get_lock()
