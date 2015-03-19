@@ -11,6 +11,7 @@ import platform
 import os
 from motor import Motor
 from uc_interface import ucEncoder
+import math
 
 p = None
 LINUX = False
@@ -70,10 +71,9 @@ class Pendulum():
 		'''
 		returns (x cm, degrees, L switch, R switch)
 		'''
-		position = self.uc.getPosition()
-		angle = self.uc.getAngle()
-		switches = self.uc.getSwitches()
-		return (position, angle, switches[1], switches[0])
+        mPose = self.uc.getXm() # meters
+		angle = self.uc.getRadians()
+		return (mPose, radians)
 	def moveRight(self, percent, threshold=30):
 		if (percent > threshold):
 			percent = threshold
@@ -83,14 +83,25 @@ class Pendulum():
 			percent = threshold
 		self.motor.MoveLeft(percent)
     def getActions(self):
-        return (0,1) # (0)Left (1)Right
+        return [0,1] # (0)Left (1)Right
     def step(self, action):
+        # TODO: change percent move
         if action == 0:
             self.moveLeft(15)
         elif action == 1:
             self.moveRight(15)
     def isTerminated(self):
-        pass #FIXME
+        switches = self.uc.getSwitches()
+        if switches[0] == 1 || switches[1] == 1:
+            return True
+        return False
+    def getReward(self):
+        # TODO: change angle range
+        angle = self.uc.getAngle()
+        reward = -1
+        if angle >= 168 and angle <= 192:
+            reward = 0
+        return reward
 	def stop(self):
 		self.motor.Stop()
 	def print_status():
@@ -129,8 +140,9 @@ class Pendulum():
 		print "Voltage: ", 					stats[1]
 		print "Temperature: ", 				stats[2]
 		print "Motor Speed: ", 				stats[3]
-		print "Angle: ", 					self.uc.getAngle()
-		print "Position: ", 				self.uc.getPosition()
+		print "Angle: %f%c"                 %(self.uc.getAngle(), u'\xb0')
+        print "       %f rad", 			    %(self.uc.getRadians())
+		print "Position: %f meters", 		%(self.uc.getXm())
 		print "Left Switch: ", 				switches[1]
 		print "Right Switch: ", 			switches[0]
 		print ""

@@ -7,6 +7,7 @@ import time
 import signal
 import sys
 import argparse
+import math
 #from encoder import Encoder
 
 class ucEncoder():
@@ -49,10 +50,20 @@ class ucEncoder():
 	def getAngle(self):
 		angle = float(self.arm_count) * 360 / (4*self.acpr)
 		return angle
+
+    def getRadians(self):
+        radians = self.getAngle() * (math.pi / 180.0)
+        return radians
 	
 	def getPosition(self):
 		position = float(self.motor_count-7059) / (self.mconst)
 		return position*100
+
+    def getXcm(self):
+        return self.getPosition()
+
+    def getXm(self):
+        return self.getPosition() / 100.0
 
 	def getSwitches(self):
 		temp = []
