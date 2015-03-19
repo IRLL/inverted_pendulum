@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <title>IRLL: Inverted Pendulum</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="stylesheet" href="stylesheets/bootstrap.css" media="screen">
-    <!--<link rel="stylesheet" href="http://bootswatch.com/assets/css/bootswatch.min.css">-->
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
-      <script src="../bower_components/respond/dest/respond.min.js"></script>
-    <![endif]-->
-    
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>IRLL: Inverted Pendulum</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<link rel="stylesheet" href="stylesheets/bootstrap.css" media="screen">
+		<!--<link rel="stylesheet" href="http://bootswatch.com/assets/css/bootswatch.min.css">-->
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+		  <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
+		  <script src="../bower_components/respond/dest/respond.min.js"></script>
+		<![endif]-->
   </head>
   <body>
   <!-- Menu (Copy to every page) -->
@@ -78,6 +79,24 @@
               <h1 id="intro">Hardware</h1>
 			  <p class="lead">The IRLL Inverted Pendulum</p>
 			  <p>This is where all information on the Pendulum's hardware will be kept</p>
+			  <p>The following components are used to provide power and control the motor on the pendulum: </p>
+			  <div class="col-lg-4">
+				  <table class="table">
+					<tbody>
+						<tr>
+							<td>24 Volt AC to DC Power Supply</td>
+						</tr>
+						<tr>
+							<td>chipKIT uC32 micro-controller</td>
+						</tr>
+						<tr>
+							<td>Pololu Simple High-Power Motor Controller 24v23</td>
+						</tr>
+							<td>Various resistors and capacitors</td>
+						</tr>
+					<tbody>
+				  </table>
+			  </div>
             </div>
           </div>
         </div>
@@ -85,7 +104,7 @@
       </div>
       
 		<!-- Pin outs -->
-		 <h3></a>Used Pins</h3>
+      <h3></a>Used Pins</h3>
       <table class="table table-striped table-hover">
           <thead>
               <tr>
@@ -143,18 +162,6 @@
                   <td>RG7</td>
                   <td>CN8</td>
                   <td>Backward limit switch</td>
-              </tr>
-              <tr>
-                  <td>39</td>
-                  <td>UART2</td>
-                  <td>U2RX</td>
-                  <td>UART RX line from the motor controller</td>
-              </tr>
-              <tr>
-                  <td>40</td>
-                  <td>UART2</td>
-                  <td>U2TX</td>
-                  <td>UART TX line to the motor controller</td>
               </tr>
           </tbody>
       </table>
