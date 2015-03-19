@@ -125,7 +125,7 @@ int receive_UART(Uart channel, uint8 data_size, uint8 *data_ptr) {
 }
 
 void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
-    uint8 received, transmit;
+    static uint8 received, transmit[UART_BUFF_SIZE], count, i;
     extern sint16 ArmCount, MotorCount;
     asm volatile ("di"); //disable interrupt
 
@@ -162,12 +162,27 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
             u1.Tx_is_idle = 1;
 
         } else {
-            //we have data to transmit - pop that data off the queue
-            //store popped data into the transmit registry
-            while (!U1STAbits.UTXBF && !dequeue(&(u1.Tx_queue), &transmit, 1)) { //while we are dequeuing data AND the transmit buffer is not full
-                //write the data to the buffer
-                U1TXREG = transmit;
-            } //write data until the queue is empty or the registry is full
+            //there is in the transmit queue, let's send it
+            //assume the hardware FIFO is empty
+            //it should, that's what triggers the tx interrupt
+
+            //try to pull out enough data out of queue to
+            //fill up the hardware FIFO
+            if(u1.Tx_queue.numStored > UART_BUFF_SIZE)
+            {
+                count = UART_BUFF_SIZE;
+            }
+            else //pull as much data as we can
+            {
+                count = u1.Tx_queue.numStored;
+            }
+            dequeue(&(u1.Tx_queue), transmit, count);
+
+            //load the data into the hardware FIFO
+            for (i=0; i<count; ++i)
+            {
+                U1TXREG = transmit[i];
+            }
 
             if (uart_1_tx_callback != NULL) {
                 uart_1_tx_callback(); //call additional ISR functionality

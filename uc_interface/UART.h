@@ -18,6 +18,7 @@ extern "C" {
 #include "Queue.h"
 
     /*Enum Defintions*/
+#define UART_BUFF_SIZE 4
 
     /*Object Defintions*/
 
