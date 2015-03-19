@@ -82,6 +82,15 @@ class Pendulum():
 		if (percent > threshold):
 			percent = threshold
 		self.motor.MoveLeft(percent)
+    def getActions(self):
+        return (0,1) # (0)Left (1)Right
+    def step(self, action):
+        if action == 0:
+            self.moveLeft(15)
+        elif action == 1:
+            self.moveRight(15)
+    def isTerminated(self):
+        pass #FIXME
 	def stop(self):
 		self.motor.Stop()
 	def print_status():
