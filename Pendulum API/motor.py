@@ -10,7 +10,7 @@ import argparse
 
 class Motor():
 	
-	def __init__(self, Port, baudrate=115200):
+	def __init__(self, Port='/dev/ttyACM0', baudrate=115200):
 		
 		##Serial port setup	
 		self.ser = serial.Serial()
@@ -111,4 +111,15 @@ class Motor():
 		result = (ord(hbyte) << 8) | ord(lbyte)
 		return result
 
-	
+def tester():
+	motor = Motor()
+	while True:
+		motor_stats = motor.get_Variables()
+		print "Temperature:   ", stats[2]
+		print "Input Voltage: ", stats[1]
+		time.sleep(.2)	
+
+if __name__ == "__main__":
+	signal.signal(signal.SIGINT, exit_handler)
+	tester()
+
