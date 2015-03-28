@@ -47,7 +47,7 @@
 uint8 tx1buff[10] = {0};
 uint8 packet[6] = {0};
 sint16 ArmCount = 0;
-sint16 MotorCount = 500;
+sint16 MotorCount = 60000;
 uint8 data = 0;
 uint8 prev_data = 0;
 
@@ -79,7 +79,7 @@ int main(void) {
     INTEnableInterrupts();
 
     while (1) {
-        data = (PORTB & 0b111100) | ((PORTG & 0b110000000) >> 7);
+        data = (PORTB & 0b111100);
 
         if (data ^ prev_data) {
             /*
@@ -87,8 +87,8 @@ int main(void) {
              */
 
             //save the previous state of the arm
-            LastState = prev_data >> 4;
-            CurrentState = data >> 4;
+            LastState = (prev_data >> 4) & 0b11;
+            CurrentState = (data >> 4) & 0b11;
 
             if (CurrentState != LastState) {
                 switch (CurrentState) {
@@ -127,8 +127,8 @@ int main(void) {
              */
 
             //save the previous state of the motor
-            LastState = (prev_data & 0b1100) >> 2;
-            CurrentState = (data & 0b1100) >> 2;
+            LastState = (prev_data & 0b01100) >> 2;
+            CurrentState = (data & 0b01100) >> 2;
 
             if (CurrentState != LastState) {
                 switch (CurrentState) {
@@ -154,13 +154,8 @@ int main(void) {
                         break;
                 }
             }
-
-            //update the previous data for next update
-            prev_data = data;
-            //update the counters
-            //updateTicks();
         }
-        //prev_data = data;
+        prev_data = data;
     }
 
     return 0;
@@ -183,94 +178,13 @@ void setupPorts(void) {
 void setupTimer(void) {
     TRISDbits.TRISD0 = 0;
     T1CONbits.TCKPS = 0b11; //0b11 is 1:256 clock prescale
-    PR1 = 20000;
+    PR1 = 2000;
     T1CONbits.ON = 1;
     IEC0bits.T1IE = 1;
     IPC1bits.T1IP = 7;
 
 }
 
-//Function that computes ticks
-
-void updateTicks(void) {
-    uint8 LastState;
-    uint8 CurrentState;
-    /*
-     * Arm Encoder Data
-     */
-
-    //save the previous state of the arm
-    LastState = prev_data >> 4;
-    CurrentState = data >> 4;
-
-    if (CurrentState != LastState) {
-        switch (CurrentState) {
-            case 0: //current state = 00
-                //if LastState=01, increment Count (CW)
-                //else LastState=10, decrement Count (CCW)
-                LastState == 1 ? ArmCount++ : ArmCount--;
-                break;
-            case 1: //current state = 01
-                //if LastState=11, increment Count (CW)
-                //else LastState=00, decrement Count (CCW)
-                LastState == 3 ? ArmCount++ : ArmCount--;
-                break;
-            case 2: //current state = 10
-                //if LastState=00, increment Count (CW)
-                //else LastState=11, decrement Count (CCW)
-                LastState == 0 ? ArmCount++ : ArmCount--;
-                break;
-            case 3: //current state = 11
-                //if LastState=10, increment Count (CW)
-                //else LastState=01, decrement Count (CCW)
-                LastState == 2 ? ArmCount++ : ArmCount--;
-                break;
-        }
-
-
-        if (ArmCount < 0) {
-            ArmCount = 2000;
-        } else if (ArmCount > 2000) {
-            ArmCount = 0;
-        }
-    }
-
-    /*
-     * Motor Encoder Data Processing
-     */
-
-    //save the previous state of the motor
-    LastState = (prev_data & 0b1100) >> 2;
-    CurrentState = (data & 0b1100) >> 2;
-
-    if (CurrentState != LastState) {
-        switch (CurrentState) {
-            case 0: //current state = 00
-                //if LastState=01, increment Count (CW)
-                //else LastState=10, decrement Count (CCW)
-                LastState == 1 ? MotorCount++ : MotorCount--;
-                break;
-            case 1: //current state = 01
-                //if LastState=11, increment Count (CW)
-                //else LastState=00, decrement Count (CCW)
-                LastState == 3 ? MotorCount++ : MotorCount--;
-                break;
-            case 2: //current state = 10
-                //if LastState=00, increment Count (CW)
-                //else LastState=11, decrement Count (CCW)
-                LastState == 0 ? MotorCount++ : MotorCount--;
-                break;
-            case 3: //current state = 11
-                //if LastState=10, increment Count (CW)
-                //else LastState=01, decrement Count (CCW)
-                LastState == 2 ? MotorCount++ : MotorCount--;
-                break;
-        }
-    }
-
-    //update the previous data for next update
-    prev_data = data;
-}
 
 //Setup the UART communication
 
@@ -286,7 +200,7 @@ void packetize(void) {
     packet[2] = ArmCount & 0xFF; //Low data of ArmCount
     packet[3] = MotorCount >> 8;
     packet[4] = MotorCount & 0xFF;
-    packet[5] = data & 3;
+    packet[5] = ((PORTG & 0b110000000) >> 7) & 3;
 }
 
 void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {

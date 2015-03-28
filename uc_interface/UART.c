@@ -139,7 +139,7 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
         if (received == RESET_BYTE)
         {
             ArmCount = 0;
-            MotorCount = 500;
+            MotorCount = 60000;
         }
 
         //enqueue(&(u1.Rx_queue), &received, 1);
