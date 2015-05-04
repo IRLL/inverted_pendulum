@@ -16464,28 +16464,25 @@ Source: http://www.linear.com/pc/downloadDocument.do?navId=H0,C3,P2222,D3148</de
 <wire x1="3.53" y1="-2.49" x2="3.53" y2="-2.54" width="0.127" layer="21"/>
 <text x="-3.455" y="2.64" size="1.016" layer="25">name</text>
 <text x="-3.43" y="-3.56" size="1.016" layer="27">value</text>
+<rectangle x1="-3.81" y1="-2.54" x2="3.81" y2="2.54" layer="29"/>
 </package>
 </packages>
 <symbols>
 <symbol name="7X5MMOSC">
-<rectangle x1="-2.54" y1="-5.08" x2="0" y2="2.54" layer="94"/>
-<rectangle x1="-2.54" y1="2.54" x2="0" y2="5.08" layer="94"/>
-<wire x1="-5.08" y1="5.08" x2="-5.08" y2="0" width="0.254" layer="94"/>
-<wire x1="-5.08" y1="0" x2="-5.08" y2="-5.08" width="0.254" layer="94"/>
-<wire x1="2.54" y1="5.08" x2="2.54" y2="0" width="0.254" layer="94"/>
-<wire x1="2.54" y1="0" x2="2.54" y2="-5.08" width="0.254" layer="94"/>
-<wire x1="-5.08" y1="0" x2="-12.7" y2="0" width="0.254" layer="94"/>
-<wire x1="2.54" y1="0" x2="10.16" y2="0" width="0.254" layer="94"/>
-<pin name="C1" x="-12.7" y="0" length="middle"/>
-<pin name="C2" x="10.16" y="0" length="middle" rot="R180"/>
-<pin name="GND1" x="-5.08" y="-10.16" length="middle"/>
-<pin name="GND2" x="2.54" y="-10.16" length="middle" rot="R180"/>
+<rectangle x1="-1.24" y1="-5.08" x2="1.3" y2="2.54" layer="94"/>
+<rectangle x1="-1.24" y1="2.54" x2="1.3" y2="5.08" layer="94"/>
+<wire x1="-2.08" y1="5.08" x2="-2.08" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="2.24" y1="5.08" x2="2.24" y2="-5.08" width="0.254" layer="94"/>
+<pin name="C1" x="-7.2" y="0" length="middle"/>
+<pin name="C2" x="7.46" y="0" length="middle" rot="R180"/>
+<pin name="GND1" x="0.06" y="-6.28" length="middle" rot="R90"/>
+<pin name="GND2" x="0.06" y="6.54" length="middle" rot="R270"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="7X5MMOSC">
+<deviceset name="7X5MMOSC" prefix="X">
 <gates>
-<gate name="G$1" symbol="7X5MMOSC" x="0" y="2.54"/>
+<gate name="G$1" symbol="7X5MMOSC" x="0" y="5.08"/>
 </gates>
 <devices>
 <device name="" package="7X5MMOSC">
@@ -16496,7 +16493,9 @@ Source: http://www.linear.com/pc/downloadDocument.do?navId=H0,C3,P2222,D3148</de
 <connect gate="G$1" pin="GND2" pad="GND2"/>
 </connects>
 <technologies>
-<technology name=""/>
+<technology name="">
+<attribute name="X" value="8.000 MHz" constant="no"/>
+</technology>
 </technologies>
 </device>
 </devices>
@@ -16609,7 +16608,7 @@ Here</text>
 <instance part="C4" gate="G$1" x="17.78" y="-50.8"/>
 <instance part="C5" gate="G$1" x="-76.2" y="7.62"/>
 <instance part="C6" gate="G$1" x="-35.56" y="7.62"/>
-<instance part="R3" gate="G$1" x="-55.88" y="27.94" rot="R180"/>
+<instance part="R3" gate="G$1" x="-68.58" y="27.94" rot="R180"/>
 <instance part="JP2" gate="G$1" x="38.1" y="-50.8"/>
 <instance part="JP3" gate="G$1" x="73.66" y="-38.1"/>
 <instance part="JP4" gate="G$1" x="73.66" y="-55.88"/>
@@ -16754,13 +16753,13 @@ Here</text>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="GND1"/>
-<wire x1="-60.96" y1="7.62" x2="-66.04" y2="7.62" width="0.1524" layer="91"/>
-<label x="-66.04" y="7.62" size="1.778" layer="95"/>
+<wire x1="-55.82" y1="11.5" x2="-55.88" y2="7.62" width="0.1524" layer="91"/>
+<label x="-55.88" y="7.62" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="GND2"/>
-<wire x1="-53.34" y1="7.62" x2="-48.26" y2="7.62" width="0.1524" layer="91"/>
-<label x="-48.26" y="7.62" size="1.778" layer="95"/>
+<wire x1="-55.82" y1="24.32" x2="-55.88" y2="25.4" width="0.1524" layer="91"/>
+<label x="-55.88" y="25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VCC3V3" class="0">
@@ -16819,6 +16818,11 @@ Here</text>
 <wire x1="177.8" y1="22.86" x2="187.96" y2="22.86" width="0.1524" layer="91"/>
 <label x="182.88" y="22.86" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="IC1" gate="G$1" pin="AVDD"/>
+<wire x1="60.96" y1="-5.08" x2="60.96" y2="-15.24" width="0.1524" layer="91"/>
+<label x="60.96" y="-15.24" size="1.778" layer="95" rot="R90"/>
+</segment>
 </net>
 <net name="N$10" class="0">
 <segment>
@@ -16870,19 +16874,19 @@ Here</text>
 <segment>
 <pinref part="R3" gate="G$1" pin="2"/>
 <pinref part="C5" gate="G$1" pin="1"/>
-<wire x1="-60.96" y1="27.94" x2="-76.2" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="-73.66" y1="27.94" x2="-76.2" y2="27.94" width="0.1524" layer="91"/>
 <wire x1="-76.2" y1="27.94" x2="-76.2" y2="17.78" width="0.1524" layer="91"/>
 <wire x1="-76.2" y1="17.78" x2="-76.2" y2="10.16" width="0.1524" layer="91"/>
 <junction x="-76.2" y="17.78"/>
 <pinref part="U$1" gate="G$1" pin="C1"/>
-<wire x1="-76.2" y1="17.78" x2="-68.58" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="-76.2" y1="17.78" x2="-63.08" y2="17.78" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="OSC2" class="0">
 <segment>
 <pinref part="R3" gate="G$1" pin="1"/>
-<wire x1="-50.8" y1="27.94" x2="-40.64" y2="27.94" width="0.1524" layer="91"/>
-<label x="-45.72" y="27.94" size="1.778" layer="95"/>
+<wire x1="-63.5" y1="27.94" x2="-58.42" y2="27.94" width="0.1524" layer="91"/>
+<label x="-63.5" y="27.94" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="IC1" gate="G$1" pin="RC15"/>
@@ -16892,7 +16896,7 @@ Here</text>
 </net>
 <net name="OSC1" class="0">
 <segment>
-<wire x1="-45.72" y1="17.78" x2="-35.56" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="-48.42" y1="17.78" x2="-35.56" y2="17.78" width="0.1524" layer="91"/>
 <label x="-40.64" y="5.08" size="1.778" layer="95"/>
 <pinref part="U$1" gate="G$1" pin="C2"/>
 <label x="-33.02" y="17.78" size="1.778" layer="95"/>
