@@ -16465,6 +16465,7 @@ Source: http://www.linear.com/pc/downloadDocument.do?navId=H0,C3,P2222,D3148</de
 <text x="-3.455" y="2.64" size="1.016" layer="25">name</text>
 <text x="-3.43" y="-3.56" size="1.016" layer="27">value</text>
 <rectangle x1="-3.81" y1="-2.54" x2="3.81" y2="2.54" layer="29"/>
+<text x="-1.65" y="1" size="0.8128" layer="21">1</text>
 </package>
 </packages>
 <symbols>
@@ -16523,7 +16524,7 @@ Source: http://www.linear.com/pc/downloadDocument.do?navId=H0,C3,P2222,D3148</de
 <part name="C5" library="rcl" deviceset="C-US" device="C0805" value="30pF"/>
 <part name="C6" library="rcl" deviceset="C-US" device="C0805" value="30pF"/>
 <part name="R3" library="rcl" deviceset="R-US_" device="R0805" value="680"/>
-<part name="JP2" library="SparkFun-Connectors" deviceset="M04" device="LOCK_LONGPADS"/>
+<part name="JP2" library="SparkFun-Connectors" deviceset="M04" device="PTH"/>
 <part name="JP3" library="SparkFun-Connectors" deviceset="M04" device="PTH"/>
 <part name="JP4" library="SparkFun-Connectors" deviceset="M04" device="PTH"/>
 <part name="JP5" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
