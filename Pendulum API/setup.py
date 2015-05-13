@@ -30,7 +30,7 @@ def config():
 	
 	#Open the micro-controller port for reading
 	print "Initializing with port: " + port
-	#uc = ucEncoder(port)
+	uc = ucEncoder(port)
 	
 	#Open the config file for writing
 	file = open(file_name, 'w')
@@ -39,11 +39,13 @@ def config():
 	
 	#initialize setup object
 	setup = Setup()
-	print setup
 	
 	#Do the setup
+	raw_input("Move the cart to the right brake position and press enter.")
+	setup.rightBrakePos = uc.getPosition()
 	
-	
+	raw_input("Move the cart to the left brake position and press enter.")
+	setup.leftBrakePos = uc.getPosition()
 	
 	#write the setup object to the file in pickle
 	pickle.dump(setup, file)
