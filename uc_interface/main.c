@@ -207,9 +207,40 @@ void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
     asm volatile ("di"); //disable interrupt
 
     //LATDbits.LATD0 = ~LATDbits.LATD0;
-    packetize();
+    //packetize();
+    packet[0] = 0x0A;
+    packet[1] = ArmCount >> 8; //High data of ArmCount
+    packet[2] = ArmCount & 0xFF; //Low data of ArmCount
+    packet[3] = MotorCount >> 8;
+    packet[4] = MotorCount & 0xFF;
+    packet[5] = ((PORTG & 0b110000000) >> 7) & 3;
+
+
     //Send the latest values to the computer
-    send_UART(UART1, sizeof (packet), packet);
+    //send_UART(UART1, sizeof (packet), packet);
+    int status;
+    //we need to place the provided data onto the Tx queue
+    switch (channel) {
+        case UART1:
+            status = enqueue(&(u1.Tx_queue), data_ptr, data_size);
+            if (u1.Tx_is_idle) { //if the tx is idle, force-start it
+                IEC0bits.U1TXIE = 1;
+                IFS0bits.U1TXIF = 1;
+            }
+            break;
+        case UART2:
+            status = enqueue(&(u2.Tx_queue), data_ptr, data_size);
+            if (u2.Tx_is_idle) { ////if the tx is idle, force-start it
+                IEC1bits.U2TXIE = 1;
+                IFS1bits.U2TXIF = 1;
+            }
+            break;
+        default:
+            status = 1; //return failure
+            break;
+
+    }
+
 
     IFS0bits.T1IF = 0; //clear the interrupt flag
     asm volatile ("ei"); //reenable interrupts
