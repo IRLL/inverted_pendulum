@@ -41,17 +41,24 @@ def config():
 	setup = Setup()
 	
 	#Do the setup
+	raw_input("Move the cart to the far right and press enter.")
+	uc.send_reset()
+	
 	raw_input("Move the cart to the right brake position and press enter.")
-	setup.rightBrakePos = uc.getPosition()
+	setup.rightBrakePos = uc.motor_count
 	
 	raw_input("Move the cart to the left brake position and press enter.")
-	setup.leftBrakePos = uc.getPosition()
+	setup.leftBrakePos = uc.motor_count
 	
 	#write the setup object to the file in pickle
 	pickle.dump(setup, file)
 	
 	#Close the file
 	file.close()
+	
+	file = open(file_name, 'r')
+	test = pickle.load(file)
+	print test.rightBrakePos
 
 if __name__ == "__main__":
 	config()
