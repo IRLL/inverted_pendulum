@@ -84,26 +84,26 @@ class Pendulum():
 		if (percent > threshold):
 			percent = threshold
 		self.motor.MoveLeft(percent)
-    def getActions(self):
-        return [0,1] # (0)Left (1)Right
-    def step(self, action):
-        # TODO: change percent move
-        if action == 0:
-            self.moveLeft(15)
-        elif action == 1:
-            self.moveRight(15)
-    def isTerminated(self):
-        switches = self.uc.getSwitches()
-        if switches[0] == 1 || switches[1] == 1:
-            return True
-        return False
-    def getReward(self):
-        # TODO: change angle range
-        angle = self.uc.getAngle()
-        reward = -1
-        if angle >= 168 and angle <= 192:
-            reward = 0
-        return reward
+	def getActions(self):
+		return [0,1] # (0)Left (1)Right
+	def step(self, action):
+		# TODO: change percent move
+		if action == 0:
+			self.moveLeft(15)
+		elif action == 1:
+			self.moveRight(15)
+	def isTerminated(self):
+		switches = self.uc.getSwitches()
+		if switches[0] == 1 || switches[1] == 1:
+			return True
+		return False
+	def getReward(self):
+		# TODO: change angle range
+		angle = self.uc.getAngle()
+		reward = -1
+		if angle >= 168 and angle <= 192:
+			reward = 0
+		return reward
 	def stop(self):
 		self.motor.Stop()
 	def print_status():
