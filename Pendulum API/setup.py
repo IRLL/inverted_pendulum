@@ -61,16 +61,14 @@ class Setup():
 		
 		#Close the file
 		file.close()
+	def unpack(self, file_name):
+		file = open(file_name, 'r')
+		data = pickle.load(file)
+		#Remember to close the file!
+		file.close()
+		return data
 		
 if __name__ == "__main__":
-	config()
-	
-	
-#Example for loading the config object
-'''
-file = open(file_name, 'r')
-test = pickle.load(file)
-print test.rightBrakePos
-#Remember to close the file!
-file.close()
-'''
+	setup = Setup()
+	setup.pack()
+
