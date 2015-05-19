@@ -10,70 +10,76 @@ import platform
 import os
 from motor import Motor
 from uc_interface import ucEncoder
+import setup
 
 p = None
 LINUX = False
 WINDOWS = False
 
 class Pendulum():
-    def __init__(self, motorPort, ucPort):
-        self.status = "Booting..."
-        self.motor = Motor(motorPort)
-        self.uc = ucEncoder(ucPort)
-        self.status = "Booted"
-    def __del__(self):
-        self.motor.Stop()
-    def Reset(self, start=0):
-        self.status = "resetting pendulum!"
-        speed = 19
-        left_switch = 0
-        right_switch = 0
-        while(not right_switch):
-            self.motor.MoveRight(speed)
-            switches = self.uc.getSwitches()
-            right_switch = switches[0]
-            time.sleep(.1)
-        while(not left_switch):
-            self.motor.MoveLeft(speed)
-            switches = self.uc.getSwitches()
-            left_switch = switches[1]
-		
-        #wait for arm to settle
-        current = 0
-        previous = 1
-        wait = 3
-        count = wait #must be constant for this many seconds
-        self.status = "waiting for arm to settle"
-        while count > 0: 
-            previous = current
-            time.sleep(1)
-            current = self.uc.getAngle()
-            if (previous == current):
-                count -= 1
-            else:
-                count = wait
-		
-        self.uc.send_reset()
-        time.sleep(.5)
+	def __init__(self, motorPort, ucPort):
+		self.status = "Booting..."
+		self.motor = Motor(motorPort)
+		self.uc = ucEncoder(ucPort)
 
-        self.status = "moving to zero position"
-        while True:
-            position = self.uc.getPosition()
-            if (position > -12 + start):
-                break;
-        self.motor.MoveRight(speed)
-        self.motor.Stop()
+		#Load the Setup configuration
+		su = setup.Setup()
+		su = su.unpack("config")
+		self.status = "Booted"
+	def __del__(self):
+		self.motor.Stop()
+	def Reset(self, start=0):
+		self.status = "resetting pendulum!"
+		speed = 19
+		left_switch = 0
+		right_switch = 0
+		while(not right_switch):
+			self.motor.MoveRight(speed)
+			switches = self.uc.getSwitches()
+			right_switch = switches[0]
+			time.sleep(.1)
+			
+		while(not left_switch):
+			self.motor.MoveLeft(speed)
+			switches = self.uc.getSwitches()
+			left_switch = switches[1]
 		
-        self.status = "done resetting!"
-        time.sleep(1)
+		#wait for arm to settle
+		current = 0
+		previous = 1
+		wait = 3
+		count = wait #must be constant for this many seconds
+		self.status = "waiting for arm to settle"
+		while count > 0: 
+			previous = current
+			time.sleep(1)
+			current = self.uc.getAngle()
+			if (previous == current):
+				count -= 1
+			else:
+				count = wait
+		
+		self.uc.send_reset()
+		time.sleep(.5)
+
+		self.status = "moving to zero position"
+		while True:
+			position = self.uc.getPosition()
+			if (position > -12 + start):
+				break;
+			self.motor.MoveRight(speed)
+			self.motor.Stop()
+		
+		self.status = "done resetting!"
+		time.sleep(1)
         
-    def getState(self):
-        '''
-        returns (meters, radians)
-        '''
-        mPose = self.uc.getXm() # meters
-        radians = self.uc.getRadians()
-        return (mPose, radians)
+	def getState(self):
+		'''
+		returns (meters, radians)
+		'''
+		mPose = self.uc.getXm() # meters
+		radians = self.uc.getRadians()
+		return (mPose, radians)
 	def moveRight(self, percent, threshold=30):
 		if (percent > threshold):
 			percent = threshold
