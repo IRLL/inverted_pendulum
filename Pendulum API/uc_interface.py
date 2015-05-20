@@ -70,6 +70,9 @@ class ucEncoder():
 		temp.append( (self.switches & 0b10) >> 1 )
 		return temp
 
+	def getMotorCount(self):
+		return motor_count
+		
 	def send_reset(self):
 		self.status = "Zeroing Counters"
 		self.ser.write(chr(0x0A))

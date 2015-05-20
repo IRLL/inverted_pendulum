@@ -25,11 +25,19 @@ class Pendulum():
 		#Load the Setup configuration
 		su = setup.Setup()
 		su = su.unpack("config")
+		
+		self.watchdogThread = threading.Thread(target=watchdog)
+		self.watchdogThread.daemon = True
+		self.watchdogThread.start()
+		
+		self.resetFlag = False
+		
 		self.status = "Booted"
 	def __del__(self):
 		self.motor.Stop()
 	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
+		self.resetFlag = True
 		speed = 19
 		left_switch = 0
 		right_switch = 0
@@ -69,6 +77,8 @@ class Pendulum():
 				break;
 			self.motor.MoveRight(speed)
 			self.motor.Stop()
+		
+		self.resetFlag = False
 		
 		self.status = "done resetting!"
 		time.sleep(1)
@@ -110,6 +120,16 @@ class Pendulum():
 		return reward
 	def stop(self):
 		self.motor.Stop()
+	
+	#TODO: Add in the Camera positioning
+	def watchdog(self):
+		while(True):
+			#TODO Check
+			pos = self.uc.getMotorCount()
+			if (not resetFlag and (pos >= self.su.rightBrakeEncoderPos or pos <= self.su.leftBrakeEncoderPos):
+				self.stop()
+			time.sleep(.05)
+		
 	def print_status(self):
 		global LINUX
 		global WINDOWS
@@ -139,18 +159,18 @@ class Pendulum():
 	def console_update(self):
          stats = self.motor.getVariables()
          switches = self.uc.getSwitches()
-         print "Pendulum Status: ",               self.status
-         print "uC Process Status: ",             self.uc.status
-         print "Motor Process Status: ",          self.motor.status
-         print "Motor Controller Status: ",       hex(stats[0])
-         print "Voltage: ",                       stats[1]
-         print "Temperature: ",                   stats[2]
-         print "Motor Speed: ",                   stats[3]
-         print "Angle: %f%c"                      %(self.uc.getAngle(), u'\xb0')
-         print "       %f rad"                    %(self.uc.getRadians())
-         print "Position: %f meters"              %(self.uc.getXm())
-         print "Left Switch: ", 				switches[1]
-         print "Right Switch: ",                  switches[0]
+         print "Pendulum Status: ",				self.status
+         print "uC Process Status: ",			self.uc.status
+         print "Motor Process Status: ",		self.motor.status
+         print "Motor Controller Status: ",		hex(stats[0])
+         print "Voltage: ",						stats[1]
+         print "Temperature: ",					stats[2]
+         print "Motor Speed: ",					stats[3]
+         print "Angle: %f%c"					%(self.uc.getAngle(), u'\xb0')
+         print "       %f rad"					%(self.uc.getRadians())
+         print "Position: %f meters"			%(self.uc.getXm())
+         print "Left Switch: ",					switches[1]
+         print "Right Switch: ",				switches[0]
          print ""
 
 

@@ -49,11 +49,11 @@ class Setup():
 		uc.send_reset()
 		
 		raw_input("Move the cart to the right brake position and press enter.")
-		setup.rightBrakeEncoderPos = uc.motor_count
+		setup.rightBrakeEncoderPos = uc.getMotorCount()
 		#TODO add camera Calibration
 		
 		raw_input("Move the cart to the left brake position and press enter.")
-		setup.leftBrakeEncoderPos = uc.motor_count
+		setup.leftBrakeEncoderPos = uc.getMotorCount()
 		#TODO add camera Calibration
 		
 		#write the setup object to the file in pickle
