@@ -219,7 +219,8 @@ pip-log.txt
 ###################
 ##Mplab stuff
 ###################
-uc_interface.X/
+*.X/
+*.X/*
 
 ###################
 ## EagleCAD
