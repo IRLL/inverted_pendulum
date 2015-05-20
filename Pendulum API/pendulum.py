@@ -23,10 +23,10 @@ class Pendulum():
 		self.uc = ucEncoder(ucPort)
 
 		#Load the Setup configuration
-		su = setup.Setup()
-		su = su.unpack("config")
+		self.su = setup.Setup()
+		self.su = self.su.unpack("config")
 		
-		self.watchdogThread = threading.Thread(target=watchdog)
+		self.watchdogThread = threading.Thread(target=self.watchdog)
 		self.watchdogThread.daemon = True
 		self.watchdogThread.start()
 		
@@ -126,8 +126,9 @@ class Pendulum():
 		while(True):
 			#TODO Check
 			pos = self.uc.getMotorCount()
-			if (not resetFlag and (pos >= self.su.rightBrakeEncoderPos or pos <= self.su.leftBrakeEncoderPos):
-				self.stop()
+			if (not self.resetFlag):
+				if (pos >= self.su.rightBrakeEncoderPos) or (pos <= self.su.leftBrakeEncoderPos):
+					self.stop()
 			time.sleep(.05)
 		
 	def print_status(self):

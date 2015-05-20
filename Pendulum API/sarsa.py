@@ -76,21 +76,21 @@ class Sarsa:
 
         for a in self.actions:
             key = (game.getState(), a)
-            if key not in qvalues:
-                qvalues[key] = 0.0
+            if key not in self.qvalues:
+                self.qvalues[key] = 0.0
 
         self.bestActionIndex = 0
         nDuplicates = 0
         duplicates = []
         for i in range(1, nActions):
             key1 = (game.getState(), self.actions[i])
-            key2 = (game.getState(), bestActionIndex)
-            if qvalues[key1] > qvalues[key2]:
+            key2 = (game.getState(), self.bestActionIndex)
+            if self.qvalues[key1] > self.qvalues[key2]:
                 self.bestActionIndex = i
                 # reset duplicates if new bestActionIndex
                 nDuplicates = 0
                 duplicates = []
-            elif qvalues[key1] == qvalues[key2]:
+            elif self.qvalues[key1] == self.qvalues[key2]:
                 duplicates.append(i)
                 nDuplicates += 1
 
