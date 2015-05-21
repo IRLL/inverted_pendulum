@@ -45,11 +45,11 @@
  Global Variables
  ************************************************************************/
 uint8 tx1buff[10] = {0};
-uint8 packet[6] = {0};
 sint16 ArmCount = 0;
 sint16 MotorCount = 60000;
 uint8 data = 0;
 uint8 prev_data = 0;
+sint8 encoder_lookup[] = {0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0};
 
 /*************************************************************************
  Function Declarations
@@ -64,14 +64,15 @@ void setupTimer(void);
  Main Code
  ************************************************************************/
 int main(void) {
-    uint8 LastState;
+    uint8 prev_arm = 0;
+    uint8 prev_motor = 0;
     uint8 CurrentState;
 
     setupUART();
     setupPorts();
 
     //Timer setup
-    //Need the timer for periodic transmission of data ot the computer
+    //Need the timer for periodic transmission of data to the computer
     setupTimer();
 
 
@@ -87,33 +88,41 @@ int main(void) {
              */
 
             //save the previous state of the arm
-            LastState = (prev_data >> 4) & 0b11;
+            prev_arm = (prev_data >> 4) & 0b11;
             CurrentState = (data >> 4) & 0b11;
 
-            if (CurrentState != LastState) {
-                switch (CurrentState) {
-                    case 0: //current state = 00
-                        //if LastState=01, increment Count (CW)
-                        //else LastState=10, decrement Count (CCW)
-                        LastState == 1 ? ArmCount++ : ArmCount--;
-                        break;
-                    case 1: //current state = 01
-                        //if LastState=11, increment Count (CW)
-                        //else LastState=00, decrement Count (CCW)
-                        LastState == 3 ? ArmCount++ : ArmCount--;
-                        break;
-                    case 2: //current state = 10
-                        //if LastState=00, increment Count (CW)
-                        //else LastState=11, decrement Count (CCW)
-                        LastState == 0 ? ArmCount++ : ArmCount--;
-                        break;
-                    case 3: //current state = 11
-                        //if LastState=10, increment Count (CW)
-                        //else LastState=01, decrement Count (CCW)
-                        LastState == 2 ? ArmCount++ : ArmCount--;
-                        break;
-                }
+            if (CurrentState != prev_arm) {
+/**********************************************************
+ Our old method for determining increment or decrement
+ **********************************************************/
+//                switch (CurrentState) {
+//                    case 0: //current state = 00
+//                        //if LastState=01, increment Count (CW)
+//                        //else LastState=10, decrement Count (CCW)
+//                        LastState == 1 ? ArmCount++ : ArmCount--;
+//                        break;
+//                    case 1: //current state = 01
+//                        //if LastState=11, increment Count (CW)
+//                        //else LastState=00, decrement Count (CCW)
+//                        LastState == 3 ? ArmCount++ : ArmCount--;
+//                        break;
+//                    case 2: //current state = 10
+//                        //if LastState=00, increment Count (CW)
+//                        //else LastState=11, decrement Count (CCW)
+//                        LastState == 0 ? ArmCount++ : ArmCount--;
+//                        break;
+//                    case 3: //current state = 11
+//                        //if LastState=10, increment Count (CW)
+//                        //else LastState=01, decrement Count (CCW)
+//                        LastState == 2 ? ArmCount++ : ArmCount--;
+//                        break;
+//                }
 
+                /*
+                 New way:
+                 */
+                CurrentState = (CurrentState << 2) | prev_arm;
+                ArmCount += encoder_lookup[CurrentState];
 
                 if (ArmCount < 0) {
                     ArmCount = 2000;
@@ -127,32 +136,42 @@ int main(void) {
              */
 
             //save the previous state of the motor
-            LastState = (prev_data & 0b01100) >> 2;
+            prev_motor = (prev_data & 0b01100) >> 2;
             CurrentState = (data & 0b01100) >> 2;
 
-            if (CurrentState != LastState) {
-                switch (CurrentState) {
-                    case 0: //current state = 00
-                        //if LastState=01, increment Count (CW)
-                        //else LastState=10, decrement Count (CCW)
-                        LastState == 1 ? MotorCount++ : MotorCount--;
-                        break;
-                    case 1: //current state = 01
-                        //if LastState=11, increment Count (CW)
-                        //else LastState=00, decrement Count (CCW)
-                        LastState == 3 ? MotorCount++ : MotorCount--;
-                        break;
-                    case 2: //current state = 10
-                        //if LastState=00, increment Count (CW)
-                        //else LastState=11, decrement Count (CCW)
-                        LastState == 0 ? MotorCount++ : MotorCount--;
-                        break;
-                    case 3: //current state = 11
-                        //if LastState=10, increment Count (CW)
-                        //else LastState=01, decrement Count (CCW)
-                        LastState == 2 ? MotorCount++ : MotorCount--;
-                        break;
-                }
+
+            if (CurrentState != prev_motor) {
+/********************************************************
+ Our old method for determining increment or decrement
+*********************************************************/
+//                switch (CurrentState) {
+//                    case 0: //current state = 00
+//                        //if LastState=01, increment Count (CW)
+//                        //else LastState=10, decrement Count (CCW)
+//                        LastState == 1 ? MotorCount++ : MotorCount--;
+//                        break;
+//                    case 1: //current state = 01
+//                        //if LastState=11, increment Count (CW)
+//                        //else LastState=00, decrement Count (CCW)
+//                        LastState == 3 ? MotorCount++ : MotorCount--;
+//                        break;
+//                    case 2: //current state = 10
+//                        //if LastState=00, increment Count (CW)
+//                        //else LastState=11, decrement Count (CCW)
+//                        LastState == 0 ? MotorCount++ : MotorCount--;
+//                        break;
+//                    case 3: //current state = 11
+//                        //if LastState=10, increment Count (CW)
+//                        //else LastState=01, decrement Count (CCW)
+//                        LastState == 2 ? MotorCount++ : MotorCount--;
+//                        break;
+//                }
+            
+                /*
+                New Way:
+                */
+                CurrentState = (CurrentState << 2) | prev_motor;
+                MotorCount += encoder_lookup[CurrentState];
             }
         }
         prev_data = data;

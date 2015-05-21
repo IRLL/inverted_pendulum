@@ -1,5 +1,4 @@
 #include "system.h"
-#include "UART.h"
 
 //callback functions
 void (*uart_1_tx_callback) (void);
@@ -147,9 +146,6 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
         if (uart_1_rx_callback != NULL) {
             uart_1_rx_callback(); //call additional ISR functionality
         }
-
-        //now clear the interrupt flag
-        IFS0bits.U1RXIF = 0;
     }
     if (IFS0bits.U1TXIF) { //if the interrupt flag of TX is set
         
@@ -158,11 +154,9 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
         
         //Disable the TX interrupt (no longer needed)
         IEC0bits.U1TXIE = 0;
-        
-        //now clear the interrupt flag
-        IFS0bits.U1TXIF = 0;
     }
-
+    //now clear the interrupt flag
+    IFS0bits.U1TXIF = 0;
     asm volatile ("ei"); //reenable interrupts
 }
 

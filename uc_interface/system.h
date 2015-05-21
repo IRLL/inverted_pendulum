@@ -27,6 +27,8 @@ extern "C" {
  ************************************************************************/
  #define RESET_BYTE 0x0A
 
+//Universal Variables
+uint8 packet[6];
 
 #ifdef	__cplusplus
 }
