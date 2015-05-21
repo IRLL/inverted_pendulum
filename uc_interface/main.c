@@ -45,12 +45,11 @@
  Global Variables
  ************************************************************************/
 uint8 tx1buff[10] = {0};
+uint8 packet[6] = {0};
 sint16 ArmCount = 0;
 sint16 MotorCount = 60000;
 uint8 data = 0;
 uint8 prev_data = 0;
-uint8 packet[6] = {0};
-sint8 encoder_lookup[16] = {0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0};
 
 /*************************************************************************
  Function Declarations
@@ -65,15 +64,14 @@ void setupTimer(void);
  Main Code
  ************************************************************************/
 int main(void) {
-    uint8 prev_arm = 0;
-    uint8 prev_motor = 0;
+    uint8 LastState;
     uint8 CurrentState;
 
     setupUART();
     setupPorts();
 
     //Timer setup
-    //Need the timer for periodic transmission of data to the computer
+    //Need the timer for periodic transmission of data ot the computer
     setupTimer();
 
 
@@ -89,41 +87,33 @@ int main(void) {
              */
 
             //save the previous state of the arm
-            prev_arm = (prev_data >> 4) & 0b11;
+            LastState = (prev_data >> 4) & 0b11;
             CurrentState = (data >> 4) & 0b11;
 
-            if (CurrentState != prev_arm) {
-/**********************************************************
- Our old method for determining increment or decrement
- **********************************************************/
-//                switch (CurrentState) {
-//                    case 0: //current state = 00
-//                        //if LastState=01, increment Count (CW)
-//                        //else LastState=10, decrement Count (CCW)
-//                        LastState == 1 ? ArmCount++ : ArmCount--;
-//                        break;
-//                    case 1: //current state = 01
-//                        //if LastState=11, increment Count (CW)
-//                        //else LastState=00, decrement Count (CCW)
-//                        LastState == 3 ? ArmCount++ : ArmCount--;
-//                        break;
-//                    case 2: //current state = 10
-//                        //if LastState=00, increment Count (CW)
-//                        //else LastState=11, decrement Count (CCW)
-//                        LastState == 0 ? ArmCount++ : ArmCount--;
-//                        break;
-//                    case 3: //current state = 11
-//                        //if LastState=10, increment Count (CW)
-//                        //else LastState=01, decrement Count (CCW)
-//                        LastState == 2 ? ArmCount++ : ArmCount--;
-//                        break;
-//                }
+            if (CurrentState != LastState) {
+                switch (CurrentState) {
+                    case 0: //current state = 00
+                        //if LastState=01, increment Count (CW)
+                        //else LastState=10, decrement Count (CCW)
+                        LastState == 1 ? ArmCount++ : ArmCount--;
+                        break;
+                    case 1: //current state = 01
+                        //if LastState=11, increment Count (CW)
+                        //else LastState=00, decrement Count (CCW)
+                        LastState == 3 ? ArmCount++ : ArmCount--;
+                        break;
+                    case 2: //current state = 10
+                        //if LastState=00, increment Count (CW)
+                        //else LastState=11, decrement Count (CCW)
+                        LastState == 0 ? ArmCount++ : ArmCount--;
+                        break;
+                    case 3: //current state = 11
+                        //if LastState=10, increment Count (CW)
+                        //else LastState=01, decrement Count (CCW)
+                        LastState == 2 ? ArmCount++ : ArmCount--;
+                        break;
+                }
 
-                /*
-                 New way:
-                 */
-                CurrentState = (CurrentState << 2) | prev_arm;
-                ArmCount += encoder_lookup[CurrentState];
 
                 if (ArmCount < 0) {
                     ArmCount = 2000;
@@ -137,42 +127,32 @@ int main(void) {
              */
 
             //save the previous state of the motor
-            prev_motor = (prev_data & 0b01100) >> 2;
+            LastState = (prev_data & 0b01100) >> 2;
             CurrentState = (data & 0b01100) >> 2;
 
-
-            if (CurrentState != prev_motor) {
-/********************************************************
- Our old method for determining increment or decrement
-*********************************************************/
-//                switch (CurrentState) {
-//                    case 0: //current state = 00
-//                        //if LastState=01, increment Count (CW)
-//                        //else LastState=10, decrement Count (CCW)
-//                        LastState == 1 ? MotorCount++ : MotorCount--;
-//                        break;
-//                    case 1: //current state = 01
-//                        //if LastState=11, increment Count (CW)
-//                        //else LastState=00, decrement Count (CCW)
-//                        LastState == 3 ? MotorCount++ : MotorCount--;
-//                        break;
-//                    case 2: //current state = 10
-//                        //if LastState=00, increment Count (CW)
-//                        //else LastState=11, decrement Count (CCW)
-//                        LastState == 0 ? MotorCount++ : MotorCount--;
-//                        break;
-//                    case 3: //current state = 11
-//                        //if LastState=10, increment Count (CW)
-//                        //else LastState=01, decrement Count (CCW)
-//                        LastState == 2 ? MotorCount++ : MotorCount--;
-//                        break;
-//                }
-            
-                /*
-                New Way:
-                */
-                CurrentState = (CurrentState << 2) | prev_motor;
-                MotorCount += encoder_lookup[CurrentState];
+            if (CurrentState != LastState) {
+                switch (CurrentState) {
+                    case 0: //current state = 00
+                        //if LastState=01, increment Count (CW)
+                        //else LastState=10, decrement Count (CCW)
+                        LastState == 1 ? MotorCount++ : MotorCount--;
+                        break;
+                    case 1: //current state = 01
+                        //if LastState=11, increment Count (CW)
+                        //else LastState=00, decrement Count (CCW)
+                        LastState == 3 ? MotorCount++ : MotorCount--;
+                        break;
+                    case 2: //current state = 10
+                        //if LastState=00, increment Count (CW)
+                        //else LastState=11, decrement Count (CCW)
+                        LastState == 0 ? MotorCount++ : MotorCount--;
+                        break;
+                    case 3: //current state = 11
+                        //if LastState=10, increment Count (CW)
+                        //else LastState=01, decrement Count (CCW)
+                        LastState == 2 ? MotorCount++ : MotorCount--;
+                        break;
+                }
             }
         }
         prev_data = data;
@@ -224,24 +204,44 @@ void packetize(void) {
 }
 
 void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
-    int i = 0;
     asm volatile ("di"); //disable interrupt
 
     //LATDbits.LATD0 = ~LATDbits.LATD0;
-    packetize();
-    
-    //Load in the first 4 bytes
-    for (i = 0; i < 4; ++i)
-    {
-        U1TXREG = packet[i];
-    }
-    
-    //Enable the U1 TX interrupt
-    IEC0bits.U1TXIE = 1;
-    
+    //packetize();
+    packet[0] = 0x0A;
+    packet[1] = ArmCount >> 8; //High data of ArmCount
+    packet[2] = ArmCount & 0xFF; //Low data of ArmCount
+    packet[3] = MotorCount >> 8;
+    packet[4] = MotorCount & 0xFF;
+    packet[5] = ((PORTG & 0b110000000) >> 7) & 3;
+
+
     //Send the latest values to the computer
     //send_UART(UART1, sizeof (packet), packet);
+    int status;
+    //we need to place the provided data onto the Tx queue
+    switch (channel) {
+        case UART1:
+            status = enqueue(&(u1.Tx_queue), data_ptr, data_size);
+            if (u1.Tx_is_idle) { //if the tx is idle, force-start it
+                IEC0bits.U1TXIE = 1;
+                IFS0bits.U1TXIF = 1;
+            }
+            break;
+        case UART2:
+            status = enqueue(&(u2.Tx_queue), data_ptr, data_size);
+            if (u2.Tx_is_idle) { ////if the tx is idle, force-start it
+                IEC1bits.U2TXIE = 1;
+                IFS1bits.U2TXIF = 1;
+            }
+            break;
+        default:
+            status = 1; //return failure
+            break;
+
+    }
+
 
     IFS0bits.T1IF = 0; //clear the interrupt flag
-    asm volatile ("ei"); //re-enable interrupts
+    asm volatile ("ei"); //reenable interrupts
 }

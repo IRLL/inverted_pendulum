@@ -1,4 +1,5 @@
 #include "system.h"
+#include "UART.h"
 
 //callback functions
 void (*uart_1_tx_callback) (void);
@@ -124,9 +125,8 @@ int receive_UART(Uart channel, uint8 data_size, uint8 *data_ptr) {
 }
 
 void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
-    static uint8 received;
+    static uint8 received, transmit[UART_BUFF_SIZE], count, i;
     extern sint16 ArmCount, MotorCount;
-    extern uint8 packet[6];
     asm volatile ("di"); //disable interrupt
 
     if (IFS0bits.U1RXIF) { //if the interrupt flag of RX is set
@@ -139,7 +139,7 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
         if (received == RESET_BYTE)
         {
             ArmCount = 0;
-            MotorCount = 60000;
+            MotorCount = 20000;
         }
 
         //enqueue(&(u1.Rx_queue), &received, 1);
@@ -147,17 +147,51 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
         if (uart_1_rx_callback != NULL) {
             uart_1_rx_callback(); //call additional ISR functionality
         }
+
+        //now clear the interrupt flag
+        IFS0bits.U1RXIF = 0;
     }
     if (IFS0bits.U1TXIF) { //if the interrupt flag of TX is set
-        
-        U1TXREG = packet[4];
-        U1TXREG = packet[5];
-        
-        //Disable the TX interrupt (no longer needed)
-        IEC0bits.U1TXIE = 0;
+        u1.Tx_is_idle = 0; //tx is not idle
+        //if the transmit queue is empty
+        if (u1.Tx_queue.numStored == 0) {
+            //our buffer is empty
+            //we need to disable the interrupts
+            IEC0bits.U1TXIE = 0;
+            //and set the queue to idle
+            u1.Tx_is_idle = 1;
+
+        } else {
+            //there is in the transmit queue, let's send it
+            //assume the hardware FIFO is empty
+            //it should, that's what triggers the tx interrupt
+
+            //try to pull out enough data out of queue to
+            //fill up the hardware FIFO
+            if(u1.Tx_queue.numStored > UART_BUFF_SIZE)
+            {
+                count = UART_BUFF_SIZE;
+            }
+            else //pull as much data as we can
+            {
+                count = u1.Tx_queue.numStored;
+            }
+            dequeue(&(u1.Tx_queue), transmit, count);
+
+            //load the data into the hardware FIFO
+            for (i=0; i<count; ++i)
+            {
+                U1TXREG = transmit[i];
+            }
+
+            if (uart_1_tx_callback != NULL) {
+                uart_1_tx_callback(); //call additional ISR functionality
+            }
+            //now clear the interrupt flag
+            IFS0bits.U1TXIF = 0;
+        }
     }
-    //now clear the interrupt flag
-    IFS0bits.U1TXIF = 0;
+
     asm volatile ("ei"); //reenable interrupts
 }
 
