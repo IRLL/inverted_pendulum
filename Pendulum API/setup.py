@@ -17,7 +17,7 @@ class Setup():
 		self.leftBrakeEncoderPos = 0
 		self.leftBrakeCameraPos = 0
 		
-	def pack():
+	def pack(self):
 		print "Used to setup the pendulum, this will overwrite the configuration file!"
 		answer = raw_input("Is this your intended action (Y/n)?: ")
 		
@@ -41,23 +41,22 @@ class Setup():
 		print "Opened File " + file.name + " for writing."
 		print file
 		
-		#initialize setup object
-		setup = Setup()
-		
 		#Do the setup
 		raw_input("Move the cart to the far right and press enter.")
 		uc.send_reset()
 		
 		raw_input("Move the cart to the right brake position and press enter.")
-		setup.rightBrakeEncoderPos = uc.getMotorCount()
+		self.rightBrakeEncoderPos = uc.motor_count
+		print self.rightBrakeEncoderPos
 		#TODO add camera Calibration
 		
 		raw_input("Move the cart to the left brake position and press enter.")
-		setup.leftBrakeEncoderPos = uc.getMotorCount()
+		self.leftBrakeEncoderPos = uc.motor_count
+		print self.leftBrakeEncoderPos
 		#TODO add camera Calibration
 		
 		#write the setup object to the file in pickle
-		pickle.dump(setup, file)
+		pickle.dump(self, file)
 		
 		#Close the file
 		file.close()
