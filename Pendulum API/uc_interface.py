@@ -71,7 +71,7 @@ class ucEncoder():
 		return temp
 
 	def getMotorCount(self):
-		return motor_count
+		return self.motor_count
 		
 	def send_reset(self):
 		self.status = "Zeroing Counters"
