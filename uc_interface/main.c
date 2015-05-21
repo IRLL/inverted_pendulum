@@ -49,7 +49,8 @@ sint16 ArmCount = 0;
 sint16 MotorCount = 60000;
 uint8 data = 0;
 uint8 prev_data = 0;
-sint8 encoder_lookup[] = {0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0};
+uint8 packet[6] = {0};
+sint8 encoder_lookup[16] = {0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0};
 
 /*************************************************************************
  Function Declarations

@@ -126,6 +126,7 @@ int receive_UART(Uart channel, uint8 data_size, uint8 *data_ptr) {
 void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
     static uint8 received;
     extern sint16 ArmCount, MotorCount;
+    extern uint8 packet[6];
     asm volatile ("di"); //disable interrupt
 
     if (IFS0bits.U1RXIF) { //if the interrupt flag of RX is set
@@ -138,7 +139,7 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void) {
         if (received == RESET_BYTE)
         {
             ArmCount = 0;
-            MotorCount = 20000;
+            MotorCount = 60000;
         }
 
         //enqueue(&(u1.Rx_queue), &received, 1);
