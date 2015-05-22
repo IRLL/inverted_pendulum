@@ -47,7 +47,7 @@
 uint8 tx1buff[10] = {0};
 uint8 packet[6] = {0};
 sint16 ArmCount = 0;
-sint16 MotorCount = 60000;
+sint16 MotorCount = 20000;
 uint8 data = 0;
 uint8 prev_data = 0;
 sint8 encoder_lookup[16] = {0,1,-1,0,-1,0,0,1,1,0,0,-1,0,-1,1,0};
@@ -192,7 +192,6 @@ void setupTimer(void) {
     T1CONbits.ON = 1;
     IEC0bits.T1IE = 1;
     IPC1bits.T1IP = 7;
-
 }
 
 
@@ -219,9 +218,62 @@ void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
     //LATDbits.LATD0 = ~LATDbits.LATD0;
     packetize();
 
+    U1TXREG = packet[0];
+    U1TXREG = packet[1];
+    U1TXREG = packet[2];
+    U1TXREG = packet[3];
+    
+    //Enable the U1 Tx interrupt
+    IEC0bits.U1TXIE = 1;
+    
     //Send the latest values to the computer
-    send_UART(UART1, sizeof (packet), packet);
+    //send_UART(UART1, sizeof (packet), packet);
 
     IFS0bits.T1IF = 0; //clear the interrupt flag
+    asm volatile ("ei"); //reenable interrupts
+}
+
+void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void)
+{
+    static uint8 received, transmit[UART_BUFF_SIZE], count, i;
+    sint16 ArmCount, MotorCount;
+    asm volatile ("di"); //disable interrupt
+
+    //Receive Data
+    if (IFS0bits.U1RXIF) { //if the interrupt flag of RX is set
+
+
+        //we have received information - pop that information off the channel
+        //push that data onto our received queue
+        received = U1RXREG;
+
+        if (received == RESET_BYTE)
+        {
+            ArmCount = 0;
+            MotorCount = 20000;
+        }
+
+        //enqueue(&(u1.Rx_queue), &received, 1);
+
+        if (uart_1_rx_callback != NULL) {
+            uart_1_rx_callback(); //call additional ISR functionality
+        }
+
+        //now clear the interrupt flag
+        IFS0bits.U1RXIF = 0;
+    }
+    
+    //Transmit Data
+    if (IFS0bits.U1TXIF) { //if the interrupt flag of TX is set
+        U1TXREG = packet[4];
+        U1TXREG = packet[5];
+        
+        //Disable the Tx interrupt
+        IEC0bits.U1TXIE = 0;
+        
+        //Clear interrupt flag
+        IFS0bits.U1TXIF = 0;
+    }
+
     asm volatile ("ei"); //reenable interrupts
 }
