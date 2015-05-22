@@ -235,7 +235,7 @@ void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
 
 void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void)
 {
-    static uint8 received, transmit[UART_BUFF_SIZE], count, i;
+    static uint8 received;
     sint16 ArmCount, MotorCount;
     asm volatile ("di"); //disable interrupt
 
@@ -255,9 +255,9 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void)
 
         //enqueue(&(u1.Rx_queue), &received, 1);
 
-        if (uart_1_rx_callback != NULL) {
-            uart_1_rx_callback(); //call additional ISR functionality
-        }
+//        if (uart_1_rx_callback != NULL) {
+//            uart_1_rx_callback(); //call additional ISR functionality
+//        }
 
         //now clear the interrupt flag
         IFS0bits.U1RXIF = 0;
