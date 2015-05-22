@@ -46,6 +46,7 @@
  ************************************************************************/
 uint8 tx1buff[10] = {0};
 uint8 packet[6] = {0};
+uint8 remainder[2];
 sint16 ArmCount = 0;
 sint16 MotorCount = 20000;
 uint8 data = 0;
@@ -222,6 +223,8 @@ void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
     U1TXREG = packet[1];
     U1TXREG = packet[2];
     U1TXREG = packet[3];
+    remainder[0] = packet[4];
+    remainder[1] = packet[5];
     
     //Enable the U1 Tx interrupt
     IEC0bits.U1TXIE = 1;
@@ -265,8 +268,8 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void)
     
     //Transmit Data
     if (IFS0bits.U1TXIF) { //if the interrupt flag of TX is set
-        U1TXREG = packet[4];
-        U1TXREG = packet[5];
+        U1TXREG = remainder[0];
+        U1TXREG = remainder[1];
         
         //Disable the Tx interrupt
         IEC0bits.U1TXIE = 0;
