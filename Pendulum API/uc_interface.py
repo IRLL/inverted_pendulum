@@ -55,7 +55,7 @@ class ucEncoder():
 		return radians
 	
 	def getPosition(self):
-		position = float(self.motor_count-7059) / (self.mconst)
+		position = float(self.motor_count-6244) / (self.mconst)
 		return position*100
 
 	def getXcm(self):
@@ -75,7 +75,9 @@ class ucEncoder():
 		
 	def send_reset(self):
 		self.status = "Zeroing Counters"
+		print "got here"
 		self.ser.write(chr(0x0A))
+		print "got here"
 	
 	def uc_process(self):
 		self.status = "Process Started"
@@ -167,13 +169,14 @@ def exit_handler(signum, frame):
 	
 	
 def tester():
-	uc = ucEncoder('/dev/ttyUSB0')	
+	uc = ucEncoder(4)	
+	time.sleep(1)
 	uc.send_reset()
 	while 1:
 		angle= uc.getAngle()
 		position = uc.getPosition()
 		switches = uc.getSwitches()
-		print "buffer: ", uc.ser.inWaiting()
+		#print "buffer: ", uc.ser.inWaiting()
 		print "angle: ", angle
 		print "position: ", position
 		print "left switch: ", switches[1], "right switch: ", switches[0]

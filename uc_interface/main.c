@@ -46,7 +46,7 @@
  ************************************************************************/
 uint8 tx1buff[10] = {0};
 uint8 packet[6] = {0};
-uint8 remainder[2];
+uint8 other_stuff[2];
 sint16 ArmCount = 0;
 sint16 MotorCount = 20000;
 uint8 data = 0;
@@ -123,8 +123,8 @@ int main(void) {
                 ArmCount += encoder_lookup[lookupval];
 
                 if (ArmCount < 0) {
-                    ArmCount = 2000;
-                } else if (ArmCount > 2000) {
+                    ArmCount = 1999;
+                } else if (ArmCount == 2000) {
                     ArmCount = 0;
                 }
             }
@@ -213,7 +213,7 @@ void packetize(void) {
     packet[5] = ((PORTG & 0b110000000) >> 7) & 3;
 }
 
-void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
+void __ISR(_TIMER_1_VECTOR, IPL7SRS) Timer_Handler_1(void) {
     asm volatile ("di"); //disable interrupt
 
     //LATDbits.LATD0 = ~LATDbits.LATD0;
@@ -223,10 +223,11 @@ void __ISR(_TIMER_1_VECTOR, IPL7AUTO) Timer_Handler_1(void) {
     U1TXREG = packet[1];
     U1TXREG = packet[2];
     U1TXREG = packet[3];
-    remainder[0] = packet[4];
-    remainder[1] = packet[5];
+    other_stuff[0] = packet[4];
+    other_stuff[1] = packet[5];
     
     //Enable the U1 Tx interrupt
+    IFS0bits.U1TXIF = 0;
     IEC0bits.U1TXIE = 1;
     
     //Send the latest values to the computer
@@ -268,8 +269,8 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart_1_Handler(void)
     
     //Transmit Data
     if (IFS0bits.U1TXIF) { //if the interrupt flag of TX is set
-        U1TXREG = remainder[0];
-        U1TXREG = remainder[1];
+        U1TXREG = other_stuff[0];
+        U1TXREG = other_stuff[1];
         
         //Disable the Tx interrupt
         IEC0bits.U1TXIE = 0;
