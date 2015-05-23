@@ -2974,10 +2974,10 @@ Please make sure your boards conform to these design rules.</description>
 <polygon width="0.4064" layer="16">
 <vertex x="-1.30566875" y="32.88876875"/>
 <vertex x="-2.54" y="-1.27"/>
-<vertex x="17.835128125" y="-1.27"/>
-<vertex x="17.835128125" y="9.604440625"/>
-<vertex x="30.738575" y="9.604440625"/>
-<vertex x="30.738575" y="-1.420375"/>
+<vertex x="15.529525" y="-1.31939375"/>
+<vertex x="15.529525" y="9.555046875"/>
+<vertex x="33.500234375" y="9.4562625"/>
+<vertex x="33.500234375" y="-1.568553125"/>
 <vertex x="50.3033875" y="-1.767528125"/>
 <vertex x="50.309984375" y="32.62950625"/>
 </polygon>
