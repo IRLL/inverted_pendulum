@@ -4,6 +4,7 @@ This is the class that reads the encoder data from the microcontroller
 import serial
 import threading
 import time
+import datetime
 import signal
 import sys
 import argparse
@@ -67,10 +68,10 @@ class ucEncoder():
 	def getArmVelRadPS(self):
 		return (float(self.arm_vel_dps) / 90) * (math.pi / 2)
 
-	def getMotorVelMPS(self):
+	def getMotorVelCMPS(self):
 		return float(self.motor_vel) / self.mconst
 	
-	def getMotorVelCMPS(self):
+	def getMotorVelMPS(self):
 		return float(self.motor_vel) / (100 * self.mconst)
 
 	def getXcm(self):
@@ -97,26 +98,33 @@ class ucEncoder():
 		prev_arm = 0
 		prev_motor = 0
 		start = time.time()
-		end = 1
+		print "start: ", start
+		end = 0
 		self.get_lock()
 		while 1:
 			#read serial byte (this call is blocking)
 			#print "reading data..."
+			start = time.clock()
+			#print "start: ", start
 			packet = self.get_packet()
 			#print "data read, pushing to variables..."
 			#aquire mutex lock
-			
-			end = time.time()
+			end = time.clock()
+			#print "End: ", end
+			#print "end-start: ", end - start
 			self.data_lock.acquire()
 			try: #update the motor variable
 				self.arm_count = (packet[1] << 8) | packet[2]
-				self.arm_vel_dps = (float (self.arm_count - prev_arm) * 360 / 8000) / (end - start)
+				self.arm_vel_dps = float( (self.arm_count - prev_arm) * 45 / 1000) / (float(end) - float(start))
 				self.motor_count = (packet[3] << 8) | packet[4]
-				self.motor_vel = float (self.motor_count - prev_motor) / (end - start)
+				self.motor_vel = float (self.motor_count - prev_motor) / (float(end) - float(start))
 				self.switches = packet[5]
+				prev_arm = self.arm_count
+				prev_motor = self.motor_count
+			#except ZeroDivisionError:
+				#pass
 			finally: #release the lock
 				self.data_lock.release()
-				start = time.time()
 
 		self.status = "Process Exiting"
 
@@ -206,7 +214,7 @@ def tester():
 		print "Motor Speed (M/S): ", m_spd	
 		print "Left Switch: ", switches[1], "Right Switch: ", switches[0]
 		print ""
-		time.sleep(.1)
+		time.sleep(1)
 	
 	
 if __name__ == "__main__":
