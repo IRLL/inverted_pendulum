@@ -16,8 +16,9 @@ class ucEncoder():
 
 		self.start_byte = 0x0A
 		self.acpr = 500
-		self.mconst = 127.92*90 #cpr * pulses per count (all wrapped together)
-
+		self.mcpr = 90 #Double check
+		self.mcircumference = math.pi * diam #Get pulley Diameter
+		self.mconst = float(self.mcpr * 4) / self.mcircumference
 
 		self.arm_count = 0
 		self.motor_count = 0
@@ -75,9 +76,7 @@ class ucEncoder():
 		
 	def send_reset(self):
 		self.status = "Zeroing Counters"
-		print "got here"
 		self.ser.write(chr(0x0A))
-		print "got here"
 	
 	def uc_process(self):
 		self.status = "Process Started"
@@ -109,7 +108,7 @@ class ucEncoder():
 		self.ser.close()
 		self.ser.open()
 
-		self.status = "Acquiring stream sync"
+		self.status = "Acquiring Stream Sync..."
 
 		while in_sync == False:
 			#read a packet from the serial port
@@ -135,7 +134,7 @@ class ucEncoder():
 
 					#say we are in sync so we can break out of the loop
 					in_sync = True
-					self.status = "sync locked"
+					self.status = "Sync Locked"
 	#end get_lock()
 
 	def get_packet(self):
@@ -149,7 +148,7 @@ class ucEncoder():
 
 			#ensure we are in sync by checking that the control byte is in the correct place
 			if ord(packet[0]) != self.start_byte:
-				self.status = "Error: lost sync"
+				self.status = "Error: Lost Sync"
 				self.ser.flushInput() #flushes the serial rx buffer
 				self.get_lock() #get back into sync
 			else : #if we are in sync, break out of loop
@@ -164,7 +163,7 @@ class ucEncoder():
 
 
 def exit_handler(signum, frame):
-	print "exiting!"
+	print "Exiting!"
 	sys.exit()
 	
 	
@@ -177,9 +176,11 @@ def tester():
 		position = uc.getPosition()
 		switches = uc.getSwitches()
 		#print "buffer: ", uc.ser.inWaiting()
-		print "angle: ", angle
-		print "position: ", position
-		print "left switch: ", switches[1], "right switch: ", switches[0]
+		print "Angle: ", angle
+		print "Position: ", position
+		print "Arm Speed: "
+		print "Motor Speed: "		
+		print "Left Switch: ", switches[1], "Right Switch: ", switches[0]
 		print ""
 		time.sleep(.1)
 	

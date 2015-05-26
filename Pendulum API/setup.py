@@ -53,30 +53,20 @@ class Setup():
 		time.sleep(1)
 		base = uc.motor_count
 		
-		raw_input("Move the cart to the right brake position and press enter.")
+		print "Move the cart to the right brake position wait for the"
+		raw_input("arm to settle and press enter.")
 		self.rightBrakeEncoderPos = uc.motor_count
 		print "Right Brake: ", self.rightBrakeEncoderPos
+		print "Arm Count: ", uc.arm_count
+		print "Arm Angle: "
+		print "----------degrees: ", uc.getAngle()
+		print "----------radians: ", uc.getRadians()
 		#TODO add camera Calibration
 		
 		raw_input("Move the cart to the left brake position and press enter.")
 		self.leftBrakeEncoderPos = uc.motor_count
 		print "Left Brake: ", self.leftBrakeEncoderPos
 		#TODO add camera Calibration
-		
-		#Test for Arm angle Error
-		raw_input("Let the arm come to a complete stop with the cart moved to the right. Press enter.")
-		uc.send_reset()
-		time.sleep(1)
-		print "Arm Count: ", uc.arm_count
-		print "Arm Angle: "
-		print "----------degrees: ", uc.getAngle()
-		print "----------radians: ", uc.getRadians()
-		
-		raw_input("Move the arm around a bit then let it come to rest. Press Enter.")
-		print "Arm Count: ", uc.arm_count
-		print "Arm Angle: "
-		print "----------degrees: ", uc.getAngle()
-		print "----------radians: ", uc.getRadians()
 		
 		#write the setup object to the file in pickle
 		pickle.dump(self, file)

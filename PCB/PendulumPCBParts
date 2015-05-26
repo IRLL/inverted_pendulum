@@ -1,8 +1,9 @@
 Voltage Regulator: http://www.digikey.com/product-detail/en/MCP1700T-3302E%2FMB/MCP1700T3302EMBCT-ND/652679
 Crystal: http://www.digikey.com/product-detail/en/ECS-80-20-4X/X1094-ND/827585
-LEDs:
+LEDs: Find optimal forward voltage prior to decision
 uC:
+	http://www.digikey.com/product-detail/en/PIC32MX340F512H-80I%2FPT/PIC32MX340F512H-80I%2FPT-ND/1939170
+or  http://www.digikey.com/product-detail/en/PIC32MX340F512H-80V%2FPT/PIC32MX340F512H-80V%2FPT-ND/2712376
 Capacitors:
 
 Resistors:
-
