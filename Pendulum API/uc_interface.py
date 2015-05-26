@@ -97,6 +97,7 @@ class ucEncoder():
 		self.status = "Process Started"
 		prev_arm = 0
 		prev_motor = 0
+		delta = 500
 		start = time.time()
 		print "start: ", start
 		end = 0
@@ -115,6 +116,10 @@ class ucEncoder():
 			self.data_lock.acquire()
 			try: #update the motor variable
 				self.arm_count = (packet[1] << 8) | packet[2]
+				if prev_arm > 2000 - delta and self.arm_count < delta:
+					prev_arm = prev_arm - 2000
+				elif prev_arm < delta and self.arm_count > 2000 - delta:
+					prev_arm = 2000 + prev_arm
 				self.arm_vel_dps = float( (self.arm_count - prev_arm) * 45 / 1000) / (float(end) - float(start))
 				self.motor_count = (packet[3] << 8) | packet[4]
 				self.motor_vel = float (self.motor_count - prev_motor) / (float(end) - float(start))
