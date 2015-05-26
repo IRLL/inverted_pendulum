@@ -16,12 +16,14 @@ class ucEncoder():
 
 		self.start_byte = 0x0A
 		self.acpr = 500
-		self.mcpr = 90 #Double check
-		self.mcircumference = math.pi * diam #Get pulley Diameter
-		self.mconst = float(self.mcpr * 4) / self.mcircumference
+		self.mcpr = 90
+		self.mcircumference = math.pi * 5 #pi * diameter
+		self.mconst = float(self.mcpr * 4) / self.mcircumference #Pulses per centimeter
 
 		self.arm_count = 0
+		self.arm_vel_dps = 0
 		self.motor_count = 0
+		self.motor_vel = 0
 		self.switches = 0
 		self.status = "Idle"
 
@@ -57,7 +59,19 @@ class ucEncoder():
 	
 	def getPosition(self):
 		position = float(self.motor_count-6244) / (self.mconst)
-		return position*100
+		return position
+
+	def getArmVelDegPS(self):
+		return self.arm_vel_dps
+
+	def getArmVelRadPS(self):
+		return (float(self.arm_vel_dps) / 90) * (math.pi / 2)
+
+	def getMotorVelMPS(self):
+		return float(self.motor_vel) / self.mconst
+	
+	def getMotorVelCMPS(self):
+		return float(self.motor_vel) / (100 * self.mconst)
 
 	def getXcm(self):
 		return self.getPosition()
@@ -80,6 +94,10 @@ class ucEncoder():
 	
 	def uc_process(self):
 		self.status = "Process Started"
+		prev_arm = 0
+		prev_motor = 0
+		start = time.time()
+		end = 0
 		self.get_lock()
 		while 1:
 			#read serial byte (this call is blocking)
@@ -88,13 +106,17 @@ class ucEncoder():
 			#print "data read, pushing to variables..."
 			#aquire mutex lock
 			
+			end = time.time()
 			self.data_lock.acquire()
 			try: #update the motor variable
 				self.arm_count = (packet[1] << 8) | packet[2]
+				self.arm_vel_dps = (float (self.arm_count - prev_arm) * 360 / 8000) / (end - start)
 				self.motor_count = (packet[3] << 8) | packet[4]
+				self.motor_vel = float (self.motor_count - prev_motor) / (end - start)
 				self.switches = packet[5]
 			finally: #release the lock
 				self.data_lock.release()
+				start = time.time()
 
 		self.status = "Process Exiting"
 
@@ -175,11 +197,13 @@ def tester():
 		angle= uc.getAngle()
 		position = uc.getPosition()
 		switches = uc.getSwitches()
+		arm_spd = uc.getArmVelDegPS()
+		m_spd = uc.getMotorVelMPS()
 		#print "buffer: ", uc.ser.inWaiting()
 		print "Angle: ", angle
 		print "Position: ", position
-		print "Arm Speed: "
-		print "Motor Speed: "		
+		print "Arm Speed (Deg/S): ", arm_spd
+		print "Motor Speed (M/S): ", m_spd	
 		print "Left Switch: ", switches[1], "Right Switch: ", switches[0]
 		print ""
 		time.sleep(.1)
