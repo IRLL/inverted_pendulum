@@ -97,7 +97,7 @@ class ucEncoder():
 		prev_arm = 0
 		prev_motor = 0
 		start = time.time()
-		end = 0
+		end = 1
 		self.get_lock()
 		while 1:
 			#read serial byte (this call is blocking)
