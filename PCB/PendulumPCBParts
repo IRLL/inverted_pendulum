@@ -1,9 +1,27 @@
 Voltage Regulator: http://www.digikey.com/product-detail/en/MCP1700T-3302E%2FMB/MCP1700T3302EMBCT-ND/652679
+
 Crystal: http://www.digikey.com/product-detail/en/ECS-80-20-4X/X1094-ND/827585
+
 LEDs: http://www.digikey.com/product-detail/en/5975311407F/350-2437-1-ND/2810539
+
 uC:
 	http://www.digikey.com/product-detail/en/PIC32MX340F512H-80I%2FPT/PIC32MX340F512H-80I%2FPT-ND/1939170
 or      http://www.digikey.com/product-detail/en/PIC32MX340F512H-80V%2FPT/PIC32MX340F512H-80V%2FPT-ND/2712376
+
 Capacitors:
+	30pF (x2): http://www.digikey.com/product-detail/en/CL21C300JBANNNC/1276-1130-1-ND/3889216
+	100nF (0.1pF): http://www.digikey.com/product-detail/en/UQCFVA0R1BAT2A%5C500/478-6549-1-ND/2580352
+	10uF/6.3V: http://www.digikey.com/product-detail/en/GRM219R60J106KE19D/490-3340-1-ND/702881
+	0.1uF (100pF) (x4): http://www.digikey.com/product-detail/en/C0805C101K5RACTU/399-7981-1-ND/3471704
+	2.2uF (x2) (2200pF): http://www.digikey.com/product-detail/en/C0805C222K5RACTU/399-1151-1-ND/411426
+	10uF/10V: http://www.digikey.com/product-detail/en/LMK212F106ZG-T/587-1312-1-ND/931089
 
 Resistors:
+	3.9k (x2): http://www.digikey.com/product-detail/en/RMCF0805JT3K90/RMCF0805JT3K90CT-ND/1942569
+	47 (x2): http://www.digikey.com/product-detail/en/RMCF0805JT10K0/RMCF0805JT10K0CT-ND/1942577
+	470: http://www.digikey.com/product-detail/en/ESR10EZPJ471/RHM470KCT-ND/1763027
+	10k: http://www.digikey.com/product-detail/en/RMCF0805JT10K0/RMCF0805JT10K0CT-ND/1942577
+	680: http://www.digikey.com/product-detail/en/RMCF0805JT680R/RMCF0805JT680RCT-ND/1942554
+	60: http://www.digikey.com/product-detail/en/RMCF0805FT60R4/RMCF0805FT60R4CT-ND/1942327
+	145: http://www.digikey.com/product-detail/en/ERJ-6ENF1500V/P150CCT-ND/118719
+

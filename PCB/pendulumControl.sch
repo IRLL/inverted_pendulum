@@ -17006,8 +17006,8 @@ Source: 008-0260-0_E.pdf</description>
 <part name="IC1" library="microchip" deviceset="PIC32MX340F*H" device="" technology="512"/>
 <part name="C1" library="rcl" deviceset="C-US" device="C0805" value="10uF/10V"/>
 <part name="JP1" library="SparkFun-Connectors" deviceset="M06" device="FEMALE_LOCK"/>
-<part name="R1" library="resistor" deviceset="R-US_" device="R0805" value="50"/>
-<part name="R2" library="resistor" deviceset="R-US_" device="R0805" value="50"/>
+<part name="R1" library="resistor" deviceset="R-US_" device="R0805" value="47"/>
+<part name="R2" library="resistor" deviceset="R-US_" device="R0805" value="47"/>
 <part name="C2" library="resistor" deviceset="C-US" device="C0805" value="0.1uF"/>
 <part name="C3" library="resistor" deviceset="C-US" device="C0805" value="0.1uF"/>
 <part name="C4" library="resistor" deviceset="C-US" device="C0805" value="0.1uF"/>
@@ -17023,7 +17023,7 @@ Source: 008-0260-0_E.pdf</description>
 <part name="C7" library="rcl" deviceset="C-US" device="C0805" value="2.2uF"/>
 <part name="C8" library="rcl" deviceset="C-US" device="C0805" value="2.2uF"/>
 <part name="JP6" library="SparkFun-Connectors" deviceset="M04" device="PTH"/>
-<part name="C9" library="rcl" deviceset="C-US" device="C0805" value="100uF"/>
+<part name="C9" library="rcl" deviceset="C-US" device="C0805" value="10uF/6.3V"/>
 <part name="LED1" library="led" deviceset="LED" device="CHIP-LED0805" value="GRN"/>
 <part name="LED2" library="led" deviceset="LED" device="CHIP-LED0805" value="GRN"/>
 <part name="R6" library="rcl" deviceset="R-US_" device="R0805" value="60"/>
@@ -17639,6 +17639,12 @@ Here</text>
 <approved hash="202,1,81.28,-5.08,IC1,TCK,,,,"/>
 <approved hash="202,1,83.82,-5.08,IC1,TDI,,,,"/>
 <approved hash="205,1,170.947,19.9813,IC2G$2,GND,,,,"/>
+<approved hash="113,1,-99.7373,-32.8253,JP1,,,,,"/>
+<approved hash="113,1,39.9627,-48.0653,JP2,,,,,"/>
+<approved hash="113,1,75.5227,-35.3653,JP3,,,,,"/>
+<approved hash="113,1,75.5227,-53.1453,JP4,,,,,"/>
+<approved hash="113,1,111.083,-49.7247,JP5,,,,,"/>
+<approved hash="113,1,166.963,-45.5253,JP6,,,,,"/>
 </errors>
 </schematic>
 </drawing>
