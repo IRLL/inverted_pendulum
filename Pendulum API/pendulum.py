@@ -11,34 +11,39 @@ import os
 from motor import Motor
 from uc_interface import ucEncoder
 import setup
+import pickle
 
 p = None
 LINUX = False
 WINDOWS = False
+
+class Setup():
+	pass
 
 class Pendulum():
 	def __init__(self, motorPort, ucPort):
 		self.status = "Booting..."
 		self.motor = Motor(motorPort)
 		self.uc = ucEncoder(ucPort)
-
+		self.resetFlag = False
+		
 		#Load the Setup configuration
-		self.su = setup.Setup()
-		self.su = self.su.unpack("config")
+		file = open("config", 'r')
+		up = pickle.Unpickler(file)
+		self.su = up.load()
+		#self.su = self.su.unpack("config")
 		
 		self.watchdogThread = threading.Thread(target=self.watchdog)
 		self.watchdogThread.daemon = True
 		self.watchdogThread.start()
-		
-		self.resetFlag = False
-		
+				
 		self.status = "Booted"
 	def __del__(self):
 		self.motor.Stop()
 	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
 		self.resetFlag = True
-		speed = 19
+		speed = 18
 		left_switch = 0
 		right_switch = 0
 		while(not right_switch):
@@ -90,11 +95,11 @@ class Pendulum():
 		mPose = self.uc.getXm() # meters
 		radians = self.uc.getRadians()
 		return (mPose, radians)
-	def moveRight(self, percent, threshold=30):
+	def moveRight(self, percent, threshold=20):
 		if (percent > threshold):
 			percent = threshold
 		self.motor.MoveRight(percent)
-	def moveLeft(self, percent, threshold=30):
+	def moveLeft(self, percent, threshold=20):
 		if (percent > threshold):
 			percent = threshold
 		self.motor.MoveLeft(percent)
@@ -128,7 +133,9 @@ class Pendulum():
 			pos = self.uc.getMotorCount()
 			if (not self.resetFlag):
 				if (pos >= self.su.rightBrakeEncoderPos) or (pos <= self.su.leftBrakeEncoderPos):
+					self.uc.status = "Watchdog tripped!"
 					self.stop()
+					self.Reset()
 			time.sleep(.05)
 		
 	def print_status(self):
@@ -185,7 +192,7 @@ def exit_handler(signum, frame):
 #Tests the Pendulum Reset function
 def temp():
 	global p
-	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
+	p = Pendulum('COM6', 'COM4')
 	p.status = "Running..."
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
@@ -196,17 +203,18 @@ def temp():
 #Tests Motor movement
 def tester():
 	global p
-	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
+	p = Pendulum('COM6', 'COM4')
 	
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
-	status_thread.start()	
+	status_thread.start()
+	p.Reset()
 	
 	while 1:	
-		p.motor.MoveRight(25)
-		time.sleep(2)
-		p.motor.MoveLeft(25)
-		time.sleep(2)
+		p.motor.MoveRight(20)
+		time.sleep(1.5)
+		p.motor.MoveLeft(20)
+		time.sleep(1.5)
 #p.motor.Stop()
 #		time.sleep(.5)
 
@@ -253,9 +261,9 @@ def console_update():
 	print "Position: ", 				p.uc.getPosition()
 	print "Left Switch: ", 				switches[1]
 	print "Right Switch: ", 			switches[0]
-	print ""
+	print "right Brake: ", 				p.su.rightBrakeEncoderPos
 	
 if __name__ == "__main__":
 	signal.signal(signal.SIGINT, exit_handler)
-	#tester()
-	temp()
+	tester()
+	#temp()
