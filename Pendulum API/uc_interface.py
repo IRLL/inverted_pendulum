@@ -99,7 +99,6 @@ class ucEncoder():
 		prev_motor = 0
 		delta = 500
 		start = time.time()
-		print "start: ", start
 		end = 0
 		self.get_lock()
 		while 1:
@@ -211,12 +210,16 @@ def tester():
 		position = uc.getPosition()
 		switches = uc.getSwitches()
 		arm_spd = uc.getArmVelDegPS()
+		rps = uc.getArmVelRadPS()
 		m_spd = uc.getMotorVelMPS()
+		cmps = uc.getMotorVelCMPS()
 		#print "buffer: ", uc.ser.inWaiting()
 		print "Angle: ", angle
 		print "Position: ", position
 		print "Arm Speed (Deg/S): ", arm_spd
-		print "Motor Speed (M/S): ", m_spd	
+		print "Arm Speed (Rad/S): ", rps
+		print "Motor Speed (M/S): ", m_spd
+		print "Motor Speed (CM/S): ", cmps
 		print "Left Switch: ", switches[1], "Right Switch: ", switches[0]
 		print ""
 		time.sleep(.1)
