@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.2.0">
+<eagle version="7.3.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -17018,20 +17018,24 @@ Source: 008-0260-0_E.pdf</description>
 <part name="JP3" library="SparkFun-Connectors" deviceset="M04" device="PTH"/>
 <part name="JP4" library="SparkFun-Connectors" deviceset="M04" device="PTH"/>
 <part name="JP5" library="SparkFun-Connectors" deviceset="M03" device="PTH"/>
-<part name="R4" library="rcl" deviceset="R-US_" device="R0805"/>
-<part name="R5" library="rcl" deviceset="R-US_" device="R0805"/>
+<part name="R4" library="rcl" deviceset="R-US_" device="R0805" value="3.9k"/>
+<part name="R5" library="rcl" deviceset="R-US_" device="R0805" value="3.9k"/>
 <part name="C7" library="rcl" deviceset="C-US" device="C0805" value="2.2uF"/>
 <part name="C8" library="rcl" deviceset="C-US" device="C0805" value="2.2uF"/>
 <part name="JP6" library="SparkFun-Connectors" deviceset="M04" device="PTH"/>
 <part name="C9" library="rcl" deviceset="C-US" device="C0805" value="100uF"/>
-<part name="LED1" library="led" deviceset="LED" device="CHIP-LED0805"/>
-<part name="LED2" library="led" deviceset="LED" device="CHIP-LED0805"/>
-<part name="R6" library="rcl" deviceset="R-US_" device="R0805"/>
-<part name="R7" library="rcl" deviceset="R-US_" device="R0805"/>
+<part name="LED1" library="led" deviceset="LED" device="CHIP-LED0805" value="GRN"/>
+<part name="LED2" library="led" deviceset="LED" device="CHIP-LED0805" value="GRN"/>
+<part name="R6" library="rcl" deviceset="R-US_" device="R0805" value="60"/>
+<part name="R7" library="rcl" deviceset="R-US_" device="R0805" value="145"/>
 <part name="IC2" library="linear-technology" deviceset="LT1963EST" device="" technology="-3.3"/>
-<part name="Q1" library="crystal" deviceset="CRYSTAL" device="HC49S"/>
-<part name="PAD1" library="wirepad" deviceset="3,81/1,4" device=""/>
-<part name="PAD2" library="wirepad" deviceset="3,81/1,4" device=""/>
+<part name="Q1" library="crystal" deviceset="CRYSTAL" device="HC49S" value="8MHz"/>
+<part name="PAD1" library="wirepad" deviceset="3,81/1,4" device="" value="5V"/>
+<part name="PAD2" library="wirepad" deviceset="3,81/1,4" device="" value="GND"/>
+<part name="C10" library="rcl" deviceset="C-US" device="C0805" value="0.1uF"/>
+<part name="C11" library="rcl" deviceset="C-US" device="C0805" value="100nF"/>
+<part name="R8" library="resistor" deviceset="R-US_" device="R0805" value="10k"/>
+<part name="R9" library="resistor" deviceset="R-US_" device="R0805" value="470"/>
 </parts>
 <sheets>
 <sheet>
@@ -17054,7 +17058,7 @@ Source: 008-0260-0_E.pdf</description>
 <wire x1="-111.76" y1="-68.58" x2="-38.1" y2="-68.58" width="0.1524" layer="97"/>
 <wire x1="-38.1" y1="-27.94" x2="27.94" y2="-27.94" width="0.1524" layer="97"/>
 <wire x1="27.94" y1="-27.94" x2="27.94" y2="-68.58" width="0.1524" layer="97"/>
-<text x="-20.32" y="-38.1" size="1.778" layer="97">Decoupling Caps</text>
+<text x="-30.48" y="-30.48" size="1.778" layer="97">Decoupling Caps</text>
 <wire x1="-91.44" y1="-5.08" x2="-91.44" y2="33.02" width="0.1524" layer="97"/>
 <wire x1="-73.66" y1="33.02" x2="-22.86" y2="33.02" width="0.1524" layer="97"/>
 <text x="-35.56" y="-2.54" size="1.778" layer="97">Oscillator</text>
@@ -17119,6 +17123,10 @@ Here</text>
 <instance part="Q1" gate="G$1" x="-55.88" y="17.78"/>
 <instance part="PAD1" gate="1" x="152.4" y="-15.24"/>
 <instance part="PAD2" gate="1" x="152.4" y="-17.78" rot="MR180"/>
+<instance part="C10" gate="G$1" x="-15.24" y="-50.8"/>
+<instance part="C11" gate="G$1" x="-78.74" y="-45.72"/>
+<instance part="R8" gate="G$1" x="-66.04" y="-48.26" rot="R90"/>
+<instance part="R9" gate="G$1" x="-53.34" y="-40.64"/>
 </instances>
 <busses>
 </busses>
@@ -17130,9 +17138,9 @@ Here</text>
 <label x="17.78" y="40.64" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="JP1" gate="G$1" pin="1"/>
-<wire x1="-96.52" y1="-40.64" x2="-86.36" y2="-40.64" width="0.1524" layer="91"/>
-<label x="-91.44" y="-40.64" size="1.778" layer="95"/>
+<pinref part="R9" gate="G$1" pin="2"/>
+<wire x1="-48.26" y1="-40.64" x2="-43.18" y2="-40.64" width="0.1524" layer="91"/>
+<label x="-48.26" y="-40.64" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -17180,8 +17188,12 @@ Here</text>
 <junction x="17.78" y="-60.96"/>
 <label x="-30.48" y="-63.5" size="1.778" layer="95"/>
 <pinref part="C9" gate="G$1" pin="2"/>
-<wire x1="-5.08" y1="-60.96" x2="-30.48" y2="-60.96" width="0.1524" layer="91"/>
+<wire x1="-5.08" y1="-60.96" x2="-15.24" y2="-60.96" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="-60.96" x2="-30.48" y2="-60.96" width="0.1524" layer="91"/>
 <wire x1="-30.48" y1="-60.96" x2="-30.48" y2="-58.42" width="0.1524" layer="91"/>
+<junction x="-15.24" y="-60.96"/>
+<pinref part="C10" gate="G$1" pin="2"/>
+<wire x1="-15.24" y1="-60.96" x2="-15.24" y2="-55.88" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="C5" gate="G$1" pin="2"/>
@@ -17244,6 +17256,17 @@ Here</text>
 <wire x1="167.64" y1="15.24" x2="167.64" y2="10.16" width="0.1524" layer="91"/>
 <label x="167.64" y="10.16" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="JP5" gate="G$1" pin="1"/>
+<wire x1="114.3" y1="-45.72" x2="114.3" y2="-38.1" width="0.1524" layer="91"/>
+<wire x1="114.3" y1="-38.1" x2="101.6" y2="-38.1" width="0.1524" layer="91"/>
+<label x="101.6" y="-38.1" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="C11" gate="G$1" pin="2"/>
+<wire x1="-78.74" y1="-50.8" x2="-78.74" y2="-58.42" width="0.1524" layer="91"/>
+<label x="-78.74" y="-58.42" size="1.778" layer="95" rot="R90"/>
+</segment>
 </net>
 <net name="VCC3V3" class="0">
 <segment>
@@ -17284,7 +17307,11 @@ Here</text>
 <junction x="-5.08" y="-40.64"/>
 <junction x="5.08" y="-40.64"/>
 <junction x="17.78" y="-40.64"/>
-<label x="-15.24" y="-43.18" size="1.778" layer="95"/>
+<label x="-25.4" y="-38.1" size="1.778" layer="95"/>
+<pinref part="C10" gate="G$1" pin="1"/>
+<wire x1="-15.24" y1="-48.26" x2="-15.24" y2="-40.64" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="-40.64" x2="-25.4" y2="-40.64" width="0.1524" layer="91"/>
+<junction x="-15.24" y="-40.64"/>
 </segment>
 <segment>
 <pinref part="JP2" gate="G$1" pin="4"/>
@@ -17305,6 +17332,11 @@ Here</text>
 <pinref part="IC1" gate="G$1" pin="AVDD"/>
 <wire x1="60.96" y1="-5.08" x2="60.96" y2="-15.24" width="0.1524" layer="91"/>
 <label x="60.96" y="-15.24" size="1.778" layer="95" rot="R90"/>
+</segment>
+<segment>
+<pinref part="R8" gate="G$1" pin="1"/>
+<wire x1="-66.04" y1="-53.34" x2="-66.04" y2="-58.42" width="0.1524" layer="91"/>
+<label x="-66.04" y="-58.42" size="1.778" layer="95" rot="R180"/>
 </segment>
 </net>
 <net name="N$10" class="0">
@@ -17569,12 +17601,6 @@ Here</text>
 <wire x1="157.48" y1="22.86" x2="149.86" y2="22.86" width="0.1524" layer="91"/>
 <label x="149.86" y="22.86" size="1.778" layer="95"/>
 </segment>
-<segment>
-<pinref part="JP5" gate="G$1" pin="1"/>
-<wire x1="114.3" y1="-45.72" x2="114.3" y2="-38.1" width="0.1524" layer="91"/>
-<wire x1="114.3" y1="-38.1" x2="101.6" y2="-38.1" width="0.1524" layer="91"/>
-<label x="101.6" y="-38.1" size="1.778" layer="95"/>
-</segment>
 </net>
 <net name="N$4" class="0">
 <segment>
@@ -17590,9 +17616,30 @@ Here</text>
 <wire x1="-50.8" y1="50.8" x2="-50.8" y2="48.26" width="0.1524" layer="91"/>
 </segment>
 </net>
+<net name="N$6" class="0">
+<segment>
+<pinref part="R9" gate="G$1" pin="1"/>
+<pinref part="R8" gate="G$1" pin="2"/>
+<wire x1="-78.74" y1="-40.64" x2="-66.04" y2="-40.64" width="0.1524" layer="91"/>
+<wire x1="-66.04" y1="-40.64" x2="-58.42" y2="-40.64" width="0.1524" layer="91"/>
+<wire x1="-66.04" y1="-43.18" x2="-66.04" y2="-40.64" width="0.1524" layer="91"/>
+<pinref part="C11" gate="G$1" pin="1"/>
+<wire x1="-78.74" y1="-43.18" x2="-78.74" y2="-40.64" width="0.1524" layer="91"/>
+<junction x="-66.04" y="-40.64"/>
+<pinref part="JP1" gate="G$1" pin="1"/>
+<wire x1="-96.52" y1="-40.64" x2="-78.74" y2="-40.64" width="0.1524" layer="91"/>
+<junction x="-78.74" y="-40.64"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
+<errors>
+<approved hash="202,1,71.12,-5.08,IC1,TMS,,,,"/>
+<approved hash="202,1,81.28,-5.08,IC1,TCK,,,,"/>
+<approved hash="202,1,83.82,-5.08,IC1,TDI,,,,"/>
+<approved hash="205,1,170.947,19.9813,IC2G$2,GND,,,,"/>
+</errors>
 </schematic>
 </drawing>
 <compatibility>
