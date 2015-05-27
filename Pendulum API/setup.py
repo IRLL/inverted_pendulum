@@ -15,6 +15,7 @@ class Setup():
 	def __init__(self):
 		self.rightBrakeEncoderPos = 500
 		self.rightBrakeCameraPos = 500
+		self.encoderCenter = 0
 		self.leftBrakeEncoderPos = 0
 		self.leftBrakeCameraPos = 0
 		
@@ -33,12 +34,12 @@ def pack():
 	#Get user input
 	port = raw_input("Enter the micro-controller's port: ")
 	if port == '':
-		print "Defaulting to port: COM4!"
-		port = "COM4"
+		print "Defaulting to port: /dev/ttyUSB0!"
+		port = "/dev/ttyUSB0"
 	file_name = raw_input("Enter the file for saving: ")
 	if file_name == '':
-		print "Defaulting to file name: test!"
-		file_name = "test"
+		print "Defaulting to file name: config!"
+		file_name = "config"
 	#Open the micro-controller port for reading
 	print "Initializing with port: " + port
 	uc = ucEncoder(port)
@@ -68,6 +69,10 @@ def pack():
 	setup.leftBrakeEncoderPos = uc.motor_count
 	print "Left Brake: ", setup.leftBrakeEncoderPos
 	#TODO add camera Calibration
+
+	#Calculate the center
+	setup.encoderCenter = (setup.leftBrakeEncoderPos + setup.rightBrakeEncoderPos)/2
+	print "Center: ", setup.encoderCenter
 	
 	#write the setup object to the file in pickle
 	p = pickle.Pickler(file)

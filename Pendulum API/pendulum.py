@@ -26,6 +26,7 @@ class Pendulum():
 		self.motor = Motor(motorPort)
 		self.uc = ucEncoder(ucPort)
 		self.resetFlag = False
+		self.softStopFlag = False
 		
 		#Load the Setup configuration
 		file = open("config", 'r')
@@ -43,19 +44,20 @@ class Pendulum():
 	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
 		self.resetFlag = True
-		speed = 18
+		speed = 19
 		left_switch = 0
 		right_switch = 0
-		while(not right_switch):
-			self.motor.MoveRight(speed)
-			switches = self.uc.getSwitches()
-			right_switch = switches[0]
-			time.sleep(.1)
-			
 		while(not left_switch):
 			self.motor.MoveLeft(speed)
 			switches = self.uc.getSwitches()
 			left_switch = switches[1]
+			time.sleep(.1)
+			
+		while(not right_switch):
+			self.motor.MoveRight(speed)
+			switches = self.uc.getSwitches()
+			left_switch = switches[0]
+			time.sleep(.1)
 		
 		#wait for arm to settle
 		current = 0
@@ -75,18 +77,18 @@ class Pendulum():
 		self.uc.send_reset()
 		time.sleep(.5)
 
-		self.status = "moving to zero position"
+		self.status = "moving to center position"
 		while True:
-			position = self.uc.getPosition()
-			if (position > -12 + start):
+			position = self.uc.motor_count
+			if (position <= self.su.encoderCenter):
+				self.stop()
 				break;
-			self.motor.MoveRight(speed)
-			self.motor.Stop()
+			self.motor.MoveLeft(speed)
 		
 		self.resetFlag = False
 		
 		self.status = "done resetting!"
-		time.sleep(1)
+		time.sleep(2)
         
 	def getState(self):
 		'''
@@ -98,11 +100,13 @@ class Pendulum():
 	def moveRight(self, percent, threshold=20):
 		if (percent > threshold):
 			percent = threshold
-		self.motor.MoveRight(percent)
+		if not softStopFlag:
+			self.motor.MoveRight(percent)
 	def moveLeft(self, percent, threshold=20):
 		if (percent > threshold):
 			percent = threshold
-		self.motor.MoveLeft(percent)
+		if not softStopFlag:
+			self.motor.MoveLeft(percent)
 	def getActions(self):
 		return [0,1] # (0)Left (1)Right
 	def step(self, action):
@@ -133,9 +137,12 @@ class Pendulum():
 			pos = self.uc.getMotorCount()
 			if (not self.resetFlag):
 				if (pos >= self.su.rightBrakeEncoderPos) or (pos <= self.su.leftBrakeEncoderPos):
+					self.softStopFlag = True
 					self.uc.status = "Watchdog tripped!"
 					self.stop()
+					time.sleep(2)
 					self.Reset()
+					self.softStopFlag = False
 			time.sleep(.05)
 		
 	def print_status(self):
@@ -192,7 +199,7 @@ def exit_handler(signum, frame):
 #Tests the Pendulum Reset function
 def temp():
 	global p
-	p = Pendulum('COM6', 'COM4')
+	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
 	p.status = "Running..."
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
@@ -203,20 +210,20 @@ def temp():
 #Tests Motor movement
 def tester():
 	global p
-	p = Pendulum('COM6', 'COM4')
+	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
 	
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
 	status_thread.start()
-	p.Reset()
+#	p.Reset()
 	
 	while 1:	
 		p.motor.MoveRight(20)
 		time.sleep(1.5)
 		p.motor.MoveLeft(20)
 		time.sleep(1.5)
-#p.motor.Stop()
-#		time.sleep(.5)
+		p.motor.Stop()
+		time.sleep(.5)
 
 #Continuously print the status of the Pendulum	
 def print_status():
@@ -235,7 +242,7 @@ def print_status():
 	print "Python Version: ", platform.python_version()
 	print "Clear the Path of the arm or suffer the consequences!"
 	time.sleep(3)
-	
+	#p.Reset()	
 	#Endlessly update the console
 	while True:
 		if (WINDOWS):

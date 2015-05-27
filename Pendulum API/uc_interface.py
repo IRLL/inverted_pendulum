@@ -104,12 +104,12 @@ class ucEncoder():
 		while 1:
 			#read serial byte (this call is blocking)
 			#print "reading data..."
-			start = time.clock()
+			start = time.time()
 			#print "start: ", start
 			packet = self.get_packet()
 			#print "data read, pushing to variables..."
 			#aquire mutex lock
-			end = time.clock()
+			end = time.time()
 			#print "End: ", end
 			#print "end-start: ", end - start
 			self.data_lock.acquire()
@@ -202,7 +202,7 @@ def exit_handler(signum, frame):
 	
 	
 def tester():
-	uc = ucEncoder(4)	
+	uc = ucEncoder('/dev/ttyUSB0')	
 	time.sleep(1)
 	uc.send_reset()
 	while 1:
