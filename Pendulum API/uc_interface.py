@@ -73,7 +73,7 @@ class ucEncoder():
 	
 	def getMotorVelMPS(self):
 		return float(self.motor_vel) / (100 * self.mconst)
-* 360 / (4*self.acpr)
+
 	def getXcm(self):
 		return self.getPosition()
 
@@ -219,7 +219,7 @@ def tester():
 		print "Motor Speed (M/S): ", m_spd	
 		print "Left Switch: ", switches[1], "Right Switch: ", switches[0]
 		print ""
-		time.sleep(1)
+		time.sleep(.1)
 	
 	
 if __name__ == "__main__":
