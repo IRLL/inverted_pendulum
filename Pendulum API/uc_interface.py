@@ -73,7 +73,7 @@ class ucEncoder():
 	
 	def getMotorVelMPS(self):
 		return float(self.motor_vel) / (100 * self.mconst)
-
+* 360 / (4*self.acpr)
 	def getXcm(self):
 		return self.getPosition()
 
@@ -120,7 +120,7 @@ class ucEncoder():
 					prev_arm = prev_arm - 2000
 				elif prev_arm < delta and self.arm_count > 2000 - delta:
 					prev_arm = 2000 + prev_arm
-				self.arm_vel_dps = float( (self.arm_count - prev_arm) * 45 / 1000) / (float(end) - float(start))
+				self.arm_vel_dps = float( (self.arm_count - prev_arm) * 360 / (4 * self.acpr)) / (float(end) - float(start))
 				self.motor_count = (packet[3] << 8) | packet[4]
 				self.motor_vel = float (self.motor_count - prev_motor) / (float(end) - float(start))
 				self.switches = packet[5]
