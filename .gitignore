@@ -227,6 +227,7 @@ uc_interface.X/
 #############
 
 build/
+devel/
 bin/
 lib/
 msg_gen/
