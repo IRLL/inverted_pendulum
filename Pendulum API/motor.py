@@ -32,6 +32,9 @@ class Motor():
 		
 		self.update_period = .5 #update rate for variables		
 
+		self.ser.write(chr(0x92))
+		self.ser.write(chr(32))
+
 		#Motor Variables
 		self.error_codes = 0
 		self.supply_voltage = 0
@@ -57,8 +60,7 @@ class Motor():
 		self.ser.write(chr(0x86) + speed1 + speed2)
 	def Stop(self):
 		self.status = "Stopping"
-		self.ser.write(chr(0x92))
-		self.ser.write(chr(32))
+		self.ser.write(chr(0xE0))
 	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()
