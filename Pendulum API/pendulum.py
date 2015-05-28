@@ -218,12 +218,12 @@ def tester():
 #	p.Reset()
 	
 	while 1:	
-		p.motor.MoveRight(20)
+		p.moveRight(20)
 		time.sleep(1.5)
-		p.motor.MoveLeft(20)
+		p.moveLeft(20)
 		time.sleep(1.5)
-		p.motor.Stop()
-		time.sleep(.5)
+#		p.motor.Stop()
+#		time.sleep(.5)
 
 #Continuously print the status of the Pendulum	
 def print_status():
