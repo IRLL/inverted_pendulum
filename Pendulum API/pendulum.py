@@ -44,7 +44,7 @@ class Pendulum():
 	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
 		self.resetFlag = True
-		speed = 19
+		speed = 15
 		left_switch = 0
 		right_switch = 0
 		while(not left_switch):
@@ -56,7 +56,7 @@ class Pendulum():
 		while(not right_switch):
 			self.motor.MoveRight(speed)
 			switches = self.uc.getSwitches()
-			left_switch = switches[0]
+			right_switch = switches[0]
 			time.sleep(.1)
 		
 		#wait for arm to settle
@@ -84,7 +84,7 @@ class Pendulum():
 				self.stop()
 				break;
 			self.motor.MoveLeft(speed)
-		
+		time.sleep(1)		
 		self.resetFlag = False
 		
 		self.status = "done resetting!"
@@ -97,15 +97,15 @@ class Pendulum():
 		mPose = self.uc.getXm() # meters
 		radians = self.uc.getRadians()
 		return (mPose, radians)
-	def moveRight(self, percent, threshold=20):
+	def moveRight(self, percent, threshold=30):
 		if (percent > threshold):
 			percent = threshold
-		if not softStopFlag:
+		if not self.softStopFlag:
 			self.motor.MoveRight(percent)
-	def moveLeft(self, percent, threshold=20):
+	def moveLeft(self, percent, threshold=30):
 		if (percent > threshold):
 			percent = threshold
-		if not softStopFlag:
+		if not self.softStopFlag:
 			self.motor.MoveLeft(percent)
 	def getActions(self):
 		return [0,1] # (0)Left (1)Right
@@ -218,10 +218,10 @@ def tester():
 #	p.Reset()
 	
 	while 1:	
-		p.moveRight(20)
-		time.sleep(1.5)
-		p.moveLeft(20)
-		time.sleep(1.5)
+		p.moveRight(17)
+		time.sleep(1)
+		p.moveLeft(17)
+		time.sleep(1)
 #		p.motor.Stop()
 #		time.sleep(.5)
 
