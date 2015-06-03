@@ -44,7 +44,7 @@ class Pendulum():
 	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
 		self.resetFlag = True
-		speed = 15
+		speed = 20
 		left_switch = 0
 		right_switch = 0
 		while(not left_switch):
@@ -54,10 +54,12 @@ class Pendulum():
 			time.sleep(.1)
 			
 		while(not right_switch):
-			self.motor.MoveRight(speed)
+			self.motor.MoveRight(speed+5)
 			switches = self.uc.getSwitches()
 			right_switch = switches[0]
 			time.sleep(.1)
+		
+		self.motor.Stop()
 		
 		#wait for arm to settle
 		current = 0
@@ -75,15 +77,16 @@ class Pendulum():
 				count = wait
 		
 		self.uc.send_reset()
-		time.sleep(.5)
+		time.sleep(2)
 
 		self.status = "moving to center position"
 		while True:
 			position = self.uc.motor_count
 			if (position <= self.su.encoderCenter):
-				self.stop()
+				self.motor.Stop()
 				break;
 			self.motor.MoveLeft(speed)
+		self.motor.Stop()
 		time.sleep(1)		
 		self.resetFlag = False
 		
@@ -218,9 +221,9 @@ def tester():
 #	p.Reset()
 	
 	while 1:	
-		p.moveRight(17)
+		p.moveRight(30)
 		time.sleep(1)
-		p.moveLeft(17)
+		p.moveLeft(30)
 		time.sleep(1)
 #		p.motor.Stop()
 #		time.sleep(.5)

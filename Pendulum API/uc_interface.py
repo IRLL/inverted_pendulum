@@ -17,7 +17,7 @@ class ucEncoder():
 
 		self.start_byte = 0x0A
 		self.acpr = 500
-		self.mcpr = 90
+		self.mcpr = 540
 		self.mcircumference = math.pi * 5 #pi * diameter
 		self.mconst = float(self.mcpr * 4) / self.mcircumference #Pulses per centimeter
 

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 '''
 This is the class that controls the motor
 '''
@@ -35,6 +36,8 @@ class Motor():
 		self.ser.write(chr(0x92))
 		self.ser.write(chr(32))
 
+		self.rightDir = 0
+
 		#Motor Variables
 		self.error_codes = 0
 		self.supply_voltage = 0
@@ -46,6 +49,7 @@ class Motor():
 		self.ser.close()
 	def MoveRight(self, percent):
 		self.status = "Moving Right"
+		self.rightDir = 1
 		self.Enable() #enable the motor
 		speed = self.getValueFromPercent(percent)
 		speed1 = chr(speed & 0x1F)
@@ -53,6 +57,7 @@ class Motor():
 		self.ser.write(chr(0x85) + speed1 + speed2)
 	def MoveLeft(self, percent):
 		self.status = "Moving Left"
+		self.rightDir = 0
 		self.Enable() #enable the motor
 		speed = self.getValueFromPercent(percent)
 		speed1 = chr(speed & 0x1F)
@@ -60,7 +65,16 @@ class Motor():
 		self.ser.write(chr(0x86) + speed1 + speed2)
 	def Stop(self):
 		self.status = "Stopping"
-		self.ser.write(chr(0xE0))
+#		self.ser.write(chr(0x92))
+#		self.ser.write(chr(0x20))
+
+		if self.rightDir:
+			#Move left to stop
+			self.MoveLeft(20)
+		else:
+			#Move right to stop
+			self.MoveRight(20)
+		self.MoveRight(0)
 	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()
@@ -115,13 +129,23 @@ class Motor():
 
 def tester():
 	motor = Motor()
+	flop = 0
 	while True:
-		motor_stats = motor.get_Variables()
-		print "Temperature:   ", stats[2]
-		print "Input Voltage: ", stats[1]
-		time.sleep(.2)	
+		motor_stats = motor.getVariables()
+		if flop:
+			motor.MoveLeft(25)
+		
+		else:
+			motor.MoveRight(25)
+		flop = not flop
+		print "Temperature:   ", motor_stats[2]
+		print "Input Voltage: ", motor_stats[1]
+		time.sleep(2)	
+
+def exit_handler(signal):
+    
+    sys.exit()
 
 if __name__ == "__main__":
 	signal.signal(signal.SIGINT, exit_handler)
 	tester()
-
