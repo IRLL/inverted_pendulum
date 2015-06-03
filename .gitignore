@@ -235,3 +235,4 @@ pip-log.txt
 *.l#[0-9]
 *.l#[0-9][0-9]
 *.job
+Pendulum API/config
