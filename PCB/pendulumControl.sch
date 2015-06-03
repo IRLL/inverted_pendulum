@@ -17646,6 +17646,8 @@ Source: 008-0260-0_E.pdf</description>
 <part name="R9" library="resistor" deviceset="R-US_" device="R0805" value="470"/>
 <part name="IC2" library="v-reg" deviceset="78MXXS" device=""/>
 <part name="FAN" library="SparkFun-Connectors" deviceset="M03" device="POLAR"/>
+<part name="C7" library="rcl" deviceset="C-US" device="C0805" value="0.022uF"/>
+<part name="C8" library="rcl" deviceset="C-US" device="C0805" value="0.022uF"/>
 </parts>
 <sheets>
 <sheet>
@@ -17736,6 +17738,8 @@ Here</text>
 <instance part="R9" gate="G$1" x="-53.34" y="-40.64"/>
 <instance part="IC2" gate="A" x="177.8" y="-40.64"/>
 <instance part="FAN" gate="G$1" x="157.48" y="15.24"/>
+<instance part="C7" gate="G$1" x="121.92" y="-35.56" rot="R90"/>
+<instance part="C8" gate="G$1" x="121.92" y="-60.96" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -17859,6 +17863,16 @@ Here</text>
 <pinref part="FAN" gate="G$1" pin="1"/>
 <wire x1="165.1" y1="12.7" x2="182.88" y2="12.7" width="0.1524" layer="91"/>
 <label x="172.72" y="12.7" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="C7" gate="G$1" pin="2"/>
+<wire x1="127" y1="-35.56" x2="134.62" y2="-35.56" width="0.1524" layer="91"/>
+<label x="129.54" y="-35.56" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="C8" gate="G$1" pin="2"/>
+<wire x1="127" y1="-60.96" x2="134.62" y2="-60.96" width="0.1524" layer="91"/>
+<label x="129.54" y="-60.96" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VCC3V3" class="0">
@@ -18098,8 +18112,13 @@ Here</text>
 </segment>
 <segment>
 <pinref part="LIMITS" gate="G$1" pin="1"/>
-<wire x1="114.3" y1="-48.26" x2="129.54" y2="-48.26" width="0.1524" layer="91"/>
+<wire x1="114.3" y1="-48.26" x2="116.84" y2="-48.26" width="0.1524" layer="91"/>
 <label x="129.54" y="-45.72" size="1.778" layer="95" rot="R180"/>
+<junction x="116.84" y="-48.26"/>
+<wire x1="116.84" y1="-48.26" x2="129.54" y2="-48.26" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="-48.26" x2="116.84" y2="-35.56" width="0.1524" layer="91"/>
+<pinref part="C7" gate="G$1" pin="1"/>
+<wire x1="119.38" y1="-35.56" x2="116.84" y2="-35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="LIM_L" class="0">
@@ -18110,8 +18129,13 @@ Here</text>
 </segment>
 <segment>
 <pinref part="LIMITS" gate="G$1" pin="2"/>
-<wire x1="114.3" y1="-50.8" x2="129.54" y2="-50.8" width="0.1524" layer="91"/>
+<wire x1="114.3" y1="-50.8" x2="116.84" y2="-50.8" width="0.1524" layer="91"/>
 <label x="129.54" y="-50.8" size="1.778" layer="95" rot="R180"/>
+<junction x="116.84" y="-50.8"/>
+<wire x1="116.84" y1="-50.8" x2="129.54" y2="-50.8" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="-50.8" x2="116.84" y2="-60.96" width="0.1524" layer="91"/>
+<pinref part="C8" gate="G$1" pin="1"/>
+<wire x1="116.84" y1="-60.96" x2="119.38" y2="-60.96" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$4" class="0">
