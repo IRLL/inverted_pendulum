@@ -3015,9 +3015,9 @@ Please make sure your boards conform to these design rules.</description>
 <attribute name="VALUE" x="9.525" y="16.51" size="1.27" layer="28" rot="MR180"/>
 </element>
 <element name="R2" library="resistor" package="R0805" value="47" x="7.62" y="17.78" rot="MR0"/>
-<element name="R3" library="rcl" package="R0805" value="680" x="22.61404375" y="14.437040625" smashed="yes" rot="MR270">
-<attribute name="NAME" x="25.456715625" y="16.55345" size="1.27" layer="26" rot="MR270"/>
-<attribute name="VALUE" x="25.15404375" y="15.072040625" size="1.27" layer="28" rot="MR270"/>
+<element name="R3" library="rcl" package="R0805" value="680" x="23.523478125" y="15.2691375" smashed="yes" rot="MR0">
+<attribute name="NAME" x="25.6398875" y="12.426465625" size="1.27" layer="26" rot="MR0"/>
+<attribute name="VALUE" x="24.158478125" y="12.7291375" size="1.27" layer="28" rot="MR0"/>
 </element>
 <element name="R6" library="rcl" package="R0805" value="60" x="8.700559375" y="27.8262" rot="R90"/>
 <element name="R7" library="rcl" package="R0805" value="" x="12.584" y="28.038259375" rot="R90"/>
@@ -3173,7 +3173,16 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="38.1165625" y1="16.8756375" x2="38.28531875" y2="16.70688125" width="0.254" layer="16"/>
 <wire x1="26.235784375" y1="15.484715625" x2="28.124090625" y2="17.373021875" width="0.254" layer="1"/>
 <wire x1="28.124090625" y1="17.373021875" x2="28.124090625" y2="17.93948125" width="0.254" layer="1"/>
-<wire x1="39.322409375" y1="15.114184375" x2="39.37" y2="3.81" width="0" layer="19" extent="16-16"/>
+<wire x1="39.322409375" y1="15.114184375" x2="37.85468125" y2="15.114184375" width="0.4064" layer="16"/>
+<wire x1="37.85468125" y1="15.114184375" x2="37.85468125" y2="15.121940625" width="0.4064" layer="16"/>
+<via x="37.85468125" y="15.121940625" extent="1-16" drill="0.5"/>
+<wire x1="37.85468125" y1="15.121940625" x2="37.85468125" y2="10.807309375" width="0.254" layer="1"/>
+<wire x1="37.85468125" y1="10.807309375" x2="37.896509375" y2="10.76548125" width="0.254" layer="1"/>
+<via x="37.896509375" y="10.76548125" extent="1-16" drill="0.5"/>
+<wire x1="37.896509375" y1="10.76548125" x2="37.56230625" y2="10.76548125" width="0.254" layer="16"/>
+<wire x1="37.56230625" y1="10.76548125" x2="37.269084375" y2="10.472259375" width="0.254" layer="16"/>
+<wire x1="20.725584375" y1="11.92384375" x2="20.44593125" y2="11.644190625" width="0.254" layer="16"/>
+<wire x1="20.44593125" y1="11.644190625" x2="19.358671875" y2="11.644190625" width="0.254" layer="16"/>
 </signal>
 <signal name="MCLR">
 <contactref element="IC1" pad="7"/>
@@ -3291,23 +3300,24 @@ Please make sure your boards conform to these design rules.</description>
 <contactref element="R3" pad="2"/>
 <contactref element="C5" pad="1"/>
 <contactref element="Q1" pad="1"/>
-<wire x1="22.625584375" y1="11.92384375" x2="24.87910625" y2="14.177365625" width="0.254" layer="16"/>
-<wire x1="24.87910625" y1="14.177365625" x2="25.733621875" y2="14.177365625" width="0.4064" layer="16"/>
-<wire x1="27.225003125" y1="10.325328125" x2="25.733621875" y2="11.816709375" width="0.254" layer="16"/>
-<wire x1="25.733621875" y1="11.816709375" x2="25.733621875" y2="14.177365625" width="0.254" layer="16"/>
+<wire x1="22.573478125" y1="15.2691375" x2="22.625584375" y2="15.21703125" width="0.254" layer="16"/>
+<wire x1="22.625584375" y1="15.21703125" x2="22.625584375" y2="11.92384375" width="0.254" layer="16"/>
+<wire x1="22.625584375" y1="11.92384375" x2="25.6264875" y2="11.92384375" width="0.254" layer="16"/>
+<wire x1="25.6264875" y1="11.92384375" x2="27.225003125" y2="10.325328125" width="0.254" layer="16"/>
 </signal>
 <signal name="OSC2">
 <contactref element="R3" pad="1"/>
 <contactref element="IC1" pad="40"/>
-<wire x1="25.733621875" y1="16.077365625" x2="26.7893375" y2="17.13308125" width="0.254" layer="16"/>
-<wire x1="26.7893375" y1="17.13308125" x2="29.371625" y2="17.13308125" width="0.254" layer="16"/>
-<via x="29.371625" y="17.13308125" extent="1-16" drill="0.5"/>
-<wire x1="29.371625" y1="17.13308125" x2="30.954253125" y2="17.13308125" width="0.254" layer="1"/>
+<wire x1="24.92539375" y1="15.2691375" x2="26.7893375" y2="17.13308125" width="0.254" layer="16"/>
+<wire x1="26.7893375" y1="17.13308125" x2="29.581621875" y2="17.1214125" width="0.254" layer="16"/>
+<via x="29.581621875" y="17.1214125" extent="1-16" drill="0.5"/>
+<wire x1="29.581621875" y1="17.1214125" x2="30.954253125" y2="17.13308125" width="0.254" layer="1"/>
 <wire x1="30.954253125" y1="17.13308125" x2="31.83794375" y2="18.016771875" width="0.254" layer="1"/>
 <wire x1="31.83794375" y1="18.016771875" x2="31.83794375" y2="20.166703125" width="0.254" layer="1"/>
 <wire x1="31.83794375" y1="20.166703125" x2="30.63775625" y2="21.366890625" width="0.254" layer="1"/>
 <wire x1="30.63775625" y1="21.366890625" x2="26.046890625" y2="21.366890625" width="0.254" layer="1"/>
 <wire x1="26.046890625" y1="21.366890625" x2="26.02" y2="21.34" width="0.254" layer="1"/>
+<wire x1="24.92539375" y1="15.2691375" x2="24.473478125" y2="15.2691375" width="0.254" layer="16"/>
 </signal>
 <signal name="OSC1">
 <contactref element="C6" pad="1"/>
