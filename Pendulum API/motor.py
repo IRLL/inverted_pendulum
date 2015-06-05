@@ -37,6 +37,7 @@ class Motor():
 		self.ser.write(chr(32))
 
 		self.rightDir = 0
+		self.spd = 0
 
 		#Motor Variables
 		self.error_codes = 0
@@ -51,30 +52,51 @@ class Motor():
 		self.status = "Moving Right"
 		self.rightDir = 1
 		self.Enable() #enable the motor
-		speed = self.getValueFromPercent(percent)
-		speed1 = chr(speed & 0x1F)
-		speed2 = chr(speed >> 5)
+		self.spd = self.getValueFromPercent(percent)
+		speed1 = chr(self.spd & 0x1F)
+		speed2 = chr(self.spd >> 5)
 		self.ser.write(chr(0x85) + speed1 + speed2)
+
+	def MoveRightAtSpeed(self, speed):
+		self.status = "Moving Right"
+		self.rightDir = 1
+		self.Enable()
+		speed1 = chr(self.spd & 0x1F)
+		speed2 = chr(self.spd >> 5)
+		self.ser.write(chr(0x86) + speed1 + speed2)
+
+	def MoveLeftAtSpeed(self, speed):
+		self.status = "Moving Left"
+		self.rightDir = 0
+		self.Enable()
+		speed1 = chr(self.spd & 0x1F)
+		speed2 = chr(self.spd >> 5)
+		self.ser.write(chr(0x86) + speed1 + speed2)
 	def MoveLeft(self, percent):
 		self.status = "Moving Left"
 		self.rightDir = 0
 		self.Enable() #enable the motor
-		speed = self.getValueFromPercent(percent)
-		speed1 = chr(speed & 0x1F)
-		speed2 = chr(speed >> 5)
+		self.spd = self.getValueFromPercent(percent)
+		speed1 = chr(self.spd & 0x1F)
+		speed2 = chr(self.spd >> 5)
 		self.ser.write(chr(0x86) + speed1 + speed2)
 	def Stop(self):
 		self.status = "Stopping"
+		stop_speed = 30
 #		self.ser.write(chr(0x92))
 #		self.ser.write(chr(0x20))
 
 		if self.rightDir:
 			#Move left to stop
-			self.MoveLeft(20)
+#			self.MoveLeftAtSpeed(self.spd + 160)
+			self.MoveLeft(stop_speed)
 		else:
 			#Move right to stop
-			self.MoveRight(20)
+#			self.MoveRightAtSpeed(self.spd + 160)
+			self.MoveRight(stop_speed)
+		time.sleep(.05)
 		self.MoveRight(0)
+		self.spd = 0
 	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()

@@ -44,7 +44,7 @@ class Pendulum():
 	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
 		self.resetFlag = True
-		speed = 20
+		speed = 25
 		left_switch = 0
 		right_switch = 0
 		while(not left_switch):
@@ -142,7 +142,7 @@ class Pendulum():
 				if (pos >= self.su.rightBrakeEncoderPos) or (pos <= self.su.leftBrakeEncoderPos):
 					self.softStopFlag = True
 					self.uc.status = "Watchdog tripped!"
-					self.stop()
+					self.motor.Stop()
 					time.sleep(2)
 					self.Reset()
 					self.softStopFlag = False
@@ -221,9 +221,9 @@ def tester():
 #	p.Reset()
 	
 	while 1:	
-		p.moveRight(30)
+		p.moveRight(60)
 		time.sleep(1)
-		p.moveLeft(30)
+		p.moveLeft(60)
 		time.sleep(1)
 #		p.motor.Stop()
 #		time.sleep(.5)
