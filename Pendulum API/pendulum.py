@@ -21,7 +21,7 @@ class Setup():
 	pass
 
 class Pendulum():
-	def __init__(self, motorPort, ucPort):
+	def __init__(self, motorPort = '/dev/ttyACM0', ucPort = '/dev/ttyUSB0'):
 		self.status = "Booting..."
 		self.motor = Motor(motorPort)
 		self.uc = ucEncoder(ucPort)
@@ -44,7 +44,7 @@ class Pendulum():
 	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
 		self.resetFlag = True
-		speed = 25
+		speed = 28
 		left_switch = 0
 		right_switch = 0
 		while(not left_switch):
@@ -54,7 +54,7 @@ class Pendulum():
 			time.sleep(.1)
 			
 		while(not right_switch):
-			self.motor.MoveRight(speed+5)
+			self.motor.MoveRight(speed)
 			switches = self.uc.getSwitches()
 			right_switch = switches[0]
 			time.sleep(.1)
@@ -144,6 +144,7 @@ class Pendulum():
 					self.uc.status = "Watchdog tripped!"
 					self.motor.Stop()
 					time.sleep(2)
+					self.uc.status = "Watchdog idle"
 					self.Reset()
 					self.softStopFlag = False
 			time.sleep(.05)
@@ -200,7 +201,7 @@ def exit_handler(signum, frame):
 	sys.exit()
 
 #Tests the Pendulum Reset function
-def temp():
+def test_reset():
 	global p
 	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
 	p.status = "Running..."
@@ -213,20 +214,21 @@ def temp():
 #Tests Motor movement
 def tester():
 	global p
+	move_speed = 35
 	p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
 	
 	status_thread = threading.Thread(target=print_status)
 	status_thread.daemon = True
 	status_thread.start()
-#	p.Reset()
 	
 	while 1:	
-		p.moveRight(60)
-		time.sleep(1)
-		p.moveLeft(60)
-		time.sleep(1)
+		p.moveRight(move_speed, move_speed)
+		time.sleep(.25)
+		p.moveLeft(move_speed, move_speed)
+		time.sleep(.2)
 #		p.motor.Stop()
 #		time.sleep(.5)
+
 
 #Continuously print the status of the Pendulum	
 def print_status():
@@ -276,4 +278,3 @@ def console_update():
 if __name__ == "__main__":
 	signal.signal(signal.SIGINT, exit_handler)
 	tester()
-	#temp()
