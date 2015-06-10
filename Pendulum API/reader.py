@@ -2,7 +2,6 @@
 
 import serial
 import signal
-import sys
 
 s = None
 

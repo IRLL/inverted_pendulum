@@ -5,9 +5,6 @@ This is the class that controls the motor
 import serial
 import threading
 import time
-import signal
-import sys
-import argparse
 
 class Motor():
 	
@@ -45,9 +42,11 @@ class Motor():
 		self.temperature = 0
 		self.speed = 0
 		self.status = "Idle"
+  
 	def __del__(self):
 		self.Stop()
 		self.ser.close()
+  
 	def MoveRight(self, percent):
 		self.status = "Moving Right"
 		self.rightDir = 1
@@ -57,21 +56,6 @@ class Motor():
 		speed2 = chr(self.spd >> 5)
 		self.ser.write(chr(0x85) + speed1 + speed2)
 
-	def MoveRightAtSpeed(self, speed):
-		self.status = "Moving Right"
-		self.rightDir = 1
-		self.Enable()
-		speed1 = chr(self.spd & 0x1F)
-		speed2 = chr(self.spd >> 5)
-		self.ser.write(chr(0x86) + speed1 + speed2)
-
-	def MoveLeftAtSpeed(self, speed):
-		self.status = "Moving Left"
-		self.rightDir = 0
-		self.Enable()
-		speed1 = chr(self.spd & 0x1F)
-		speed2 = chr(self.spd >> 5)
-		self.ser.write(chr(0x86) + speed1 + speed2)
 	def MoveLeft(self, percent):
 		self.status = "Moving Left"
 		self.rightDir = 0
@@ -80,6 +64,7 @@ class Motor():
 		speed1 = chr(self.spd & 0x1F)
 		speed2 = chr(self.spd >> 5)
 		self.ser.write(chr(0x86) + speed1 + speed2)
+  
 	def Stop(self):
 		self.status = "Stopping"
 		stop_speed = 30
@@ -97,6 +82,7 @@ class Motor():
 		time.sleep(.05)
 		self.MoveRight(0)
 		self.spd = 0
+  
 	def getVariables(self):
 		variables = []
 		self.data_lock.acquire()
@@ -112,6 +98,7 @@ class Motor():
 
 	def Enable(self):	
 		self.ser.write(chr(0x83))
+  
 	@staticmethod
 	def getValueFromPercent(percent):
 		return 3200 * percent / 100
@@ -148,26 +135,3 @@ class Motor():
 		[lbyte, hbyte] = self.ser.read(2)
 		result = (ord(hbyte) << 8) | ord(lbyte)
 		return result
-
-def tester():
-	motor = Motor()
-	flop = 0
-	while True:
-		motor_stats = motor.getVariables()
-		if flop:
-			motor.MoveLeft(25)
-		
-		else:
-			motor.MoveRight(25)
-		flop = not flop
-		print "Temperature:   ", motor_stats[2]
-		print "Input Voltage: ", motor_stats[1]
-		time.sleep(2)	
-
-def exit_handler(signal):
-    
-    sys.exit()
-
-if __name__ == "__main__":
-	signal.signal(signal.SIGINT, exit_handler)
-	tester()

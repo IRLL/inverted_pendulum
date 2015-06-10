@@ -4,8 +4,6 @@
 
 '''
 
-#TODO add camera Calibration
-
 import sys
 import pickle
 import time
@@ -50,25 +48,21 @@ def pack():
 	print file
 	
 	#Do the setup
-	raw_input("Move the cart to the far right and press enter.")
+	raw_input("Move the cart to the far right, wait for the arm to\nsettle and press enter.")
 	uc.send_reset()
 	time.sleep(1)
-	base = uc.motor_count
 	
-	print "Move the cart to the right brake position wait for the"
-	raw_input("arm to settle and press enter.")
+	raw_input("Move the cart to the right brake position wait for the\narm to settle and press enter.")
 	setup.rightBrakeEncoderPos = uc.motor_count
 	print "Right Brake: ", setup.rightBrakeEncoderPos
 	print "Arm Count: ", uc.arm_count
 	print "Arm Angle: "
 	print "----------degrees: ", uc.getAngle()
 	print "----------radians: ", uc.getRadians()
-	#TODO add camera Calibration
 	
 	raw_input("Move the cart to the left brake position and press enter.")
 	setup.leftBrakeEncoderPos = uc.motor_count
 	print "Left Brake: ", setup.leftBrakeEncoderPos
-	#TODO add camera Calibration
 
 	#Calculate the center
 	setup.encoderCenter = (setup.leftBrakeEncoderPos + setup.rightBrakeEncoderPos)/2

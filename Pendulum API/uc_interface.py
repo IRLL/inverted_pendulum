@@ -4,12 +4,7 @@ This is the class that reads the encoder data from the microcontroller
 import serial
 import threading
 import time
-import datetime
-import signal
-import sys
-import argparse
 import math
-#from encoder import Encoder
 
 class ucEncoder():
 	
@@ -193,40 +188,4 @@ class ucEncoder():
 			num_packet.append(ord(i))
 
 		return num_packet
-	#end get_packet()
-
-
-def exit_handler(signum, frame):
-	print "Exiting!"
-	sys.exit()
-	
-	
-def tester():
-	uc = ucEncoder('/dev/ttyUSB0')	
-	time.sleep(1)
-	uc.send_reset()
-	while 1:
-		angle= uc.getAngle()
-		position = uc.getPosition()
-		switches = uc.getSwitches()
-		arm_spd = uc.getArmVelDegPS()
-		rps = uc.getArmVelRadPS()
-		m_spd = uc.getMotorVelMPS()
-		cmps = uc.getMotorVelCMPS()
-		#print "buffer: ", uc.ser.inWaiting()
-		print "Angle: ", angle
-		print "Position: ", position
-		print "Arm Speed (Deg/S): ", arm_spd
-		print "Arm Speed (Rad/S): ", rps
-		print "Motor Speed (M/S): ", m_spd
-		print "Motor Speed (CM/S): ", cmps
-		print "Left Switch: ", switches[1], "Right Switch: ", switches[0]
-		print ""
-		time.sleep(.1)
-	
-	
-if __name__ == "__main__":
-	signal.signal(signal.SIGINT, exit_handler)
-	tester()
-
-	
+	#end get_packet()	
