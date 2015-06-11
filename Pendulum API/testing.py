@@ -16,7 +16,6 @@ p = None
 LINUX = False
 WINDOWS = False
 
-
 '''****************************************************************************
                         Testing for pendulum.py
 ****************************************************************************'''
@@ -27,7 +26,7 @@ def pexit_handler(signum, frame):
     menu()
 
 #Tests the Pendulum Reset function
-def ptest_reset():
+def ptest_reset(r_val=0):
     global p
     p = Pendulum('/dev/ttyACM0', '/dev/ttyUSB0')
     p.status = "Running..."
@@ -35,7 +34,7 @@ def ptest_reset():
     status_thread.daemon = True
     status_thread.start()
     time.sleep(5)
-    p.Reset(-20)
+    p.Reset(r_val)
     
 #Tests Motor movement
 def ptester():
@@ -59,11 +58,7 @@ def print_status():
     global LINUX
     global WINDOWS
     
-    #Check to see what OS is running
-    if (platform.system() == "Linux"):
-        LINUX = True
-    elif (platform.system() == "Windows"):
-        WINDOWS = True
+
     
     print "Inverted Pendulum API by Brandon Kallaher and James Irwin"
     print "Running on ", platform.system()
@@ -100,6 +95,10 @@ def console_update():
     
 def psubmenu():
     signal.signal(signal.SIGINT, pexit_handler)
+    if LINUX:
+        os.system("clear")
+    elif WINDOWS:
+        os.system("cls")
     print u'\u2588' * 52    
     
     print "System Sub-menu:"
@@ -108,7 +107,9 @@ def psubmenu():
     print "3. Return to Main Menu"
     choice = raw_input("Enter your decision: ")
     if choice == '1':
-        ptest_reset()
+        print u'\u2588' * 52
+        reset = raw_input("Enter the offset from zero to reset to: ")
+        ptest_reset(reset)
     elif choice == '2':
         ptester()
     elif choice == '3':
@@ -178,6 +179,10 @@ def exit_handler(signal):
 
 def menu():    
     signal.signal(signal.SIGINT, exit_handler)
+    if LINUX:
+        os.system("clear")
+    elif WINDOWS:
+        os.system("cls")
     print u'\u2588' * 52
 
     print "Main Menu:"
@@ -201,4 +206,9 @@ def menu():
         menu()
 
 if __name__ == "__main__":
+    #Check to see what OS is running
+    if (platform.system() == "Linux"):
+        LINUX = True
+    elif (platform.system() == "Windows"):
+        WINDOWS = True
     menu()

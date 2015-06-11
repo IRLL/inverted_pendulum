@@ -74,12 +74,6 @@ def pack():
 	
 	#Close the file
 	file.close()
-def unpack(file_name):
-	file = open(file_name, 'r')
-	data = pickle.load(file)
-	#Remember to close the file!
-	file.close()
-	return data
 		
 if __name__ == "__main__":
 	pack()
