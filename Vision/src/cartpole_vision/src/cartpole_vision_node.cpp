@@ -413,7 +413,7 @@ public:
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "image_converter");
+  ros::init(argc, argv, "cartpole_vision_node");
   std::cout<<"Test";
 
   ImageConverter ic;
