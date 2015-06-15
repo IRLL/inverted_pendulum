@@ -40,7 +40,10 @@ class Pendulum():
 		self.motor.Stop()
 	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
-		self.resetFlag = True
+		self.resetFlag = True					command = Twist()
+					command.linear.z = action
+					self.action_pub.publish(command)
+					rospy.sleep(.2)
 		speed = 28
 		left_switch = 0
 		right_switch = 0
@@ -83,7 +86,7 @@ class Pendulum():
 				self.motor.Stop()
 				break;
 			self.motor.MoveLeft(speed)
-		self.motor.Stop()
+		self.motor.Stop()	time.sleep(.1)
 		time.sleep(1)		
 		self.resetFlag = False
 		
@@ -95,8 +98,14 @@ class Pendulum():
 		returns (meters, radians)
 		'''
 		mPose = self.uc.getXm() # meters
-		radians = self.uc.getRadians()
-		return (mPose, radians)
+		mSpeed = self.uc.getMotorVelMPS()
+		rad = self.uc.getRadians()
+		radSpeed = self.uc.getArmVelRadPS()
+		return (mPose, mSpeed, radians, radSpeed)
+		
+	def getDegrees(self):
+		return self.uc.getAngle()
+		
 	def moveRight(self, percent, threshold=30):
 		if (percent > threshold):
 			percent = threshold
@@ -130,7 +139,7 @@ class Pendulum():
 	def stop(self):
 		self.motor.Stop()
 	
-	#TODO: Add in the Camera positioning
+	#TODO: Add in the Camera positioning/	
 	def watchdog(self):
 		while(True):
 			#TODO Check
