@@ -40,10 +40,7 @@ class Pendulum():
 		self.motor.Stop()
 	def Reset(self, start=0):
 		self.status = "resetting pendulum!"
-		self.resetFlag = True					command = Twist()
-					command.linear.z = action
-					self.action_pub.publish(command)
-					rospy.sleep(.2)
+		self.resetFlag = True	
 		speed = 28
 		left_switch = 0
 		right_switch = 0
