@@ -18,7 +18,7 @@ class Setup():
 	pass
 
 class Pendulum():
-	def __init__(self, motorPort = '/dev/ttyACM0', ucPort = '/dev/ttyUSB0'):
+	def __init__(self, motorPort = '/dev/ttyACM0', ucPort = '/dev/ttyUSB0', config = "config"):
 		self.status = "Booting..."
 		self.motor = Motor(motorPort)
 		self.uc = ucEncoder(ucPort)
@@ -26,7 +26,7 @@ class Pendulum():
 		self.softStopFlag = False
 		
 		#Load the Setup configuration
-		file = open("config", 'r')
+		file = open(config, 'r')
 		up = pickle.Unpickler(file)
 		self.su = up.load()
 		#self.su = self.su.unpack("config")
