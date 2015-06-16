@@ -45,8 +45,10 @@ def ptester():
     status_thread = threading.Thread(target=print_status)
     status_thread.daemon = True
     status_thread.start()
-    
-    while 1:    
+ 
+    p.Reset()
+
+    while 1:
         p.moveRight(move_speed, move_speed)
         time.sleep(.25)
         p.moveLeft(move_speed, move_speed)
@@ -58,14 +60,12 @@ def print_status():
     global LINUX
     global WINDOWS
     
-
-    
     print "Inverted Pendulum API by Brandon Kallaher and James Irwin"
     print "Running on ", platform.system()
     print "Python Version: ", platform.python_version()
     print "Clear the Path of the arm or suffer the consequences!"
     time.sleep(3)
-    #p.Reset()    
+    #p.Reset()
     #Endlessly update the console
     while True:
         if (WINDOWS):
