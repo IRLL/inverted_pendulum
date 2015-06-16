@@ -90,8 +90,6 @@ class PolicyGradient():
 
 				# Perform a trial of length L
 				for steps in range(self._traj_length):
-					if rospy.is_shutdown():
-						sys.exit()
 
 					# Draw an action from the policy
 					action = np.random.multivariate_normal(np.dot(self._theta.conj().T, self._data[trials].x[:,steps]).conj().T, self._sigma)

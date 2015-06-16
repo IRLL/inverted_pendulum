@@ -83,7 +83,7 @@ class Pendulum():
 				self.motor.Stop()
 				break;
 			self.motor.MoveLeft(speed)
-		self.motor.Stop()	time.sleep(.1)
+		self.motor.Stop()
 		time.sleep(1)		
 		self.resetFlag = False
 		
@@ -98,7 +98,7 @@ class Pendulum():
 		mSpeed = self.uc.getMotorVelMPS()
 		rad = self.uc.getRadians()
 		radSpeed = self.uc.getArmVelRadPS()
-		return (mPose, mSpeed, radians, radSpeed)
+		return (mPose, mSpeed, rad, radSpeed)
 		
 	def getDegrees(self):
 		return self.uc.getAngle()
