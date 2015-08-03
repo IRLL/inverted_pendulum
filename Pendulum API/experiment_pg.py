@@ -13,6 +13,7 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from math import pi
+import sys
 
 
 
@@ -25,21 +26,26 @@ class Data():
         self.r = np.empty(shape=(1,traj_length))
 
 class PolicyGradient():
-	
+
+	ACTION_DELAY = 0.001 # 0.001
+
 	def __init__(self, world, threshold):
-		
+
 		self._world = world
-		self._threshold = threshold	
-		
+		self._threshold = threshold
+
 		# Parameter definition
 		self._n = 4 # Number of states
 		self._m = 1 # Number of inputs
 
-		self._rate = .001 # Learning rate for gradient descent Original+0.75
+		self._rate = .3 # Learning rate for gradient descent Original+0.75
 
-		self._traj_length = 100 # Number of time steps to simulate in the cart-pole system
-		self._rollouts = 50 # Number of trajectories for testing
-		self._num_iterations = 30 # Number of learning episodes/iterations	
+		self._traj_length = 1000 # Number of time steps to simulate in the cart-pole system
+		self._rollouts = 10 # Number of trajectories for training
+		self._num_iterations = 1000 # Number of learning episodes/iterations
+
+		self._rollouts_test = 2
+		self._traj_length_test = 1000
 
 		time.sleep(.1)
 		#self._my0 = pi/6-2*pi/6*np.random.random((N,1)) # Initial state of the cart pole (between -60 and 50 deg)
@@ -47,115 +53,321 @@ class PolicyGradient():
 		self._s0 = 0.0001*np.eye(self._n)
 
 		# Parameters for Gaussian policies
-		self._theta = np.random.rand(self._n*self._m,1) # Remember that the mean of the normal dis. is theta'*x
-		#self._theta = np.array([[0.3855077]])
+		self._theta = np.random.rand(self._n*self._m,1) # Remember that the mean of the normal dis. is theta'*xt
+		for i in range(self._n*self._m):
+			self._theta[:,0][i] = self._theta[:,0][i] if np.random.randint(2, size=1) == 1 else -self._theta[:,0][i]
+		self._theta = np.array(
+				[[ -0.3415466],
+ 				 [-10.8511862],
+ 				 [  2.4911943],
+ 				 [  0.5160055]]
+			      )
+
 		self._sigma = np.random.rand(1,self._m) # Variance of the Gaussian dist.
-		#self._sigma = np.array([[0.356513]])
+		#self._sigma = np.array([[ 0.764011]])
 
 		self._data = [Data(self._n, self._traj_length) for i in range(self._rollouts)]
+ 
+		self._mat = np.empty(shape=(self._rollouts,self._n+1))
+		self._vec = np.empty(shape=(self._rollouts,1))
+		self._r = np.empty(shape=(1,self._rollouts))
+		self._reward_per_rates_per_iteration = np.empty(shape=(1,self._num_iterations))
 
-		self._mat = np.empty(shape=(100,self._n+1))
-		self._vec = np.empty(shape=(100,1))
-		self._r = np.empty(shape=(1,100))
-		self._reward_per_rates_per_iteration = np.empty(shape=(1,200))
-		
 		print "Initial Theta: ", self._theta
 		print "Sigma: ", self._sigma
 		print "Learning Rate: ", self._rate
-	
+
 	def startEpisode(self):
 		#z = random.uniform(1.8, 4.2)
 		z = 0 # TODO: random start
 		self.reset(z)
-	
+
+	def swingup(self, x_pose=0.0):
+		for i in range(200):
+			self._world.moveRight(self._threshold, self._threshold)
+			time.sleep(self.ACTION_DELAY)
+		self._world.stop()
+		for i in range(300):
+			self._world.moveLeft(self._threshold, self._threshold)
+			time.sleep(self.ACTION_DELAY)
+		self._world.stop()
+		for i in range(180):
+			self._world.moveRight(self._threshold, self._threshold)
+			time.sleep(self.ACTION_DELAY)
+		self._world.stop()
+		#for i in range(325):
+		#	self._world.moveLeft(self._threshold, self._threshold)
+		#	time.sleep(self.ACTION_DELAY)
+		#self._world.stop()
+		#for i in range(300):
+		#	self._world.moveRight(self._threshold, self._threshold)
+		#	time.sleep(self.ACTION_DELAY)
+		#self._world.stop()
+
+	def test(self, iteration_num, theta, rollouts, traj_length):
+		data = [Data(self._n, traj_length) for i in range(rollouts)]
+		r = np.empty(shape=(1,rollouts))
+		# In this section we obtain our data by simulating the cart-pole system
+		for trials in range(rollouts):
+			isReset = False
+			# reset
+			print "____________@ Test Trial: ", (trials+1)
+			self.startEpisode()
+			self.swingup(x_pose=0.0)
+			# Draw the initial state
+			mPose, mSpeed, angle, radSpeed = self._world.getState()
+			state = np.array([[
+							mPose/1.25, 
+							mSpeed/100, 
+							angle/(180), 
+							radSpeed/(6*pi)
+						    ]])
+			last_action = 0.0
+			print "Initial Angle: ", angle
+			try:
+				# Perform a trial of length L
+				for steps in range(traj_length):
+					#print "__________________@ Step #", steps+1
+					# Draw an action from the policy
+					action = np.dot(self._theta.conj().T, state.conj().T).conj().T[0]
+
+					action = round(action, 0)
+					# saturate action
+					if action > 1.0:
+						action = 1.0
+					elif action < -1.0:
+						action = -1.0
+					# Execute action
+					#print "Action: ", action
+					if self._world.softStopFlag or isReset:
+						if isReset:
+							action = 0.0
+						elif last_action > 0:
+							action = -1.0
+							#print "Action: Left"
+						elif last_action < 0:
+							action = 1.0
+							#print "Action: Right"
+						else:
+							action = 0.0
+							#print "Action: Stop"
+					else:
+						speed = 0
+						if action == 0:
+							self._world.stop()
+							#print "Action: Stop"
+						else:
+							temp_action = abs(action)
+							if temp_action >= .75:
+								speed = self._threshold
+							elif temp_action >= .5:
+								speed = self._threshold - 10
+							elif temp_action >= .25:
+								speed = self._threshold - 20
+							else:
+								speed = self._threshold - 30
+						if action > 0: #positive
+							self._world.moveRight(speed, self._threshold)
+							#print "Action: Right"
+						elif action < 0:
+							self._world.moveLeft(speed, self._threshold)
+							#print "Action: Left"
+						time.sleep(self.ACTION_DELAY)
+						last_action = action
+
+
+					# Calculating the reward (Remember: First term is the reward for accuracy, second is for control cost)
+					reward = self._world.getReward()
+					if isReset or self._world.softStopFlag:
+						reward = -2.0
+
+					data[trials].r[:,steps] = [reward]
+
+					# Draw next state from envrionment
+					mPose, mSpeed, angle, radSpeed = self._world.getState()
+					
+					if self._world.softStopFlag or isReset: # went outside
+						mSpeed = 0.0
+						angle = 180.0
+						radSpeed = 0.0
+						if isReset:
+							mPose = 0.0
+
+					state = np.array([[ 
+						    mPose/1.25, 
+						    mSpeed/100, 
+						    angle/(180), 
+						    radSpeed/(6*pi)
+						]])
+
+					if not self._world.softStopFlag and not isReset and (angle > 50.0 or angle < -50.0):
+						print "Reset true ", angle, " Step ", steps
+						isReset = True
+
+				# end for steps...
+			except KeyboardInterrupt:
+				print "Program interrupted!"
+				sys.exit(1)
+		# end for trials
+
+		# Calculation of the average reward
+		for z in range(np.shape(data)[0]): #TODO:check
+			r[0,z] = np.sum(data[z].r) #TODO:check
+		# end for z...
+
+
+
+		#############
+		# Plotting the average reward to verify that the parameters of the
+		# regulating controller are being learned
+                file = open('theta_outputs_test.txt', 'a')
+                print >>file, "Iteration: ", iteration_num
+                print >>file, "Theta: ", self._theta
+                mean = np.mean(r)
+                print >>file, "Mean: ", mean
+                file.close()
+
+		print "Mean: ", mean
+		return mean
+
+	# end for k...
+
 	def train(self):
 		#self._my0 = np.array([[self._world.getState()]])
 		plt.ion()
 		#plt.yscale("log")
 		plt.show()
+		
 		for k in range(self._num_iterations): # Loop for learning
-			print "______@ Iteration: ", k
+
+			print "Test Theta: ", k
+			m = self.test(k, self._theta, self._rollouts_test, self._traj_length_test)
+			plt.scatter(k, m, marker=u'x', c=np.random.random((2,3)), cmap=cm.jet)
+			plt.draw()
+
+			print "______@ Iteration: ", k+1
 
 			# In this section we obtain our data by simulating the cart-pole system
 			for trials in range(self._rollouts):
+				isReset = False
 				# reset
-				#print "____________@ Trial #", (trials+1)
+				print "____________@ Trial: ", (trials+1)
 				self.startEpisode()
-
+				self.swingup(x_pose=0.0)
 				# Draw the initial state
 				#init_state = np.random.multivariate_normal(self._my0[:,0], self._s0, 1)
 				#self._data[trials].x[:,0] = init_state[0,:]
-				mPose, mSpeed, radians, radSpeed = self._world.getState()
-				self._data[trials].x[:,0] = np.array([[mPose/1.25, mSpeed/100, radians/(2*pi), radSpeed/(6*pi)]])
+				mPose, mSpeed, angle, radSpeed = self._world.getState()
+				self._data[trials].x[:,0] = np.array([[
+								mPose/1.25, 
+								mSpeed/100, 
+								angle/(180), 
+								radSpeed/(6*pi)
+							    ]])
+				last_action = 0.0
+				print "Initial Angle: ", angle
+				try:
+					# Perform a trial of length L
+					for steps in range(self._traj_length):
+						#print "__________________@ Step #", steps+1
+						# Draw an action from the policy
+						action = np.random.multivariate_normal(
+								np.dot(self._theta.conj().T, 
+								self._data[trials].x[:,steps]).conj().T, 
+								self._sigma
+							 )
 
-				# Perform a trial of length L
-				for steps in range(self._traj_length):
+						action = round(action, 0)
+						# saturate action
+						if action > 1.0:
+							action = 1.0
+						elif action < -1.0:
+							action = -1.0
+						# Execute action
+						#print "Action: ", action
+						if self._world.softStopFlag or isReset:
+							if isReset:
+								action = 0.0
+							elif last_action > 0:
+								action = -1.0
+								#print "Action: Left"
+							elif last_action < 0:
+								action = 1.0
+								#print "Action: Right"
+							else:
+								action = 0.0
+								#print "Action: Stop"
+						else:
+							speed = 0
+							if action == 0:
+								self._world.stop()
+								#print "Action: Stop"
+							else:
+								temp_action = abs(action)
+								if temp_action >= .75:
+									speed = self._threshold
+								elif temp_action >= .5:
+									speed = self._threshold - 10
+								elif temp_action >= .25:
+									speed = self._threshold - 20
+								else:
+									speed = self._threshold - 30
+							if action > 0: #positive
+								self._world.moveRight(speed, self._threshold)
+								#print "Action: ", int(action*self._threshold)
+								#self._world.moveRight(self._threshold, self._threshold)
+								#print "Action: Right"
+								#self._world.stop()
+							elif action < 0:
+								self._world.moveLeft(speed, self._threshold)
+								#print "Action: ", int(-action*self._threshold)
+								#self._world.moveLeft(self._threshold, self._threshold)
+								#print "Action: Left"
+								#self._world.stop()
+							time.sleep(self.ACTION_DELAY) # 0.28 
+							last_action = action
 
-					# Draw an action from the policy
-					action = np.random.multivariate_normal(np.dot(self._theta.conj().T, self._data[trials].x[:,steps]).conj().T, self._sigma)
-
-					# Execute action
-					#print "Action: ", action
-					if action > 0: #positive
-						self._world.moveRight(action*self._threshold, self._threshold)
-					elif action < 0:
-						self._world.moveLeft(-action*self._threshold, self._threshold)
-					elif action == 0:
-						self._world.stop()
-					time.sleep(.042)						
-
-					self._data[trials].u[:,steps] = action
+						self._data[trials].u[:,steps] = action
 
 
-					# Calculating the reward (Remember: First term is the reward for accuracy, second is for control cost)
-					#reward = -sqrt(np.dot(self._data[trials].x[:,steps].conj().T, self._data[trials].x[:,steps])) - \
-					#		  sqrt(np.dot(self._data[trials].u[:,steps].conj().T, self._data[trials].u[:,steps]))
-					current_state = -self._state # negation to get correct states
-					reward = -((0.0 - current_state) ** 2)
-					if current_state <= self.threshold and current_state >= -self.threshold:
-						reward = 0.0
-					if self.visible == 0:
-						reward += -100
+						# Calculating the reward (Remember: First term is the reward for accuracy, second is for control cost)
+						if isReset or self._world.softStopFlag:
+							reward = -2.0
+						else:
+							reward = self._world.getReward()
+						self._data[trials].r[:,steps] = [reward]
 
+						# Draw next state from envrionment
+						mPose, mSpeed, angle, radSpeed = self._world.getState()
 
-					degrees = self._world.getDegrees()
+						if self._world.softStopFlag or isReset: # went outside
+							mSpeed = 0.0
+							angle = 180.0
+							radSpeed = 0.0
+							if isReset:
+								mPose = 0.0
+
+						state = np.array([[ 
+							    mPose/1.25, 
+							    mSpeed/100, 
+							    angle/(180), 
+							    radSpeed/(6*pi)
+							]])
+						self._data[trials].x[:,steps+1] = state
+
+						if not self._world.softStopFlag and not isReset and (angle > 50.0 or angle < -50.0):
+							print "Reset true ", angle, " Step ", steps
+							isReset = True
 					
-					if degrees >= 180-10 and degrees <= 180+10:
-						reward = 0
-					elif degrees == 0:
-						reward = -180.0
-					elif degrees > 0 and degrees < 180:
-						reward = float(degrees - 180)
-					elif degrees > 180:
-						reward = -float(degrees - 180)
-					else:
-						reward = -1000 # should NEVER get this value
-										
-					
-
-					self._data[trials].r[:,steps] = [reward]
-
-					# Draw next state from envrionment
-					# This is the solution of the typical linear model dx/dt = Ax + bu
-					#commonD = I*(mc + mp) + mc*mp*l**2
-					#A = np.array([ [0,                          1,                          0, 0],
-					#               [0, -((I + mp*l**2)*d)/commonD,               mp**2*g*l**2, 0],
-					#               [0,                          0,                          0, 1],
-					#               [0,          -(mp*l*d)/commonD, (mp*g*l*(mc + mp))/commonD, 0] ])
-
-					#b = np.array([ [0], [(I + mp*l**2)/commonD], [0], [(mp*l)/commonD] ])
-
-					#xnDum = np.dot(A,data[trials].x[:,steps]) + np.dot(b,data[trials].u[:,steps])
-
-					#state = data[trials].x[:,steps] + dt*xnDum
-					mPose, mSpeed, radians, radSpeed = self._world.getState()
-					state = np.array([[mPose/1.25, mSpeed/100, radians/(2*pi), radSpeed/(6*pi)]])
-					print "State: ", state
-					print "Action: %.2f Reward: %f" %(action, reward)
-
-					self._data[trials].x[:,steps+1] = state
-
-				# end for steps...
+						'''
+						if not self._world.softStopFlag: 
+							print "State: ", state
+							print "Reward: %f" %(reward)
+						'''
+					# end for steps...
+				except KeyboardInterrupt:
+					print "Program interrupted!"
+					sys.exit(1)
 			# end for trials
 
 			self._gamma = 0.9
@@ -217,25 +429,32 @@ class PolicyGradient():
 			#############
 			# Plotting the average reward to verify that the parameters of the
 			# regulating controller are being learned
+                        file = open('theta_outputs.txt', 'a')
+                        print >>file, "Iteration: ", k+1
+                        print >>file, "Theta: ", self._theta
+                        mean = np.mean(self._r)
+                        print >>file, "Mean: ", mean
+                        file.close()
 
-			print "Mean: ", np.mean(self._r)
-			plt.scatter(k, np.mean(self._r), marker=u'x', c=np.random.random((2,3)), cmap=cm.jet)
-			plt.draw()
+			print "Mean: ", mean
 			time.sleep(0.05)
 		# end for k...
+		print "Final Test Theta: ", self._num_iterations
+		m = self.test(self._num_iterations, self._theta, self._rollouts_test, self._traj_length_test)
+		plt.scatter(self._num_iterations, m, marker=u'x', c=np.random.random((2,3)), cmap=cm.jet)
+		plt.draw()
 		plt.show(block=True)
-	
+
 	def reset(self, start=0):
 		self._world.Reset(start)
 
 
 if __name__ == "__main__":
 	world = Pendulum(
-	          motorPort = '/dev/ttyACM0', 
-	          ucPort = '/dev/ttyUSB0', 
+	          motorPort = '/dev/ttyACM0',
+	          ucPort = '/dev/ttyUSB0',
 	          config = "config"
 	        )
-	threshold = 30 # percent speed of pendulum
+	threshold = 60 # percent speed of pendulum #45 with delay of .1
 	agent = PolicyGradient(world, threshold)
-	agent.reset()
 	agent.train()

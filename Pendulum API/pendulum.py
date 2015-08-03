@@ -9,6 +9,8 @@ import os
 from motor import Motor
 from uc_interface import ucEncoder
 import pickle
+import sys 
+from math import floor, ceil,sqrt
 
 p = None
 LINUX = False
@@ -40,7 +42,7 @@ class Pendulum():
     def Reset(self, start=0):
         self.status = "resetting pendulum!"
         self.resetFlag = True
-        speed = 28
+        speed = 25
         left_switch = 0
         right_switch = 0
         while(not left_switch):
@@ -76,29 +78,80 @@ class Pendulum():
         time.sleep(2)
 
         self.status = "moving to center position"
-        while True:
+        position = self.uc.motor_count
+        self.motor.MoveLeft(speed)
+        while position > self.su.encoderCenter:
             position = self.uc.motor_count
-            if (position <= self.su.encoderCenter):
-                self.motor.Stop()
-                break;
             self.motor.MoveLeft(speed)
         self.motor.Stop()
-        time.sleep(1)        
+        time.sleep(1)       
+
+	# GABE start
+	#wait for arm to settle at the center 
+        current = 0
+        previous = 1
+        wait = 3
+        count = wait #must be constant for this many seconds
+        self.status = "waiting for arm to settle"
+        while count > 0: 
+            previous = current
+            time.sleep(1)
+            current = self.uc.getAngle()
+            if (previous == current):
+                count -= 1
+            else:
+                count = wait
+	# GABE end
+ 
         self.resetFlag = False
         self.softStopFlag = False
   
         self.status = "done resetting!"
         time.sleep(2)
+
+    def plotting_process(self):
+        print "starting plotting thread"        
+        self.myplot = MyPlot(100)
+        fig = plt.figure()
+        ax = plt.axes(xlim=(0,100), ylim=(-360, 360))
+        angle_data, = ax.plot([], [])
+        pos_data, = ax.plot([], [])
+        anim = animation.FuncAnimation(fig, self.update_plot, fargs=(angle_data, pos_data), interval = 100)
+        
+        plt.show()
+        print "plotting windows closed"
+
+        #os._exit(0)
+
+    def update_plot(self, frameNum, angle_data, pos_data):
+        data = [self.uc.getAngle(), 0]
+        self.myplot.add(data)
+        angle_data.set_data(range(self.myplot.maxLen), self.myplot.ax)
+        pos_data.set_data(range(self.myplot.maxLen), self.myplot.ay)
+
+        return angle_data,
+        
+        
+
         
     def getState(self):
         '''
         returns (meters, radians)
         '''
-        mPose = self.uc.getXm() # meters
         mSpeed = self.uc.getMotorVelMPS()
-        radians = self.uc.getRadians()
-        radps = self.uc.getArmVelRadPS()
-        return (mPose, mSpeed, radians, radps)
+        #radians = self.uc.getRadians()
+	radps = self.uc.getArmVelRadPS()
+	mPose = self.uc.getXm() # meters
+	angle = self.uc.getAngle() 
+	#print "Angle from State ", angle
+	if angle >= 0 and angle <= 180:
+		angle = 180 - angle
+	elif angle > 180:
+		angle = -(angle - 180)
+  	if angle == -0:
+		angle = 0.0
+        
+        return (mPose, mSpeed, angle, radps)
     def getDegrees(self):
         return self.uc.getAngle()
     def moveRight(self, percent, threshold=30):
@@ -123,11 +176,37 @@ class Pendulum():
         return self.softStopFlag
     def getReward(self):
         # TODO: change angle range
-        angle = self.uc.getAngle()
-        reward = -1
-        if angle >= 168 and angle <= 192:
-            reward = 0
+        angle = self.uc.getAngle()   
+	#print "Angle from Reward ", angle,
+
+	f_angle = floor(angle)
+	c_angle = ceil(angle)
+
+	if f_angle == 180 or c_angle == 180:
+		print "Perfect!"
+	if f_angle == 90 or c_angle == 90:
+		print "90 degrees"
+	if f_angle == 270 or c_angle == 270:
+		print "270 degrees"
+
+
+	if angle >= 0 and angle <= 180:
+		reward = (angle - 180) / 180.0
+	elif angle > 180:
+		reward = -(angle - 180) / 180.0
+	else:
+		reward = -10000 # should NEVER get this values
+		print angle
+		print "Should never get a reward of -1000"
+		sys.exit(1)
+
+	if reward == -0.0:
+		reward = 0.0
+
+	if self.softStopFlag: # went outside
+		reward = -2
         return reward
+
     def stop(self):
         self.motor.Stop()
     
