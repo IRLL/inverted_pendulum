@@ -234,16 +234,16 @@ class PolicyGradient():
 
 	def train(self):
 		#self._my0 = np.array([[self._world.getState()]])
-		plt.ion()
+		#plt.ion()
 		#plt.yscale("log")
-		plt.show()
+		#plt.show()
 		
 		for k in range(self._num_iterations): # Loop for learning
 
 			print "Test Theta: ", k
 			m = self.test(k, self._theta, self._rollouts_test, self._traj_length_test)
-			plt.scatter(k, m, marker=u'x', c=np.random.random((2,3)), cmap=cm.jet)
-			plt.draw()
+			#plt.scatter(k, m, marker=u'x', c=np.random.random((2,3)), cmap=cm.jet)
+			#plt.draw()
 
 			print "______@ Iteration: ", k+1
 
@@ -441,9 +441,9 @@ class PolicyGradient():
 		# end for k...
 		print "Final Test Theta: ", self._num_iterations
 		m = self.test(self._num_iterations, self._theta, self._rollouts_test, self._traj_length_test)
-		plt.scatter(self._num_iterations, m, marker=u'x', c=np.random.random((2,3)), cmap=cm.jet)
-		plt.draw()
-		plt.show(block=True)
+		#plt.scatter(self._num_iterations, m, marker=u'x', c=np.random.random((2,3)), cmap=cm.jet)
+		#plt.draw()
+		#plt.show(block=True)
 
 	def reset(self, start=0):
 		self._world.Reset(start)

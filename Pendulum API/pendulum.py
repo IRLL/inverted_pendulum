@@ -11,6 +11,9 @@ from uc_interface import ucEncoder
 import pickle
 import sys 
 from math import floor, ceil,sqrt
+from collections import deque
+import matplotlib.pyplot as plt 
+import matplotlib.animation as animation
 
 p = None
 LINUX = False
@@ -18,6 +21,29 @@ WINDOWS = False
 
 class Setup():
     pass
+
+class MyPlot:
+	# constr
+	def __init__(self, maxLen):
+		self.count = 0.0
+		self.ax = deque([0.0]*maxLen)
+		self.ay = deque([0.0]*maxLen)
+		self.maxLen = maxLen
+
+	# add to buffer
+	def addToBuf(self, buf, val):
+		if len(buf) < self.maxLen:
+			buf.appendleft(val)
+		else:
+			buf.popleft()
+			buf.append(val)
+
+	# add data
+	def add(self, data):
+		assert(len(data) == 2)
+		self.addToBuf(self.ax, data[0])
+		self.addToBuf(self.ay, data[1])
+
 
 class Pendulum():
     def __init__(self, motorPort = '/dev/ttyACM0', ucPort = '/dev/ttyUSB0', config = "config"):
@@ -35,6 +61,13 @@ class Pendulum():
         self.watchdogThread = threading.Thread(target=self.watchdog)
         self.watchdogThread.daemon = True
         self.watchdogThread.start()
+        
+        #start plotting thread
+        plotting_thread = threading.Thread(target=self.plotting_process)
+        plotting_thread.setDaemon(True)
+        plotting_thread.start()
+        
+        
                 
         self.status = "Booted"
     def __del__(self):
@@ -113,10 +146,10 @@ class Pendulum():
         print "starting plotting thread"        
         self.myplot = MyPlot(100)
         fig = plt.figure()
-        ax = plt.axes(xlim=(0,100), ylim=(-360, 360))
+        ax = plt.axes(xlim=(0,100), ylim=(-185, 185))
         angle_data, = ax.plot([], [])
         pos_data, = ax.plot([], [])
-        anim = animation.FuncAnimation(fig, self.update_plot, fargs=(angle_data, pos_data), interval = 100)
+        anim = animation.FuncAnimation(fig, self.update_plot, fargs=(angle_data, pos_data), interval = 10)
         
         plt.show()
         print "plotting windows closed"
@@ -124,7 +157,14 @@ class Pendulum():
         #os._exit(0)
 
     def update_plot(self, frameNum, angle_data, pos_data):
-        data = [self.uc.getAngle(), 0]
+        angle = self.uc.getAngle()
+        if angle >= 0 and angle <= 180:
+            angle = 180 - angle
+        elif angle > 180:
+            angle = -(angle - 180)
+        if angle == -0:
+            angle = 0.0
+        data = [angle, 0]
         self.myplot.add(data)
         angle_data.set_data(range(self.myplot.maxLen), self.myplot.ax)
         pos_data.set_data(range(self.myplot.maxLen), self.myplot.ay)
