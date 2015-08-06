@@ -126,10 +126,15 @@ class PolicyGradient():
 			print "Initial Angle: ", angle
 			try:
 				# Perform a trial of length L
+				current_time = time.time()
 				for steps in range(traj_length):
 					#print "__________________@ Step #", steps+1
 					# Draw an action from the policy
 					action = np.dot(self._theta.conj().T, state.conj().T).conj().T[0]
+
+					last_time = current_time
+					current_time = time.time()
+					print "time/freq for main testing loop: {}/{}".format(current_time - last_time, 1.0/(current_time-last_time))
 
 					action = round(action, 0)
 					# saturate action
@@ -267,6 +272,7 @@ class PolicyGradient():
 				last_action = 0.0
 				print "Initial Angle: ", angle
 				try:
+					current_time = time.time()
 					# Perform a trial of length L
 					for steps in range(self._traj_length):
 						#print "__________________@ Step #", steps+1
@@ -276,6 +282,10 @@ class PolicyGradient():
 								self._data[trials].x[:,steps]).conj().T, 
 								self._sigma
 							 )
+
+						last_time = current_time
+						current_time = time.time()
+						print "time/freq for main training loop: {}/{}".format(current_time - last_time, 1.0/(current_time-last_time))
 
 						action = round(action, 0)
 						# saturate action
