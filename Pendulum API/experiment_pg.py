@@ -176,11 +176,6 @@ class PolicyGradient():
 						time.sleep(self.ACTION_DELAY)
 						last_action = action
 
-    					last_time = current_time
-    					current_time = time.time()
-    					print "time/freq for main testing loop: {}/{}".format(current_time - last_time, 1.0/(current_time-last_time))
-
-
 					# Calculating the reward (Remember: First term is the reward for accuracy, second is for control cost)
 					reward = self._world.getReward()
 					if isReset or self._world.softStopFlag:
@@ -208,6 +203,10 @@ class PolicyGradient():
 					if not self._world.softStopFlag and not isReset and (angle > 50.0 or angle < -50.0):
 						print "Reset true ", angle, " Step ", steps
 						isReset = True
+
+                    last_time = current_time
+                    current_time = time.time()
+                    print "time/freq for main testing loop: {}/{}".format(current_time - last_time, 1.0/(current_time-last_time))
 
 				# end for steps...
 			except KeyboardInterrupt:
