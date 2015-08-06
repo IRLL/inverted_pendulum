@@ -67,7 +67,7 @@ class PolicyGradient():
 		#self._sigma = np.array([[ 0.764011]])
 
 		self._data = [Data(self._n, self._traj_length) for i in range(self._rollouts)]
- 
+
 		self._mat = np.empty(shape=(self._rollouts,self._n+1))
 		self._vec = np.empty(shape=(self._rollouts,1))
 		self._r = np.empty(shape=(1,self._rollouts))
@@ -117,9 +117,9 @@ class PolicyGradient():
 			# Draw the initial state
 			mPose, mSpeed, angle, radSpeed = self._world.getState()
 			state = np.array([[
-							mPose/1.25, 
-							mSpeed/100, 
-							angle/(180), 
+							mPose/1.25,
+							mSpeed/100,
+							angle/(180),
 							radSpeed/(6*pi)
 						    ]])
 			last_action = 0.0
@@ -131,10 +131,6 @@ class PolicyGradient():
 					#print "__________________@ Step #", steps+1
 					# Draw an action from the policy
 					action = np.dot(self._theta.conj().T, state.conj().T).conj().T[0]
-
-					last_time = current_time
-					current_time = time.time()
-					print "time/freq for main testing loop: {}/{}".format(current_time - last_time, 1.0/(current_time-last_time))
 
 					action = round(action, 0)
 					# saturate action
@@ -180,6 +176,10 @@ class PolicyGradient():
 						time.sleep(self.ACTION_DELAY)
 						last_action = action
 
+    					last_time = current_time
+    					current_time = time.time()
+    					print "time/freq for main testing loop: {}/{}".format(current_time - last_time, 1.0/(current_time-last_time))
+
 
 					# Calculating the reward (Remember: First term is the reward for accuracy, second is for control cost)
 					reward = self._world.getReward()
@@ -190,7 +190,7 @@ class PolicyGradient():
 
 					# Draw next state from envrionment
 					mPose, mSpeed, angle, radSpeed = self._world.getState()
-					
+
 					if self._world.softStopFlag or isReset: # went outside
 						mSpeed = 0.0
 						angle = 180.0
@@ -198,10 +198,10 @@ class PolicyGradient():
 						if isReset:
 							mPose = 0.0
 
-					state = np.array([[ 
-						    mPose/1.25, 
-						    mSpeed/100, 
-						    angle/(180), 
+					state = np.array([[
+						    mPose/1.25,
+						    mSpeed/100,
+						    angle/(180),
 						    radSpeed/(6*pi)
 						]])
 
@@ -242,7 +242,7 @@ class PolicyGradient():
 		#plt.ion()
 		#plt.yscale("log")
 		#plt.show()
-		
+
 		for k in range(self._num_iterations): # Loop for learning
 
 			print "Test Theta: ", k
@@ -264,9 +264,9 @@ class PolicyGradient():
 				#self._data[trials].x[:,0] = init_state[0,:]
 				mPose, mSpeed, angle, radSpeed = self._world.getState()
 				self._data[trials].x[:,0] = np.array([[
-								mPose/1.25, 
-								mSpeed/100, 
-								angle/(180), 
+								mPose/1.25,
+								mSpeed/100,
+								angle/(180),
 								radSpeed/(6*pi)
 							    ]])
 				last_action = 0.0
@@ -278,8 +278,8 @@ class PolicyGradient():
 						#print "__________________@ Step #", steps+1
 						# Draw an action from the policy
 						action = np.random.multivariate_normal(
-								np.dot(self._theta.conj().T, 
-								self._data[trials].x[:,steps]).conj().T, 
+								np.dot(self._theta.conj().T,
+								self._data[trials].x[:,steps]).conj().T,
 								self._sigma
 							 )
 
@@ -334,7 +334,7 @@ class PolicyGradient():
 								#self._world.moveLeft(self._threshold, self._threshold)
 								#print "Action: Left"
 								#self._world.stop()
-							time.sleep(self.ACTION_DELAY) # 0.28 
+							time.sleep(self.ACTION_DELAY) # 0.28
 							last_action = action
 
 						self._data[trials].u[:,steps] = action
@@ -357,10 +357,10 @@ class PolicyGradient():
 							if isReset:
 								mPose = 0.0
 
-						state = np.array([[ 
-							    mPose/1.25, 
-							    mSpeed/100, 
-							    angle/(180), 
+						state = np.array([[
+							    mPose/1.25,
+							    mSpeed/100,
+							    angle/(180),
 							    radSpeed/(6*pi)
 							]])
 						self._data[trials].x[:,steps+1] = state
@@ -368,9 +368,9 @@ class PolicyGradient():
 						if not self._world.softStopFlag and not isReset and (angle > 50.0 or angle < -50.0):
 							print "Reset true ", angle, " Step ", steps
 							isReset = True
-					
+
 						'''
-						if not self._world.softStopFlag: 
+						if not self._world.softStopFlag:
 							print "State: ", state
 							print "Reward: %f" %(reward)
 						'''
