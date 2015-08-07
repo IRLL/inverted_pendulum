@@ -47,8 +47,8 @@ class PolicyGradient():
 		self._rollouts_test = 2
 		self._traj_length_test = 1000
 
-        self._target_freq = 30 # The frequency to achieve in the innermost loop
-        self._loop_time = 1.0/self._target_freq
+		self._target_freq = 50 # The frequency to achieve in the innermost loop
+		self._loop_time = 1.0/self._target_freq
 
 		time.sleep(.1)
 		#self._my0 = pi/6-2*pi/6*np.random.random((N,1)) # Initial state of the cart pole (between -60 and 50 deg)
@@ -207,13 +207,15 @@ class PolicyGradient():
 						print "Reset true ", angle, " Step ", steps
 						isReset = True
 
-                    end_time = time.time()
-                    if (self._loop_time > (start_time - end_time)):
-                        time.sleep(self._loop_time - (start_time - end_time))
-                    print "Target Freq: ", self._target_freq
-                    print "Actual Freq: ", 1.0/(start_time - end_time)
-                    #print "time/freq for main testing loop: {}/{}".format(start_time - end_time, 1.0/(start_time - end_time))
-                    start_time = end_time
+					end_time = time.time()
+					if (self._loop_time > (end_time - start_time)): # The loop is going too fast
+						#print "Sleeping for ", (self._loop_time - (end_time - start_time))
+						time.sleep(self._loop_time - (end_time - start_time)) # Slow it down
+					print "Loop time pre-sleep: ", (end_time - start_time)
+					print "Target Freq: ", self._target_freq
+					print "Actual Freq: ", 1.0/(time.time() - start_time)
+                    #print "time/freq for main testing loop: {}/{}".format(end_time - start_time, 1.0/(end_time - start_time))
+					start_time = time.time()
 
 				# end for steps...
 			except KeyboardInterrupt:
