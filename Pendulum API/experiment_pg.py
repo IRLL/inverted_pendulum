@@ -47,6 +47,9 @@ class PolicyGradient():
 		self._rollouts_test = 2
 		self._traj_length_test = 1000
 
+        self._target_freq = 30 # The frequency to achieve in the innermost loop
+        self._loop_time = 1.0/self._target_freq
+
 		time.sleep(.1)
 		#self._my0 = pi/6-2*pi/6*np.random.random((N,1)) # Initial state of the cart pole (between -60 and 50 deg)
 		#self._my0 = np.array([[self._state]])
@@ -126,7 +129,7 @@ class PolicyGradient():
 			print "Initial Angle: ", angle
 			try:
 				# Perform a trial of length L
-				current_time = time.time()
+				start_time = time.time()
 				for steps in range(traj_length):
 					#print "__________________@ Step #", steps+1
 					# Draw an action from the policy
@@ -204,9 +207,13 @@ class PolicyGradient():
 						print "Reset true ", angle, " Step ", steps
 						isReset = True
 
-                    last_time = current_time
-                    current_time = time.time()
-                    print "time/freq for main testing loop: {}/{}".format(current_time - last_time, 1.0/(current_time-last_time))
+                    end_time = time.time()
+                    if (self._loop_time > (start_time - end_time)):
+                        time.sleep(self._loop_time - (start_time - end_time))
+                    print "Target Freq: ", self._target_freq
+                    print "Actual Freq: ", 1.0/(start_time - end_time)
+                    #print "time/freq for main testing loop: {}/{}".format(start_time - end_time, 1.0/(start_time - end_time))
+                    start_time = end_time
 
 				# end for steps...
 			except KeyboardInterrupt:
@@ -271,7 +278,7 @@ class PolicyGradient():
 				last_action = 0.0
 				print "Initial Angle: ", angle
 				try:
-					current_time = time.time()
+					start_time = time.time()
 					# Perform a trial of length L
 					for steps in range(self._traj_length):
 						#print "__________________@ Step #", steps+1
@@ -282,9 +289,9 @@ class PolicyGradient():
 								self._sigma
 							 )
 
-						last_time = current_time
-						current_time = time.time()
-						print "time/freq for main training loop: {}/{}".format(current_time - last_time, 1.0/(current_time-last_time))
+						end_time = start_time
+						start_time = time.time()
+						print "time/freq for main training loop: {}/{}".format(start_time - end_time, 1.0/(start_time-end_time))
 
 						action = round(action, 0)
 						# saturate action
