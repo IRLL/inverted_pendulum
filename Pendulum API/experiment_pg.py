@@ -176,7 +176,16 @@ class PolicyGradient():
 						elif action < 0:
 							self._world.moveLeft(speed, self._threshold)
 							#print "Action: Left"
-						time.sleep(self.ACTION_DELAY)
+    					#Dynamic Sleeping Code:
+						end_time = time.time()
+    					if (self._loop_time > (end_time - start_time)): # The loop is going too fast
+    						#print "Sleeping for ", (self._loop_time - (end_time - start_time))
+    						time.sleep(self._loop_time - (end_time - start_time)) # Slow it down
+    					print "Loop time pre-sleep: ", (end_time - start_time)
+    					print "Target Freq: ", self._target_freq
+    					print "Actual Freq: ", 1.0/(time.time() - start_time)
+                        #print "time/freq for main testing loop: {}/{}".format(end_time - start_time, 1.0/(end_time - start_time))
+    					start_time = time.time()
 						last_action = action
 
 					# Calculating the reward (Remember: First term is the reward for accuracy, second is for control cost)
@@ -206,16 +215,6 @@ class PolicyGradient():
 					if not self._world.softStopFlag and not isReset and (angle > 50.0 or angle < -50.0):
 						print "Reset true ", angle, " Step ", steps
 						isReset = True
-
-					end_time = time.time()
-					if (self._loop_time > (end_time - start_time)): # The loop is going too fast
-						#print "Sleeping for ", (self._loop_time - (end_time - start_time))
-						time.sleep(self._loop_time - (end_time - start_time)) # Slow it down
-					print "Loop time pre-sleep: ", (end_time - start_time)
-					print "Target Freq: ", self._target_freq
-					print "Actual Freq: ", 1.0/(time.time() - start_time)
-                    #print "time/freq for main testing loop: {}/{}".format(end_time - start_time, 1.0/(end_time - start_time))
-					start_time = time.time()
 
 				# end for steps...
 			except KeyboardInterrupt:
@@ -291,10 +290,6 @@ class PolicyGradient():
 								self._sigma
 							 )
 
-						end_time = start_time
-						start_time = time.time()
-						print "time/freq for main training loop: {}/{}".format(start_time - end_time, 1.0/(start_time-end_time))
-
 						action = round(action, 0)
 						# saturate action
 						if action > 1.0:
@@ -342,7 +337,16 @@ class PolicyGradient():
 								#self._world.moveLeft(self._threshold, self._threshold)
 								#print "Action: Left"
 								#self._world.stop()
-							time.sleep(self.ACTION_DELAY) # 0.28
+        					#Dynamic Sleeping Code:
+                            end_time = time.time()
+        					if (self._loop_time > (end_time - start_time)): # The loop is going too fast
+        						#print "Sleeping for ", (self._loop_time - (end_time - start_time))
+        						time.sleep(self._loop_time - (end_time - start_time)) # Slow it down
+        					print "Loop time pre-sleep: ", (end_time - start_time)
+        					print "Target Freq: ", self._target_freq
+        					print "Actual Freq: ", 1.0/(time.time() - start_time)
+                            #print "time/freq for main testing loop: {}/{}".format(end_time - start_time, 1.0/(end_time - start_time))
+        					start_time = time.time()
 							last_action = action
 
 						self._data[trials].u[:,steps] = action
