@@ -9,13 +9,16 @@ m = 1.0
 
 class Pendulum:
 	def __init__(self, start_x=None, start_angle=pi+pi/10, track_length=1000):
+		self.track_length = track_length
+		self.reset(start_x, start_angle)
+
+	def reset(self, start_x=None, start_angle=pi+pi/10):
 		self.angle0 = start_angle
 		self.angle = angle0
 		self.velocity = 0
-		self.track_length = track_length
 
 		if(start_x == None):
-			start_x = track_length/2
+			start_x = self.track_length/2
 
 		self.x0 = start_x
 		self.y0 = 0
@@ -24,7 +27,7 @@ class Pendulum:
 		self.y = y0 + 250.0 * cos(angle0)
 
 
-	def move(self, control):
+	def update(self, control):
 		self.angle = atan2(self.x - self.x0, self.y - self.y0)
 		d_velocity = -g * sin(self.angle) * dt / l
 		self.velocity = self.velocity + d_velocity
@@ -42,7 +45,7 @@ class Pendulum:
 			self.x0 = self.x0 - dx0
 
 
-p = Pendulum(500, 300, pi-pi/10)
+p = Pendulum()
 while 1:
 	screen.fill((255,255,255))
 	for event in pygame.event.get():
