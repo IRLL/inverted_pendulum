@@ -10,11 +10,11 @@ m = 1.0
 class Pendulum:
 	def __init__(self, start_cartx=None, start_angle=pi+pi/10, track_length=1000):
 		self.track_length = track_length
-		self.reset(start_x, start_angle)
+		self.reset(start_cartx, start_angle)
 
-	def reset(self, start_x=None, start_angle=pi+pi/10):
+	def reset(self, start_cartx=None, start_angle=pi+pi/10):
 		self.angle0 = start_angle
-		self.angle = angle0
+		self.angle = self.angle0
 		self.velocity = 0
 
 		if(start_cartx == None):
@@ -23,8 +23,8 @@ class Pendulum:
 		self.cartx = start_cartx
 		self.carty = 0
 		self.cartx_vel = 0
-		self.massx = cartx + 250.0 * sin(angle0)
-		self.massy = carty + 250.0 * cos(angle0)
+		self.massx = self.cartx + 250.0 * sin(self.angle0)
+		self.massy = self.carty + 250.0 * cos(self.angle0)
 
 
 	def update(self, control):
@@ -43,4 +43,27 @@ class Pendulum:
 
 		if self.cartx > self.track_length or self.cartx < 0:
 			self.cartx = self.cartx - dcartx
+
+	
+	def get_state(self):
+		return self.cartx, self.angle-pi/2
+
+
+def tester():
+	from visualizer import Visualizer
+	import time
+	sim = Pendulum()
+	viz = Visualizer(sim.track_length)
+
+	while(1):
+		x, angle = sim.get_state()
+		viz.draw(x, angle)
+		sim.update(0)
+		time.sleep(.01)
+	
+
+
+
+if __name__ == "__main__":
+	tester()
 
