@@ -38,7 +38,7 @@ class Pendulum:
 		self.angle = atan2(self.massx - self.cartx, self.massy - self.carty)
 		d_velocity = -self.g* self.m * sin(self.angle) * self.dt / self.l 
 		self.velocity += d_velocity #add acceleration due to gravity
-		self.velocity += -self.velocity * self.pfriction #add acceleration due to friction 
+		self.velocity += (-self.velocity * self.pfriction) * self.dt #add acceleration due to friction 
 		d_angle = self.dt * self.velocity
 		self.angle = self.angle + d_angle
 		self.massx = self.cartx + self.l * sin(self.angle)
@@ -47,7 +47,7 @@ class Pendulum:
 		#calculate new cart position
 		d_cartx_vel = self.dt * control
 		self.cartx_vel += d_cartx_vel #add acceleration from input force
-		self.cartx_vel += -self.cartx_vel * self.cfriction #add acceleration due to friction 
+		self.cartx_vel += (-self.cartx_vel * self.cfriction) * self.dt #add acceleration due to friction 
 		dcartx = self.dt * self.cartx_vel
 		self.cartx = self.cartx + dcartx
 
@@ -57,7 +57,7 @@ class Pendulum:
 
 	
 	def get_state(self):
-		return self.cartx, self.angle-pi/2
+		return self.cartx, self.angle-pi/2, self.cartx_vel, self.velocity
 
 
 def tester():
@@ -67,10 +67,10 @@ def tester():
 	viz = Visualizer(sim.track_length)
 
 	sim.update(1)
-	x, angle = sim.get_state()
+	x, angle, _, _ = sim.get_state()
 	viz.draw(x, angle)
 	while(1):
-		x, angle = sim.get_state()
+		x, angle, _, _ = sim.get_state()
 		viz.draw(x, angle)
 		sim.update(0)
 		time.sleep(.01)

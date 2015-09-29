@@ -2,10 +2,11 @@
 
 import pygame
 import math
+import sys
 
 
 class Visualizer:
-	def __init__(self, track_length, screen_size=(640,480)):
+	def __init__(self, track_length, screen_size=(640,480), exit_handler=None):
 		pygame.init()
 		self.rod_length_factor = .25 #how much of the screen should the rod length be
 		(self.xsize, self.ysize) = screen_size
@@ -15,7 +16,12 @@ class Visualizer:
 		
 		self.rod_length = self.rod_length_factor * min(self.xsize, self.ysize)
 		
+		self.exit_handler = exit_handler
+		
 	def draw(self, cartx, angle):
+		#first handle any events
+		self.handle_events()
+
 		#scale the cart position
 		cartx = float(self.xsize)/self.track_length * cartx
 
@@ -37,6 +43,15 @@ class Visualizer:
 		pygame.draw.circle(self.screen, (0,0,0), [int(massx), int(massy)], 5)
 
 		pygame.display.flip()	
+
+	def handle_events(self):
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				print "close window detected, running handler: ", self.exit_handler
+				if self.exit_handler is None:
+					sys.exit(0)
+				else:
+					self.exit_handler()
 		
 
 
