@@ -4,7 +4,7 @@ from math import *
 class Pendulum:
 	def __init__(self, start_cartx=None, start_angle=pi+pi/10, track_length=1000,
 			      dt=0.01, g=9.81, l=1.0, m=1.0,
-				  cfriction=.008, pfriction=0.005):
+				  cfriction=.1, pfriction=0.1):
 
 		self.track_length = track_length
 
@@ -15,12 +15,14 @@ class Pendulum:
 
 		self.cfriction = cfriction
 		self.pfriction = pfriction
+		self.start_angle=start_angle
 
 		self.reset(start_cartx, start_angle)
 
-	def reset(self, start_cartx=None, start_angle=pi+pi/10):
-		self.angle0 = start_angle
-		self.angle = self.angle0
+	def reset(self, start_cartx=None, start_angle=None):
+		if(start_angle is None):
+			start_angle = self.start_angle
+		self.angle = start_angle 
 		self.velocity = 0
 
 		if(start_cartx == None):
@@ -29,28 +31,45 @@ class Pendulum:
 		self.cartx = start_cartx
 		self.carty = 0
 		self.cartx_vel = 0
-		self.massx = self.cartx + self.l * sin(self.angle0)
-		self.massy = self.carty + self.l * cos(self.angle0)
-
-
-	def update(self, control):
-		#calculate new angle
-		self.angle = atan2(self.massx - self.cartx, self.massy - self.carty)
-		d_velocity = -self.g* self.m * sin(self.angle) * self.dt / self.l 
-		self.velocity += d_velocity #add acceleration due to gravity
-		self.velocity += (-self.velocity * self.pfriction) * self.dt #add acceleration due to friction 
-		d_angle = self.dt * self.velocity
-		self.angle = self.angle + d_angle
 		self.massx = self.cartx + self.l * sin(self.angle)
 		self.massy = self.carty + self.l * cos(self.angle)
 
-		#calculate new cart position
-		d_cartx_vel = self.dt * control
-		self.cartx_vel += d_cartx_vel #add acceleration from input force
-		self.cartx_vel += (-self.cartx_vel * self.cfriction) * self.dt #add acceleration due to friction 
-		dcartx = self.dt * self.cartx_vel
-		self.cartx = self.cartx + dcartx
 
+	def update(self, control):
+		##################
+		#calculate new pendulum angle
+		##################
+		self.angle = atan2(self.massx - self.cartx, self.massy - self.carty)
+		
+		#calculate current acceleration
+		acceleration = -self.g * self.m * sin(self.angle) / self.l #gravity
+		acceleration += (-self.velocity * self.pfriction) / self.m #friction
+		
+		#update angle
+		d_angle = self.velocity*self.dt + (0.5 * acceleration)*(self.dt ** 2)
+		self.angle +=  d_angle
+		
+		#update velocity
+		self.velocity += acceleration * self.dt
+	
+		self.massx = self.cartx + self.l * sin(self.angle)
+		self.massy = self.carty + self.l * cos(self.angle)
+
+		##################
+		#calculate new cart position
+		##################
+		
+		#calculate current acceleration
+		acceleration = control #input control
+		acceleration += (-self.cartx_vel * self.cfriction) #friction
+
+		#update cart position
+		dcartx = self.cartx_vel*self.dt + (0.5 * acceleration)*(self.dt ** 2)
+		self.cartx += dcartx 
+
+		#update cart velocity
+		self.cartx_vel += acceleration * self.dt
+		
 		#limit cart position
 		if self.cartx > self.track_length or self.cartx < 0:
 			self.cartx = self.cartx - dcartx
