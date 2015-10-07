@@ -10,6 +10,7 @@ import sys
 import random
 import time
 import argparse
+import importlib
 from model import Pendulum
 from visualizer import Visualizer
 
@@ -38,14 +39,14 @@ class Simulator:
     def run_experiment(self):
         for i in range(self.num_trials):
             print("starting trial {} of {}".format(i+1, self.num_trials))
-            self.try_exec("init_trial", i)
+            self.try_exec("init_trial", [i] + list(self.model.get_state()))
             for j in range(self.num_episodes):
                 print("starting episode {} of {}".format(j+1,
                                                          self.num_episodes))
-                self.try_exec("init_episode", j)
+                self.try_exec("init_episode", [j] + list(self.model.get_state()))
                 self.run_episode()  # run the episode
-                self.try_exec("end_episode", j)
-            self.try_exec("end_trial", i)
+                self.try_exec("end_episode", [j] + list(self.model.get_state()))
+            self.try_exec("end_trial", [i] + list(self.model.get_state()))
 
     def run_episode(self):
         self.rand_reset()
@@ -111,8 +112,8 @@ def verify_agent(agent):
 
 def main(args):
     # Dynamically load the agent.
-    agent_filename = '.'.join(args.agent_file.split('.')[:-1])
-    agent_module = __import__(agent_filename)
+    agent_filename = args.agent_file[:-3]
+    agent_module = importlib.import_module(agent_filename)
 
     agent = agent_module.Agent()
     verify_agent(agent)
