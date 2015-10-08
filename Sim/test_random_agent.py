@@ -12,10 +12,9 @@ class Agent:
     def __init__(self):
         print "initializing agent!"
 
-    def get_action(self, x, angle, dx, dangle):
+    def get_action(self, x, angle, dx, dangle, edge):
         reward = -(math.pi - angle)**2
         self.cum_episode_reward += reward
-        
         action = random.gauss(0, 1)
         return action
 

@@ -7,6 +7,7 @@ This module implements the inverted pendulum simulator.
 
 
 import sys
+import os
 import random
 import time
 import argparse
@@ -17,8 +18,8 @@ from visualizer import Visualizer
 
 class Simulator:
     def __init__(self, agent, model, num_trials, num_episodes, episode_length,
-                 sim_timestep, gui_active, gui_freq, agent_freq, reset_angle,
-                 reset_angle_variance):
+                 sim_timestep, gui_active, gui_freq, save_gui_dir, agent_freq, 
+                 reset_angle, reset_angle_variance):
         self.agent = agent
 
         self.num_trials = num_trials
@@ -28,6 +29,7 @@ class Simulator:
         self.sim_timestep = sim_timestep
         self.gui_active = gui_active
         self.gui_freq_mod = int(1.0/self.sim_timestep/gui_freq) + 1
+        self.save_gui_dir = save_gui_dir
         self.agent_freq_mod = int(1.0/self.sim_timestep/agent_freq) + 1
         self.reset_angle = reset_angle
         self.reset_angle_variance = reset_angle_variance
@@ -42,23 +44,22 @@ class Simulator:
             self.try_exec("init_trial", [i] + list(self.model.get_state()))
             for j in range(self.num_episodes):
                 print("starting episode {} of {}".format(j+1,
-                                                         self.num_episodes))
                 self.try_exec("init_episode", [j] + list(self.model.get_state()))
-                self.run_episode()  # run the episode
+                self.run_episode(i,j)  # run the episode
                 self.try_exec("end_episode", [j] + list(self.model.get_state()))
             self.try_exec("end_trial", [i] + list(self.model.get_state()))
 
-    def run_episode(self):
+    def run_episode(self, trial, episode):
         self.rand_reset()
         action = 0
         step = 0
         while step < self.num_timesteps:
             step += 1
-            x, angle, dx, dangle = self.model.get_state()
+            x, angle, dx, dangle, edge = self.model.get_state()
 
             #agent control signal update rate is separate from simulation rate
             if not (step % self.agent_freq_mod):
-                action = self.try_exec("get_action", (x, angle, dx, dangle))
+                action = self.try_exec("get_action", (x, angle, dx, dangle, edge))
 
             #update the model state
             self.model.update(action)
@@ -67,7 +68,17 @@ class Simulator:
             if (self.gui_active):
                 time.sleep(self.sim_timestep)
                 if not (step % self.gui_freq_mod):
+                    if(self.save_gui_dir is not ""):
+                        self.save_gui(step=step, episode=episode, trial=trial, state=None)
                     self.gui.draw(x, angle)
+
+    def save_gui(self, step, episode, trial, state):
+        if self.save_gui != "":
+            dirname = self.save_gui_dir
+            dirname += "/t{}_e{}/".format(trial, episode)
+            if not os.path.exists(dirname): os.makedirs(dirname)
+            image_filename = dirname + "{}".format(step)
+            self.gui.save_screen(image_filename)
 
     def try_exec(self, function_name, params):
         function = getattr(self.agent, function_name, None)
@@ -86,9 +97,9 @@ class Simulator:
 def function_exists(classname, function_name):
     function = getattr(classname, function_name, None)
     if callable(function):
-        return True
-    return False
-
+        return True 
+    else:
+        return False 
 
 def verify_agent(agent):
     critical_functions = ["get_action"]
@@ -130,6 +141,7 @@ def main(args):
                     sim_timestep=args.timestep,
                     gui_active=(not args.nogui),
                     gui_freq=args.gui_freq,
+                    save_gui_dir=args.save_gui,
                     agent_freq=args.agent_freq,
                     reset_angle=args.reset_angle,
                     reset_angle_variance=args.reset_angle_variance)
@@ -156,6 +168,8 @@ if __name__ == "__main__":
                         help="disables the gui")
     parser.add_argument('--gui_freq', type=int, default=25,
                         help="gui update frequency (default: %(default)s)")
+    parser.add_argument('--save_gui', type=str, default="",
+                        help="saves the screen output to a directory")
     parser.add_argument('--agent_freq', type=int, default=10,
                         help="agent update frequency (default: %(default)s)")
     parser.add_argument('--track_length', type=int, default=2,

@@ -24,6 +24,10 @@ class Visualizer:
 
         self.rod_length = self.rod_length_factor * min(self.xsize, self.ysize)
 
+        #calculate track positions on the screen
+        self.track_origin = self.rod_length
+        self.track_end = self.xsize - self.rod_length
+
         self.exit_handler = exit_handler
 
     def draw(self, cartx, angle):
@@ -31,7 +35,7 @@ class Visualizer:
         self.handle_events()
 
         #scale the cart position
-        cartx = float(self.xsize)/self.track_length * cartx
+        cartx = float(self.xsize-(self.rod_length*2))/self.track_length * cartx + self.track_origin
 
         #calculate the mass position
         massx = cartx + self.rod_length*math.cos(angle)
@@ -40,7 +44,7 @@ class Visualizer:
         # Give the screen a white background.
         self.screen.fill((255, 255, 255))
         # Draw the track
-        pygame.draw.line(self.screen, (0,0,0), [0, self.ysize/2], [self.xsize, self.ysize/2], 3)
+        pygame.draw.line(self.screen, (0,0,0), [self.track_origin, self.ysize/2], [self.track_end, self.ysize/2], 3)
 
         #draw the rod
         pygame.draw.line(self.screen, (0,0,255), [cartx, self.ysize/2], [massx, massy], 2)
@@ -52,6 +56,9 @@ class Visualizer:
         pygame.draw.circle(self.screen, (0,0,0), [int(massx), int(massy)], 5)
 
         pygame.display.flip()
+
+    def save_screen(self, filename):
+            pygame.image.save(self.screen, filename)
 
     def handle_events(self):
         for event in pygame.event.get():

@@ -37,6 +37,7 @@ class Pendulum:
         self.cartx_vel = 0
         self.massx = self.cartx + self.l * sin(self.angle)
         self.massy = self.carty + self.l * cos(self.angle)
+        self.edge = False
 
     def update(self, control):
         ##################
@@ -76,9 +77,10 @@ class Pendulum:
         #limit cart position
         if self.cartx > self.track_length or self.cartx < 0:
             self.cartx = self.cartx - dcartx
+            self.edge = True
 
     def get_state(self):
-        return self.cartx, self.angle-pi/2, self.cartx_vel, self.velocity
+        return self.cartx, self.angle-pi/2, self.cartx_vel, self.velocity, self.edge
 
 
 def tester():
