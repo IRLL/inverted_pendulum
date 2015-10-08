@@ -19,7 +19,7 @@ class Agent:
         return action
 
     def init_trial(self, *meta):
-        exp_num, _, _, _, _ = meta
+        exp_num, _, _, _, _, _ = meta
         print("Sarsa agent initializing for experiment %d" % (exp_num + 1))
         self.episode_rewards = []
         self.cum_episode_reward = 0
