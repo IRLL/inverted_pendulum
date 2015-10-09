@@ -16,11 +16,11 @@ import math
 import parameters
 
 
-RESOLUTION = 18
-X_RANGE = [0.0, 1.0]
-DX_RANGE = [-30.0, 30.0]
-ANGLE_RANGE = [-4.7, 1.5]
-DANGLE_RANGE = [-10, 10]
+# [MIN, MAX, RESOLUTION]
+X_RANGE = [0.0, 2.0, 200]
+DX_RANGE = [-30.0, 30.0, 20]
+ANGLE_RANGE = [-4.7, 1.5, 10]
+DANGLE_RANGE = [-10, 10, 10]
 
 # For 7 actions, 3 will be lefts(0, 1, 2), 1 will be neutral(3),
 # 3 will be rights(4, 5, 6).
@@ -50,10 +50,10 @@ class Agent:
             if value < bounds[0]:
                 index = 0
             elif value >= bounds[1]:
-                index = RESOLUTION + 1
+                index = bounds[2] + 1
             else:
                 value -= bounds[0]
-                offset = (bounds[1] - bounds[0]) / RESOLUTION
+                offset = (bounds[1] - bounds[0]) / bounds[2]
                 index = int(value / offset)
             return index
         x = index(X_RANGE, x)
@@ -94,10 +94,10 @@ class Agent:
         discretized = self.translate(*state)
         qs = [discretized + [i] for i in range(NUM_ACTIONS)]
         evaluated_qs = [self.q_values.get(tuple(i), 0) for i in qs]
-        print(evaluated_qs,)
-        print(evaluated_qs.index(max(evaluated_qs)))
+        candidate_actions = [i for i, v in enumerate(evaluated_qs) if v ==
+                             max(evaluated_qs)]
 
-        return evaluated_qs.index(max(evaluated_qs))
+        return random.choice(candidate_actions)
 
     def get_action(self, x, angle, dx, dangle, edge):
         reward = -(math.pi - angle)**2
@@ -140,10 +140,10 @@ class Agent:
 
     def end_episode(self, *meta):
         self.episode_rewards.append(self.cum_episode_reward)
-        print("ep_reward: %d, states visited: %d, diff: %d" %\
-            (self.cum_episode_reward,
-             len(self.visited),
-             len(self.visited) - self.last_visit_count))
+        print("ep_reward: %d, states visited: %d, diff: %d" %
+              (self.cum_episode_reward,
+               len(self.visited),
+               len(self.visited) - self.last_visit_count))
         self.last_visit_count = len(self.visited)
 
     def end_trial(self, *meta):
