@@ -16,9 +16,15 @@ class Agent:
         self.angles = []
         self.dxs = []
         self.dangles = []
+        self.first = 20
 
-    def get_action(self, x, angle, dx, dangle):
-        action = random.gauss(0, 1)
+    def get_action(self, x, angle, dx, dangle, edge):
+        #action = random.gauss(0, 1)
+        if self.first:
+            action = -5
+            self.first -= 1
+        else:
+            action = 5
         self.xs.append(x)
         self.angles.append(angle)
         self.dxs.append(dx)
