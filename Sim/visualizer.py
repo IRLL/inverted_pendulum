@@ -35,6 +35,8 @@ class Visualizer:
         self.handle_events()
 
         position = cartx
+        text_angle = angle
+        angle -= math.pi*3.0/2.0
 
         cartx += self.track_length/2 
 
@@ -62,10 +64,10 @@ class Visualizer:
         #draw text readout
         myfont = pygame.font.SysFont("monospace", 15)
 
-        text = myfont.render("angle(r): %f" % angle, 1, (255,0,0))
+        text = myfont.render("angle(r): %f" % text_angle, 1, (255,0,0))
         self.screen.blit(text, (10, self.ysize-20*3))
 
-        text = myfont.render("angle(d): %f" % (angle*180/math.pi), 1, (255,0,0))
+        text = myfont.render("angle(d): %f" % (text_angle*180/math.pi), 1, (255,0,0))
         self.screen.blit(text, (10, self.ysize-20*2))
 
         text = myfont.render("position: %f" % position, 1, (255,0,0))

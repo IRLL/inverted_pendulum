@@ -80,7 +80,10 @@ class Pendulum:
             self.edge = True
 
     def get_state(self):
-        return self.cartx-self.track_length/2, self.angle-pi/2, self.cartx_vel, self.velocity, self.edge
+        angle = self.angle + pi
+        if angle > pi:
+            angle = angle - 2*pi 
+        return self.cartx-self.track_length/2, angle, self.cartx_vel, self.velocity, self.edge
 
 
 def tester():
