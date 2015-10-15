@@ -36,6 +36,8 @@ class Visualizer:
 
         position = cartx
 
+        cartx += self.track_length/2 
+
         #scale the cart position
         cartx = float(self.xsize-(self.rod_length*2))/self.track_length * cartx + self.track_origin
 
