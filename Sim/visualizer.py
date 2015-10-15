@@ -34,6 +34,8 @@ class Visualizer:
         #first handle any events
         self.handle_events()
 
+        position = cartx
+
         #scale the cart position
         cartx = float(self.xsize-(self.rod_length*2))/self.track_length * cartx + self.track_origin
 
@@ -55,6 +57,19 @@ class Visualizer:
         #draw the mass at the end of the rod
         pygame.draw.circle(self.screen, (0,0,0), [int(massx), int(massy)], 5)
 
+        #draw text readout
+        myfont = pygame.font.SysFont("monospace", 15)
+
+        text = myfont.render("angle(r): %f" % angle, 1, (255,0,0))
+        self.screen.blit(text, (10, self.ysize-20*3))
+
+        text = myfont.render("angle(d): %f" % (angle*180/math.pi), 1, (255,0,0))
+        self.screen.blit(text, (10, self.ysize-20*2))
+
+        text = myfont.render("position: %f" % position, 1, (255,0,0))
+        self.screen.blit(text, (10, self.ysize-20*1))
+
+        #draw the screen
         pygame.display.flip()
 
     def save_screen(self, filename):
