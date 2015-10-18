@@ -5,27 +5,27 @@
 
 
 import random
-import math
+from math import copysign, pi
 
 
 class Agent:
     def __init__(self):
-        self.kp = 500
-        self.ki = 1
-        self.kd = 100
+        self.kp = 50
+        self.ki = .3
+        self.kd = -200
 
         self.error_integral = 0
         self.prev_error = 0
         print "initializing agent!"
 
     def get_action(self, x, angle, dx, dangle, edge):
-        error = copysign(1, angle) * (pi-abs(angle)) + x
+        error = -angle + x/10
         derivative = self.prev_error - error
         self.prev_error = error
         self.error_integral += error
 
-        action = self.kp * error + 
-                 self.ki * self.error_integral +
+        action = self.kp * error + \
+                 self.ki * self.error_integral + \
                  self.kd * derivative
 
         return action
