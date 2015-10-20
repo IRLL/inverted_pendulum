@@ -171,7 +171,7 @@ if __name__ == "__main__":
                         help="gui update frequency (default: %(default)s)")
     parser.add_argument('--save_gui', type=str, default="",
                         help="saves the screen output to a directory")
-    parser.add_argument('--agent_freq', type=int, default=10,
+    parser.add_argument('--agent_freq', type=int, default=50,
                         help="agent update frequency (default: %(default)s)")
     parser.add_argument('--track_length', type=int, default=2,
                         help="length (meters) of the track (default: "

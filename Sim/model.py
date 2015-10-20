@@ -26,7 +26,7 @@ class Pendulum:
     def reset(self, start_cartx=None, start_angle=None):
         if start_angle is None:
             start_angle = self.start_angle
-        self.angle = start_angle
+        self.angle = start_angle + pi
         self.velocity = 0
 
         if start_cartx is None:
@@ -80,7 +80,10 @@ class Pendulum:
             self.edge = True
 
     def get_state(self):
-        return self.cartx, self.angle-pi/2, self.cartx_vel, self.velocity, self.edge
+        angle = self.angle + pi
+        if angle > pi:
+            angle = angle - 2*pi 
+        return self.cartx-self.track_length/2, angle, self.cartx_vel, self.velocity, self.edge
 
 
 def tester():
