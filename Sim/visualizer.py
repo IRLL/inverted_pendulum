@@ -30,7 +30,7 @@ class Visualizer:
 
         self.exit_handler = exit_handler
 
-    def draw(self, cartx, angle, dx, dangle):
+    def draw(self, cartx, angle, dx, dangle, action):
         #first handle any events
         self.handle_events()
 
@@ -63,6 +63,9 @@ class Visualizer:
 
         #draw text readout
         myfont = pygame.font.SysFont("monospace", 15)
+
+        text = myfont.render("Action: %f" % action, 1, (255,0,0))
+        self.screen.blit(text, (10, self.ysize-20*5))
 
         text = myfont.render("x: %f" % position, 1, (255,0,0))
         self.screen.blit(text, (10, self.ysize-20*4))

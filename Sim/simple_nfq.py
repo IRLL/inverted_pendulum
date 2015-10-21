@@ -52,6 +52,7 @@ class Agent:
                 # 3 units because 3==round(len(inputs) + len(ouputs))
                 #Layer("Sigmoid", units=5),
                 #Layer("Sigmoid", units=5),
+                Layer("Sigmoid", units=5),
                 # Single unit linear output.
                 Layer("Linear")],
             # This might be too high...
@@ -97,7 +98,7 @@ class Agent:
             return random.randint(0, NUM_ACTIONS - 1)
 
         # ε-exploitation.
-        candidates = [[self.state[0], self.state[2]] + [a-0.5] for a in range(NUM_ACTIONS)]
+        candidates = [self.state + [a - 0.5] for a in range(NUM_ACTIONS)]
         #candidates = [[self.state[0]] + [a-0.5] for a in range(NUM_ACTIONS)]
         q_values = self.clf.predict(np.array(candidates))
         if DEBUG:
@@ -113,7 +114,7 @@ class Agent:
     def get_action(self, x, angle, dx, dangle, edge):
         """Main function called from the simulator to run episode."""
         # Track reward.
-        #reward = -(angle)**2 
+        #reward = -(angle)**2
         reward = -x**2
         self.cum_episode_reward += reward
 
@@ -152,26 +153,27 @@ class Agent:
     @timeit
     def train_nfq(self):
         """"""
-        with open("transitions.p", "wb") as f:
-            pickle.dump(self.transitions, f)
+        #with open("transitions.p", "wb") as f:
+        #    pickle.dump(self.transitions, f)
         # Generate the training set from the set of transitions.
-        X = np.array([[x, dx, a-0.5]
-        #X = np.array([[x, a-0.5]
+        X = np.array([[x, angle, dx, dangle, a-0.5]
                       for [x, angle, dx, dangle], a, _sp in self.transitions])
-        #y = np.array([angle**2 + x**2 for _s, _a, [x, angle, _dx, _dangle] in
-        #             self.transitions])
-        #y = np.array([self.clf.predictfor _s, _a, [x, _angle, _dx, _dangle] in
-        #             self.transitions])
         y = list()
         for _s, _a, sp in self.transitions:
-            if sp[0]**2 < 0.05:
+            # Regulator state: targets - within .03 of 0.
+            if sp[0]**2 < 0.001:
                 y.append(0)
+
+            # Regulator state: avoid - past 0.8 from 0.
             elif sp[0]**2 > 0.64:
                 y.append(10)
+
+            # Other states.
             else:
                 if self.network_trained:
-                    y.append(min(self.clf.predict(np.array([[sp[0], sp[2], a] for a in [-0.5,
-                    0.5]]))) * self.gamma)
+                    y.append(
+                        min(self.clf.predict(np.array(
+                            [sp + [a] for a in [-0.5, 0.5]]))) * self.gamma)
                 else:
                     y.append(sp[0]**2)
         y = np.array(y)
