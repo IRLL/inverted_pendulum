@@ -75,8 +75,13 @@ class Pendulum:
         self.cartx_vel += acceleration * self.dt
 
         #limit cart position
-        if self.cartx > self.track_length or self.cartx < 0:
-            self.cartx = self.cartx - dcartx
+        if self.cartx > self.track_length:
+            self.cartx = self.track_length
+            self.cartx_vel = 0
+            self.edge = True
+        if self.cartx < 0:
+            self.cartx = 0
+            self.cartx_vel = 0
             self.edge = True
 
     def get_state(self):

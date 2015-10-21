@@ -71,7 +71,7 @@ class Simulator:
                 if not (step % self.gui_freq_mod):
                     if(self.save_gui_dir is not ""):
                         self.save_gui(step=step, episode=episode, trial=trial, state=None)
-                    self.gui.draw(x, angle)
+                    self.gui.draw(x, angle, dx, dangle)
 
     def save_gui(self, step, episode, trial, state):
         if self.save_gui != "":

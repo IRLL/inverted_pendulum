@@ -3,7 +3,7 @@
 """
 
 # Learning rate.
-ALPHA = 0.001
+ALPHA = 0.0001
 
 # Epsilon greedy random action selection rate.
 EPSILON = 0.01
