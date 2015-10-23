@@ -12,10 +12,11 @@ The basic idea underlying NFQ is that instead of updating the neural value
 function on-line, which can lead to slow learning/divergence, experiences are
 collected and the update is performed off-line.
 
-x:-0.846563-0.995918
-dx:-2.056612-47.288549
-angle:-3.139824-3.140876
-dangle:-11.219148-13.838803
+Approximate possible values when using impulses of 5.
+x:-1.000000-1.000000
+dx:-4.317354-4.106407
+angle:-3.139139-3.139918
+dangle:-11.028654-13.850106
 """
 
 import random
@@ -29,7 +30,7 @@ from collections import Counter
 
 
 # Keeping fixed number of actions to control the cart.
-ACTIONS = [-5, -2, 2, 5]
+ACTIONS = [-10, -5, -2, -1, -0.1, -0.001, 0, 0.001, 0.1, 1, 2, 5, 10]
 NUM_ACTIONS = len(ACTIONS)
 
 
@@ -39,6 +40,7 @@ class Agent:
         self.alpha = parameters.ALPHA
         self.epsilon = parameters.EPSILON
         self.lmbda = parameters.LAMBDA  # Because lambda is a keyword.
+        self.gamma = parameters.GAMMA
 
         self.action = None
         self.state = None
@@ -68,7 +70,7 @@ class Agent:
         self.episode_rewards = []
         self.cum_episode_reward = 0
         try:
-            with open("nfq_clf.save", "rb") as f:
+            with open("nfq_clf.save10", "rb") as f:
                 self.clf = pickle.load(f)
             self.network_trained = True
         except:
@@ -94,9 +96,10 @@ class Agent:
             return random.randint(0, NUM_ACTIONS - 1)
 
         # ε-exploitation.
-        candidates = [self.state + [a] for a in range(NUM_ACTIONS)]
+        candidates = [self.state + [a] for a in ACTIONS]
         q_values = self.clf.predict(np.array(candidates))
-        lowest = [i for i, v in enumerate(q_values) if v == min(q_values)]
+        lowest = [i for i, v in enumerate(q_values)
+                  if v < min(q_values) + 0.1]
 
         # Return the minimum cost action.
         return random.choice(lowest)
@@ -104,8 +107,7 @@ class Agent:
     def get_action(self, x, angle, dx, dangle, edge):
         """Main function called from the simulator to run episode."""
         # Track reward.
-        #reward = -(angle)**2 
-        reward = -x**2
+        reward = -(angle)**2 
         self.cum_episode_reward += reward
 
         # Determine action.
@@ -134,7 +136,7 @@ class Agent:
         self.network_trained = True
 
         # Save the network.
-        with open("nfq_clf.save", "wb") as f:
+        with open("nfq_clf.save10", "wb") as f:
             pickle.dump(self.clf, f)
 
     def end_trial(self, *meta):
@@ -143,13 +145,30 @@ class Agent:
     @timeit
     def train_nfq(self):
         """"""
+        with open("transitions.p", "wb") as f:
+            pickle.dump(self.transitions, f)
         # Generate the training set from the set of transitions.
-        X = np.array([[x, angle, dx, dangle, a]
+        X = np.array([[x, angle, dx, dangle, ACTIONS[a]]
                       for [x, angle, dx, dangle], a, _sp in self.transitions])
-        #y = np.array([angle**2 + x**2 for _s, _a, [x, angle, _dx, _dangle] in
-        #             self.transitions])
-        y = np.array([10 * x**2 for _s, _a, [x, _angle, _dx, _dangle] in
-                     self.transitions])
+        y = list()
+        for _s, _a, sp in self.transitions:
+            # Regulator state: targets - within .03 of 0.
+            if sp[1]**2 < 0.001:
+                y.append(0)
+
+            # Regulator state: avoid - past 0.8 from 0.
+            elif sp[1]**2 > 0.64:
+                y.append(100)
+
+            # Other states.
+            else:
+                if self.network_trained:
+                    y.append(
+                        min(self.clf.predict(np.array(
+                            [sp + [a] for a in ACTIONS]))) * self.gamma)
+                else:
+                    y.append(sp[1]**2)
+        y = np.array(y)
 
         # Train the mlp.
         self.clf.fit(X, y)

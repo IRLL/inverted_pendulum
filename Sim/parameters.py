@@ -10,3 +10,6 @@ EPSILON = 0.01
 
 # Eligibility trace decay.
 LAMBDA = 0.9
+
+# Discount factor
+GAMMA = 0.9
