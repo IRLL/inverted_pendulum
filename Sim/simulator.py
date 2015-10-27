@@ -12,14 +12,14 @@ import random
 import time
 import argparse
 import importlib
+import math
 from model import Pendulum
 from visualizer import Visualizer
 
 
 class Simulator:
     def __init__(self, agent, model, num_trials, num_episodes, episode_length,
-                 sim_timestep, gui_active, gui_freq, save_gui_dir, agent_freq, 
-                 reset_angle, reset_angle_variance):
+                 sim_timestep, gui_active, gui_freq, save_gui_dir, agent_freq, reset_angle, reset_angle_variance, fail_angle):
         self.agent = agent
 
         self.num_trials = num_trials
@@ -33,6 +33,7 @@ class Simulator:
         self.agent_freq_mod = int(1.0/self.sim_timestep/agent_freq) + 1
         self.reset_angle = reset_angle
         self.reset_angle_variance = reset_angle_variance
+        self.fail_angle = fail_angle
 
         self.model = model
         if self.gui_active:
@@ -47,7 +48,7 @@ class Simulator:
                             self.num_episodes))
                 self.try_exec("init_episode", [j] + list(self.model.get_state()))
                 self.run_episode(i,j)  # run the episode
-                self.try_exec("end_episode", [j] + list(self.model.get_state()))
+                self.try_exec("end_episode", [j] + list(self.model.get_state(), ))
             self.try_exec("end_trial", [i] + list(self.model.get_state()))
 
     def run_episode(self, trial, episode):
@@ -57,6 +58,9 @@ class Simulator:
         while step < self.num_timesteps:
             step += 1
             x, angle, dx, dangle, edge = self.model.get_state()
+            
+            if(edge or abs(angle*180/math.pi) > self.fail_angle): #check if we hit the edge
+                break
 
             #agent control signal update rate is separate from simulation rate
             if not (step % self.agent_freq_mod):
@@ -72,6 +76,7 @@ class Simulator:
                     if(self.save_gui_dir is not ""):
                         self.save_gui(step=step, episode=episode, trial=trial, state=None)
                     self.gui.draw(x, angle, dx, dangle, action)
+        return step
 
     def save_gui(self, step, episode, trial, state):
         if self.save_gui != "":
@@ -145,7 +150,8 @@ def main(args):
                     save_gui_dir=args.save_gui,
                     agent_freq=args.agent_freq,
                     reset_angle=args.reset_angle,
-                    reset_angle_variance=args.reset_angle_variance)
+                    reset_angle_variance=args.reset_angle_variance,
+                    fail_angle = args.fail_angle)
 
     sim.run_experiment()
 
@@ -154,7 +160,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Pendulum simulator.')
     parser.add_argument('agent_file', type=str,
                         help="file name of agent to run")
-    parser.add_argument('--trials', type=int, default=10,
+    parser.add_argument('--trials', type=int, default=1,
                         help='number of trials to run (default: %(default)s)')
     parser.add_argument('--episodes', type=int, default=10,
                         help="number of episodes to run "
@@ -185,5 +191,8 @@ if __name__ == "__main__":
     parser.add_argument('--reset_angle_variance', type=float, default=0.0,
                         help="variance of reset angle of the pendulum "
                         "(default: %(default)s)")
+    parser.add_argument('--fail_angle', type=float, default=360.0,
+                        help="angle at which to end the episode at (<180) " 
+                        "(default: no fail)")
     args = parser.parse_args()
     main(args)

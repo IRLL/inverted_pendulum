@@ -14,17 +14,18 @@ dangle:-11.095294-12.640812
 import random
 import math
 import parameters
+from math import pi
 
 
 # [MIN, MAX, RESOLUTION]
-X_RANGE = [0.0, 2.0, 200]
-DX_RANGE = [-30.0, 30.0, 20]
-ANGLE_RANGE = [-4.7, 1.5, 10]
+X_RANGE = [-1, 1, 1]
+DX_RANGE = [-30.0, 30.0, 1]
+ANGLE_RANGE = [-pi/2, pi/2, 10]
 DANGLE_RANGE = [-10, 10, 10]
 
 # For 7 actions, 3 will be lefts(0, 1, 2), 1 will be neutral(3),
 # 3 will be rights(4, 5, 6).
-ACTIONS = [-5, -2, 2, 5]
+ACTIONS = [-5, -2, 0, 2, 5]
 NUM_ACTIONS = len(ACTIONS)
 
 
@@ -53,7 +54,7 @@ class Agent:
                 index = bounds[2] + 1
             else:
                 value -= bounds[0]
-                offset = (bounds[1] - bounds[0]) / bounds[2]
+                offset = float(bounds[1] - bounds[0]) / bounds[2]
                 index = int(value / offset)
             return index
         x = index(X_RANGE, x)
@@ -100,8 +101,6 @@ class Agent:
         return random.choice(candidate_actions)
 
     def get_action(self, x, angle, dx, dangle, edge):
-        reward = -(math.pi - angle)**2
-        self.cum_episode_reward += reward
         action_index = self.agent_step([x, angle, dx, dangle])
 
         return ACTIONS[action_index]
@@ -113,7 +112,8 @@ class Agent:
         ap = self.egreedy([x, angle, dx, dangle])
 
         # δ ← r + γQ(s', a') - Q(s, a)
-        reward = -(math.pi - angle)**2
+        reward = math.pi - abs(angle)
+        self.cum_episode_reward += reward
         disc_sp_ap = tuple(self.translate(*state) + [ap])
         self.visited.add(disc_sp_ap)
         disc_s_a = tuple(self.translate(*self.state) + [self.action])
@@ -147,4 +147,8 @@ class Agent:
         self.last_visit_count = len(self.visited)
 
     def end_trial(self, *meta):
-        print(self.episode_rewards)
+        fh = open('rewards.txt', 'w')
+        for reward in self.episode_rewards:
+            fh.write("{}\n".format(reward))
+        fh.close()
+#print(self.episode_rewards)
