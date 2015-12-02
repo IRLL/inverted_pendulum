@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """Inverted Pendulum Simulator.
 
@@ -71,7 +71,7 @@ class Simulator:
                 else:
                     reward = -1
 
-                socket.send(b"/status/%d/%d" % (reward, terminal))
+                socket.send(("/status/%d/%d" % (reward, terminal)).encode())
             elif request == "/get/state":
                 fn = "/home/ala/tmp/dump/%03d.png" % self.frame_num
                 self.frame_num += 1
