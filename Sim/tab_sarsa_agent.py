@@ -15,17 +15,23 @@ import random
 import math
 import parameters
 from math import pi
+import sys
 
 
 # [MIN, MAX, RESOLUTION]
 X_RANGE = [-1, 1, 1]
-DX_RANGE = [-30.0, 30.0, 1]
-ANGLE_RANGE = [-pi/2, pi/2, 10]
+DX_RANGE = [-10.0, 10.0, 10]
+ANGLE_RANGE = [-pi/4, pi/4, 10]
 DANGLE_RANGE = [-10, 10, 10]
 
 # For 7 actions, 3 will be lefts(0, 1, 2), 1 will be neutral(3),
 # 3 will be rights(4, 5, 6).
-ACTIONS = [-5, -2, 0, 2, 5]
+AVAIL_ACTIONS = [1, 5, 10 ]
+
+ACTIONS = [0]
+for action in AVAIL_ACTIONS:
+    ACTIONS.append(action)
+    ACTIONS.append(-action)
 NUM_ACTIONS = len(ACTIONS)
 
 
@@ -45,22 +51,28 @@ class Agent:
         self.visited = set()
         self.last_visit_count = len(self.visited)
 
+    def index(self, bounds, value):
+        if bounds[2] == 1:
+            return 0
+        minimum = bounds[0]
+        maximum = bounds[1]
+        if value < minimum:
+            index = 0
+        elif value >= maximum:
+            index = bounds[2] + 1
+        else:
+            value -= minimum
+            offset = float(maximum - minimum) / bounds[2]
+            index = int(value / offset)
+        return index
+
     def translate(self, x, angle, dx, dangle):
         """Translate real values into table index form."""
-        def index(bounds, value):
-            if value < bounds[0]:
-                index = 0
-            elif value >= bounds[1]:
-                index = bounds[2] + 1
-            else:
-                value -= bounds[0]
-                offset = float(bounds[1] - bounds[0]) / bounds[2]
-                index = int(value / offset)
-            return index
-        x = index(X_RANGE, x)
-        angle = index(ANGLE_RANGE, angle)
-        dx = index(DX_RANGE, dx)
-        dangle = index(DANGLE_RANGE, dangle)
+        
+        x = self.index(X_RANGE, x)
+        angle = self.index(ANGLE_RANGE, angle)
+        dx = self.index(DX_RANGE, dx)
+        dangle = self.index(DANGLE_RANGE, dangle)
 
         return [x, angle, dx, dangle]
 

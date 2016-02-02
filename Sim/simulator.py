@@ -41,10 +41,10 @@ class Simulator:
 
     def run_experiment(self):
         for i in range(self.num_trials):
-            print("starting trial {} of {}".format(i+1, self.num_trials))
+            print("running trial {} of {}".format(i+1, self.num_trials))
             self.try_exec("init_trial", [i] + list(self.model.get_state()))
             for j in range(self.num_episodes):
-                print("starting episode {} of {}".format(j+1, 
+                print("running episode {} of {}".format(j+1, 
                             self.num_episodes))
                 self.try_exec("init_episode", [j] + list(self.model.get_state()))
                 self.run_episode(i,j)  # run the episode
