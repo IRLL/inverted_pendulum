@@ -26,7 +26,7 @@ DANGLE_RANGE = [-10, 10, 10]
 
 # For 7 actions, 3 will be lefts(0, 1, 2), 1 will be neutral(3),
 # 3 will be rights(4, 5, 6).
-AVAIL_ACTIONS = [1, 5, 10 ]
+AVAIL_ACTIONS = [1, 5, 10]
 
 ACTIONS = [0]
 for action in AVAIL_ACTIONS:
@@ -52,7 +52,7 @@ class Agent:
         self.last_visit_count = len(self.visited)
 
     def index(self, bounds, value):
-        if bounds[2] == 1:
+        if bounds[2] == 1: #special case for size 1 bounds
             return 0
         minimum = bounds[0]
         maximum = bounds[1]
@@ -122,9 +122,11 @@ class Agent:
         x, angle, dx, dangle = state
         # Choose a' from s' using policy derived from Q (e.g., ε-greedy).
         ap = self.egreedy([x, angle, dx, dangle])
+        angle = 180/math.pi * angle
 
         # δ ← r + γQ(s', a') - Q(s, a)
         reward = math.pi - abs(angle)
+        #print "angle:", angle
         self.cum_episode_reward += reward
         disc_sp_ap = tuple(self.translate(*state) + [ap])
         self.visited.add(disc_sp_ap)
@@ -159,6 +161,10 @@ class Agent:
         self.last_visit_count = len(self.visited)
 
     def end_trial(self, *meta):
+        fh = open ("q_values.txt", 'w')
+        for key in self.q_values:
+            fh.write("{}:{}\n".format(key, self.q_values[key]))
+        fh.close()
         fh = open('rewards.txt', 'w')
         for reward in self.episode_rewards:
             fh.write("{}\n".format(reward))
