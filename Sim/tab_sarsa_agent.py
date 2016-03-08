@@ -125,8 +125,8 @@ class Agent:
         angle = 180/math.pi * angle
 
         # δ ← r + γQ(s', a') - Q(s, a)
-        reward = math.pi - abs(angle)
-        #print "angle:", angle
+        reward = 3.14-abs(angle)
+#print "angle:", angle
         self.cum_episode_reward += reward
         disc_sp_ap = tuple(self.translate(*state) + [ap])
         self.visited.add(disc_sp_ap)

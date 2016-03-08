@@ -3,10 +3,10 @@
 """
 
 # Learning rate.
-ALPHA = 0.0001
+ALPHA = 0.001
 
 # Epsilon greedy random action selection rate.
-EPSILON = 0.01
+EPSILON = 0.001
 
 # Eligibility trace decay.
 LAMBDA = 0.9
