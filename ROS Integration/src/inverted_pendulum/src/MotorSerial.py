@@ -11,4 +11,4 @@ sub = rospy.Subscriber('/motor/cmd', Int32)
 pub = rospy.Publisher('/motor/info', Int32)
 
 while not rospy.is_shutdown():
-    
+    pass
