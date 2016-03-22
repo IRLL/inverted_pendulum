@@ -2,7 +2,7 @@
 
 import rospy
 
-from std_msgs.msg import Int32
+from inverted_pendulum.msg import PendulumPose
 
 
 rospy.init_node('StatusDisplay')
