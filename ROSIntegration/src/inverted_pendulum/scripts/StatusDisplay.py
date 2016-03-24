@@ -14,6 +14,8 @@ from inverted_pendulum.msg import PendulumPose
 from inverted_pendulum.msg import MotorInfo
 from inverted_pendulum.msg import Cmd
 
+fps = 20
+
 cmd = 0.0
 x = 0.0
 theta = 0.0
@@ -84,4 +86,4 @@ sensor_sub = rospy.Subscriber('/sensors', PendulumPose)
 while not rospy.is_shutdown():
     os.system('clear')
     redraw()
-    time.sleep(0.05)
+    time.sleep(1.0/fps)
