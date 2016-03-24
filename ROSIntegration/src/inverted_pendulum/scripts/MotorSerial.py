@@ -1,4 +1,12 @@
 #!/usr/bin/env python
+
+"""
+Author: Brandon Kallaher (brandon.kallaher@wsu.edu)
+Description:
+    Subcribes to /cmd for controlling the motor
+    Publishes to /motor/info to send out Debug information from the motor
+"""
+
 import rospy
 import serial
 import sys
