@@ -1,0 +1,9 @@
+Header header
+uint16 errorStatus
+uint16 SerialError
+uint16 limitStatus
+int16 targetSpeed
+int16 speed
+int16 brakeAmt
+int16 vin
+int16 temp

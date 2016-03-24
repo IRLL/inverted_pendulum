@@ -2,12 +2,12 @@
 
 import rospy
 
-from std_msgs.msg import Int32
+from inverted_pendulum.msg import PendulumPose
 
 
 rospy.init_node('SensorSerial')
 
-pub = rospy.Publisher('/sensors', Int32)
+pub = rospy.Publisher('/sensors', PendulumPose, queue_size=1)
 
 while not rospy.is_shutdown():
     pass
