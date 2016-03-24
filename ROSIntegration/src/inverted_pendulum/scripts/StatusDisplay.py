@@ -7,30 +7,78 @@ Description:
 """
 
 import rospy
-import curses
+import os
+import time
 
 from inverted_pendulum.msg import PendulumPose
 from inverted_pendulum.msg import MotorInfo
 from inverted_pendulum.msg import Cmd
 
-#initialize the curses screen
-stdscr = curses.initscr()
+cmd = 0.0
+x = 0.0
+theta = 0.0
+vel = 0.0
+right = False
+left = False
+errorStatus = 0x0
+SerialError = 0x0
+limitStatus = 0
+targetSpeed = 0
+speed = 0
+brakeAmt = 0
+vin = 0
+temp = 0
 
 #define the callbacks
-def info_callback:
-    pass
+def info_callback(data):
+    errorStatus = data.errorStatus
+    SerialError = data.SerialError
+    limitStatus = data.limitStatus
+    targetSpeed = data.targetSpeed
+    speed = data.speed
+    brakeAmt = data.brakeAmt
+    vin = data.vin
+    temp = data.temp
 
-def cmd_callback:
-    pass
+def cmd_callback(data):
+    cmd = data.cmd
+    print "Incoming: ", data.cmd
 
-def sensor_callback:
-    pass
+def sensor_callback(data):
+    x = data.x
+    theta = data.theta
+    vel = data.vel
+    right = data.right
+    left = data.left
+
+def redraw():
+    print "CMD: ", cmd
+    print "Sensors:"
+    print "  X: ", x
+    print "  Theta: ", theta
+    print "  Velocity: ", vel
+    print "  Limits:"
+    print "    Right: ", right
+    print "    Left: ", left
+    print "Motor Status:"
+    print "  Error Status: ", hex(errorStatus)
+    print "  Serial Error: ", hex(SerialError)
+    print "  Limit Status: ", limitStatus
+    print "  Target Speed: ", targetSpeed
+    print "  Speed: ", speed
+    print "  Brake Amount: ", brakeAmt
+    print "  Voltage: ", vin
+    print "  Temperature: ", temp
 
 #initialize the ros node
 rospy.init_node('StatusDisplay')
 
 motor_info_sub = rospy.Subscriber('/motor/info', MotorInfo, info_callback)
-motor_cmd_sub = rospy.Subscriber('/cmd', Cmd)
+motor_cmd_sub = rospy.Subscriber('/cmd', Cmd, cmd_callback)
 sensor_sub = rospy.Subscriber('/sensors', PendulumPose)
 
-rospy.spin()
+
+while not rospy.is_shutdown():
+    os.system('clear')
+    redraw()
+    time.sleep(0.05)
