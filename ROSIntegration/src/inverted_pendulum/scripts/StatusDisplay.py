@@ -31,6 +31,8 @@ temp = 0
 
 #define the callbacks
 def info_callback(data):
+    global errorStatus, SerialError, limitStatus, targetSpeed, speed, \
+            brakeAmt, vin, temp
     errorStatus = data.errorStatus
     SerialError = data.SerialError
     limitStatus = data.limitStatus
@@ -41,10 +43,11 @@ def info_callback(data):
     temp = data.temp
 
 def cmd_callback(data):
+    global cmd
     cmd = data.cmd
-    print "Incoming: ", data.cmd
 
 def sensor_callback(data):
+    global x, theta, vel, right, left
     x = data.x
     theta = data.theta
     vel = data.vel
