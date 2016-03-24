@@ -6,6 +6,8 @@ Description:
     Subcribes to all topics and prints them in a readable format
 """
 
+#TODO: Wrapup into a class for readability
+
 import rospy
 import os
 import time
