@@ -55,10 +55,11 @@ def sensor_callback(data):
     x = data.x
     theta = data.theta
     vel = data.vel
-    right = data.right
-    left = data.left
+    right = data.rightLim
+    left = data.leftLim
 
-def redraw():
+def redraw(time):
+    os.system('clear')
     print "CMD: ", cmd
     print "Sensors:"
     print "  X: ", x
@@ -82,10 +83,13 @@ rospy.init_node('StatusDisplay')
 
 motor_info_sub = rospy.Subscriber('/motor/info', MotorInfo, info_callback)
 motor_cmd_sub = rospy.Subscriber('/cmd', Cmd, cmd_callback)
-sensor_sub = rospy.Subscriber('/sensors', PendulumPose)
+sensor_sub = rospy.Subscriber('/sensors', PendulumPose, sensor_callback)
 
+rospy.Timer(rospy.Duration(1.0/fps), redraw)
 
-while not rospy.is_shutdown():
-    os.system('clear')
-    redraw()
-    time.sleep(1.0/fps)
+rospy.spin()
+
+# while not rospy.is_shutdown():
+#     os.system('clear')
+#     redraw()
+#     time.sleep(1.0/fps)
