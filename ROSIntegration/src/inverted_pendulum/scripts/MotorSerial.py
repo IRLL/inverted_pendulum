@@ -24,54 +24,54 @@ def callback(data):
     pass
 
 class Motor():
-	def __init__(self, Port='/dev/ttyACM0', baudrate=115200):
-		self.ser = serial.Serial()
-		self.ser.timeout = 1
-		self.ser.baudrate = baudrate
-		self.ser.port = Port
+    def __init__(self, Port='/dev/ttyACM0', baudrate=115200):
+        self.ser = serial.Serial()
+        self.ser.timeout = 1
+        self.ser.baudrate = baudrate
+        self.ser.port = Port
 
-		self.update_period = .5
+        self.update_period = .5
 
-		self.error_codes = 0
-		self.supply_voltage = 0
-		self.temperature = 0
-		self.speed = 0
+        self.error_codes = 0
+        self.supply_voltage = 0
+        self.temperature = 0
+        self.speed = 0
 
-	def __del__(self):
-		self.Stop()
-		self.ser.close()
+    def __del__(self):
+        self.Stop()
+        self.ser.close()
 
-	def MoveRight(self, percent):
-		self.Enable()
-		speed = self.getValueFromPercent(percent)
-		speed1 = chr(speed & 0x1F)
-		speed2 = chr(speed >> 5)
-		self.ser.write(chr(0x85) + speed1 + speed2)
+    def MoveRight(self, percent):
+        self.Enable()
+        speed = self.getValueFromPercent(percent)
+        speed1 = chr(speed & 0x1F)
+        speed2 = chr(speed >> 5)
+        self.ser.write(chr(0x85) + speed1 + speed2)
 
-	def MoveLeft(self, percent):
-		self.Enable()
-		speed = self.getValueFromPercent(percent)
-		speed1 = chr(speed & 0x1F)
-		speed2 = chr(speed >> 5)
-		self.ser.write(chr(0x86) + speed1 + speed2)
+    def MoveLeft(self, percent):
+        self.Enable()
+        speed = self.getValueFromPercent(percent)
+        speed1 = chr(speed & 0x1F)
+        speed2 = chr(speed >> 5)
+        self.ser.write(chr(0x86) + speed1 + speed2)
 
-	def Stop(self):
-		self.ser.write(chr(0x92))
-		self.ser.write(chr(32))
+    def Stop(self):
+        self.ser.write(chr(0x92))
+        self.ser.write(chr(32))
 
-	def Enable(self):
-		self.ser.write(chr(0x83))
+    def Enable(self):
+        self.ser.write(chr(0x83))
 
-	@staticmethod
-	def getValueFromPercent(percent):
-		return 3200 * percent / 100
+    @staticmethod
+    def getValueFromPercent(percent):
+        return 3200 * percent / 100
 
-	def ReadVar(self, addr):
-		self.ser.flushInput()
-		self.ser.write(chr(0xA1) + chr(addr))
-		[lbyte, hbyte] = self.ser.read()
-		result = (ord(hbyte) << 8) | ord(lbyte)
-		return result
+    def ReadVar(self, addr):
+        self.ser.flushInput()
+        self.ser.write(chr(0xA1) + chr(addr))
+        [lbyte, hbyte] = self.ser.read()
+        result = (ord(hbyte) << 8) | ord(lbyte)
+        return result
 
 if __name__ == '__main__':
     #initialize the ros node
@@ -100,8 +100,8 @@ if __name__ == '__main__':
         pass
 
     #stop the motor
-	mc.write(chr(0x92))
-	mc.write(chr(32))
+    mc.write(chr(0x92))
+    mc.write(chr(32))
 
     #close the serial port
     mc.close()
