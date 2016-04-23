@@ -274,3 +274,4 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+/microcontroller/proj/nbproject/private/
