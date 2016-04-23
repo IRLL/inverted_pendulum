@@ -60,7 +60,7 @@ int main(void) {
     adc_config.result_buffer_size = sizeof(adc_result_buf);
     adc_config.result_buffer_ptr = adc_work_buf;
     adc_config.result_buffer_size = sizeof(adc_work_buf);
-    //adc_config.channels //TODO
+    adc_config.channels = (1 << ADC_CH_0);
     initialize_ADC(adc_config);
     
     i2c_config.channel = I2C_CH_1;
@@ -92,7 +92,7 @@ void timer_callback(void)
     
     adc_node.callback = &adc_callback;
     adc_node.device_id = 0;
-    //adc_node.channel = ; //TODO
+    adc_node.channel = ADC_CH_0;
     read_ADC(adc_node);
     
     i2c_node.channel = I2C_CH_1;
@@ -125,6 +125,7 @@ void adc_callback(ADC_Node node)
 void i2c_callback(I2C_Node node)
 {
     uint8 data[3];
+    uint8 size;
     
     get_data_I2C(&node, &(data[1]));
     
@@ -132,11 +133,13 @@ void i2c_callback(I2C_Node node)
     {
         case 0x0B: //read status register
             data[0] = 1;
+            size = 2;
             break;
         case 0x0E: //read angle registers (2))
             data[0] = 2;
+            size = 3;
             break;
     }
     
-    send_packet(PACKET_UART_CH_1, data, 3);
+    send_packet(PACKET_UART_CH_1, data, size);
 }
