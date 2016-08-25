@@ -1,45 +1,46 @@
 #include <Wire.h>
 #include <ros.h>
-#include <std_msgs/IntArray>
+#include <std_msgs/Int16MultiArray.h>
 
 
-
+#define LIN_POS_PIN A0
+#define LEFT_LIMIT_SW_PIN 10
+#define RIGHT_LIMIT_SW_PIN 11
+#define MSG_SIZE 3
+#define FREQUENCY 10
 
 ros::NodeHandle roshandle;
-std_msgs::IntArray m_msg;
+std_msgs::Int16MultiArray m_msg;
+int m_msg_data[MSG_SIZE];
 
+ros::Publisher m_publisher("raw_sensors", &m_msg);
 
-double conv;
-
-ros::Publisher m_publisher("raw_sensors", &msg)
 
 
 void setup() {
   Wire.begin();
-  conv = 360.0/4096;
+
   roshandle.initNode();
-  roshandle.advertise(&m_publisher);
+  roshandle.advertise(m_publisher);
+
+  m_msg.data = m_msg_data;
+  m_msg.data_length = MSG_SIZE;
+  next_error_time = 0;
 
 }
 
 void loop() {
 
-	byte i;
-	byte rx[256];
-	byte status_bits;
+	byte i = 0;
+	byte rx[10];
+	byte status_bits = 0;
 	int raw_angle;
-	double angle;
-	bool md;
-	bool ml;
-	bool mh;
 
 	Wire.beginTransmission(0x36);
 	Wire.write(0x0B);
 	Wire.endTransmission();
 
 	Wire.requestFrom(0x36, 5);
-
-
 
 	while(Wire.available())
 	{
@@ -49,32 +50,23 @@ void loop() {
 
 
 	status_bits = rx[0] & ~(0x07);
-	raw_angle = rx[1] << 8 | rx[2];
-	angle = ((rx[3] << 8 | rx[4]));
-	angle *= conv;
+	raw_angle = ((rx[3] << 8 | rx[4]));
 
-	md = status_bits & (1 << 5);
-	ml = status_bits & (1 << 4);
-	mh = status_bits & (1 << 3);
+	int raw_position = analogRead(LIN_POS_PIN);
+	byte left_switch = digitalRead(LEFT_LIMIT_SW_PIN);
+	byte right_switch = digitalRead(RIGHT_LIMIT_SW_PIN);
+	byte switch_bitfield = 0;
+	switch_bitfield |= left_switch ? 0x2 : 0x0;
+	switch_bitfield |= right_switch ? 0x1 : 0x0;
 
 
-	//  Serial.print("md: "); Serial.print(md);
-	//  Serial.print(" ml: "); Serial.print(ml);
-	//  Serial.print(" mh: "); Serial.print(mh);
 
-	if(md)
-	{
-		Serial.print(" angle: "); Serial.print(angle);
-	}
-	else
-	{
-		Serial.print("magnet not detected!");
-	}
-
-	Serial.print("\n");
-
+	m_msg.data[0] = raw_angle;
+	m_msg.data[1] = raw_position;
+	m_msg.data[2] = (status_bits << 8) | switch_bitfield;
 
 	m_publisher.publish(&m_msg);
 	roshandle.spinOnce();
-	delay(100);
+	delay(50);
 }
+
