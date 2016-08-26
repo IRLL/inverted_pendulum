@@ -48,8 +48,19 @@ class Node():
 
 if __name__ == "__main__":
     rospy.init_node('Simulator')
+    parameters = rospy.get_param('simulator/parameters')
     node = Node()
-    model = PendulumModel()
+    model = PendulumModel(
+            start_cartx = parameters['start_cartx'],
+            start_angle = parameters['start_angle'],
+            track_length = parameters['track_length'],
+            dt = parameters['delta_time'],
+            g = parameters['gravity'],
+            l = parameters['pole_length'],
+            m = parameters['mass'],
+            cfriction = parameters['cart_friction'],
+            pfriction = parameters['pole_friction']
+            )
 
     while not rospy.is_shutdown():
         status = node.update(model)
