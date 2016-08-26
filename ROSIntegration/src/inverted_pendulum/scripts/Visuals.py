@@ -12,7 +12,11 @@ class Node():
         self.rate = rospy.Rate(20)
         self.cmd = Cmd()
         self.pose = PendulumPose()
-        self.visualizer = Visualizer(2)
+
+        parameters = rospy.get_param('pendulum')
+        self.visualizer = Visualizer(
+                track_length = parameters['track_length']
+                )
 
     def cmd_callback(self, cmd):
         self.cmd = cmd

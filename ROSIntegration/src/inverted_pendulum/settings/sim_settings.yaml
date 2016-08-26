@@ -1,3 +1,12 @@
-simulator:
-  parameters: {cart_friction: 0.1, delta_time: 0.01, gravity: 9.81, mass: 1.0, pole_friction: 0.1,
-    pole_length: 1.0, start_angle: 0, start_cartx: 0, track_length: 1000}
+pendulum:
+    start_cartx: 0
+    start_angle: 0
+    track_length: 2
+    simulation:
+        cart_friction: 0.1
+        delta_time: 0.01
+        gravity: 9.81
+        pole_friction: 0.1
+        mass: 1.0
+        pole_length: 1.0
+
