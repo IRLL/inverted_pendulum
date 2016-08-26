@@ -6,7 +6,7 @@ from math import *
 
 
 class Pendulum:
-    def __init__(self, start_cartx=None, start_angle=pi+pi/10,
+    def __init__(self, start_cartx=0, start_angle=pi+pi/10,
                  track_length=1000, dt=0.01, g=9.81, l=1.0, m=1.0,
                  cfriction=.1, pfriction=0.1):
 
@@ -23,14 +23,11 @@ class Pendulum:
 
         self.reset(start_cartx, start_angle)
 
-    def reset(self, start_cartx=None, start_angle=None):
+    def reset(self, start_cartx=0, start_angle=None):
         if start_angle is None:
             start_angle = self.start_angle
         self.angle = start_angle + pi
         self.velocity = 0
-
-        if start_cartx is None:
-            start_cartx = self.track_length/2
 
         self.cartx = start_cartx
         self.carty = 0
@@ -75,12 +72,12 @@ class Pendulum:
         self.cartx_vel += acceleration * self.dt
 
         #limit cart position
-        if self.cartx > self.track_length:
-            self.cartx = self.track_length
+        if self.cartx > self.track_length/2:
+            self.cartx = self.track_length/2
             self.cartx_vel = 0
             self.edge = True
-        if self.cartx < 0:
-            self.cartx = 0
+        if self.cartx < -self.track_length/2:
+            self.cartx = -self.track_length/2
             self.cartx_vel = 0
             self.edge = True
 
@@ -88,7 +85,7 @@ class Pendulum:
         angle = self.angle + pi
         if angle > pi:
             angle = angle - 2*pi 
-        return self.cartx-self.track_length/2, angle, self.cartx_vel, self.velocity, self.edge
+        return self.cartx, angle, self.cartx_vel, self.velocity, self.edge
 
 
 def tester():
