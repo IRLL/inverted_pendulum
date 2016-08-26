@@ -6,7 +6,7 @@ from math import *
 
 
 class Pendulum:
-    def __init__(self, start_cartx=0, start_angle=pi+pi/10,
+    def __init__(self, start_cartx=0, start_angle=0,
                  track_length=1000, dt=0.01, g=9.81, l=1.0, m=1.0,
                  cfriction=.1, pfriction=0.1):
 
@@ -23,10 +23,8 @@ class Pendulum:
 
         self.reset(start_cartx, start_angle)
 
-    def reset(self, start_cartx=0, start_angle=None):
-        if start_angle is None:
-            start_angle = self.start_angle
-        self.angle = start_angle + pi
+    def reset(self, start_cartx=0, start_angle=0):
+        self.angle = start_angle*pi/180 + pi
         self.velocity = 0
 
         self.cartx = start_cartx
