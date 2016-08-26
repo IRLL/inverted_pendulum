@@ -61,24 +61,6 @@ class Visualizer:
         #draw the mass at the end of the rod
         pygame.draw.circle(self.screen, (0,0,0), [int(massx), int(massy)], 5)
 
-        #draw text readout
-        myfont = pygame.font.SysFont("monospace", 15)
-
-        text = myfont.render("Action: %f" % action, 1, (255,0,0))
-        self.screen.blit(text, (10, self.ysize-20*5))
-
-        text = myfont.render("x: %f" % position, 1, (255,0,0))
-        self.screen.blit(text, (10, self.ysize-20*4))
-
-        text = myfont.render("angle: %f" % text_angle, 1, (255,0,0))
-        self.screen.blit(text, (10, self.ysize-20*3))
-
-        text = myfont.render("dx: %f" % (dx), 1, (255,0,0))
-        self.screen.blit(text, (10, self.ysize-20*2))
-
-        text = myfont.render("dangle: %f" % (dangle), 1, (255,0,0))
-        self.screen.blit(text, (10, self.ysize-20*1))
-
         #draw the screen
         pygame.display.flip()
 
