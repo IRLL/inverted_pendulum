@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+	<node name="Simulator" pkg="inverted_pendulum" type="Simulator.py" required="true"/>
+	<node name= "agent" pkg="inverted_pendulum" type="PID_agent.py" required="false"/>
+
+	<!-- settings file -->
+	<rosparam command="load" file="$(find inverted_pendulum)/settings/sim_settings.yaml" />
+
+</launch>

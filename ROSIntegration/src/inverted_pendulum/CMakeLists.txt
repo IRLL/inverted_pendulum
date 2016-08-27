@@ -50,6 +50,7 @@ add_message_files(
   PendulumPose.msg
   Cmd.msg
   MotorInfo.msg
+  PID_state.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -1,7 +1,7 @@
 pendulum:
     start_cartx: 0
-    start_angle: 0
-    track_length: 2
+    start_angle: 1
+    track_length: 1.5
     simulation:
         cart_friction: 0.1
         delta_time: 0.01
@@ -9,4 +9,12 @@ pendulum:
         pole_friction: 0.1
         mass: 1.0
         pole_length: 1.0
+    pid:
+        p: 4
+        i: 0.1
+        d: 20
+        xpos_weight: 0.1
+        angle_weight: 0
+        update_frequency: 10
+
 
