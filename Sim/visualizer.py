@@ -38,7 +38,7 @@ class Visualizer:
         text_angle = angle
         angle -= math.pi*3.0/2.0
 
-        cartx += self.track_length/2 
+        cartx += self.track_length/2
 
         #scale the cart position
         cartx = float(self.xsize-(self.rod_length*2))/self.track_length * cartx + self.track_origin
@@ -64,8 +64,10 @@ class Visualizer:
         #draw the screen
         pygame.display.flip()
 
+        return pygame.surfarray.array3d(pygame.display.get_surface())
+
     def save_screen(self, filename):
-            pygame.image.save(self.screen, filename)
+        pygame.image.save(self.screen, filename)
 
     def handle_events(self):
         for event in pygame.event.get():

@@ -9,8 +9,8 @@ from model import Pendulum as PendulumModel
 
 class Node():
     def __init__(self):
-        self.sensor_pub = rospy.Publisher('/sensors', PendulumPose, queue_size=1)
-        self.cmd_sub = rospy.Subscriber('/cmd', Cmd, self.cmd_callback)
+        self.sensor_pub = rospy.Publisher('/inverted_pendulum/sensors', PendulumPose, queue_size=1)
+        self.cmd_sub = rospy.Subscriber('/inverted_pendulum/cmd', Cmd, self.cmd_callback)
         self.cmd_lock = threading.Lock()
         self.cmds = list()
         self.rate = rospy.Rate(100)
@@ -67,4 +67,4 @@ if __name__ == "__main__":
         status = node.update(model)
         node.sensor_pub.publish(status)
 
-        node.rate.sleep()	
+        node.rate.sleep()
