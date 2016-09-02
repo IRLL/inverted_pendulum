@@ -2,7 +2,9 @@ pendulum:
     start_cartx: 0
     start_angle: 1
     track_length: 1.5
+    gui_update_frequency: 20
     simulation:
+        realtime_multiplier: 1 
         cart_friction: 0.1
         delta_time: 0.01
         gravity: 9.81

@@ -13,7 +13,7 @@ class Node():
         self.bridge = CvBridge()
         self.sensor_sub = rospy.Subscriber('/inverted_pendulum/sensors', PendulumPose, self.pose_callback)
         self.cmd_sub = rospy.Subscriber('/inverted_pendulum/cmd', Cmd, self.cmd_callback)
-        self.rate = rospy.Rate(20)
+        self.rate = rospy.Rate(rospy.get_param('pendulum/gui_update_frequency'))
         self.cmd = Cmd()
         self.pose = PendulumPose()
 

@@ -8,12 +8,13 @@ from math import pi
 from model import Pendulum as PendulumModel
 
 class Node():
-    def __init__(self):
+    def __init__(self, sim_parameters):
         self.sensor_pub = rospy.Publisher('/inverted_pendulum/sensors', PendulumPose, queue_size=1)
         self.cmd_sub = rospy.Subscriber('/inverted_pendulum/cmd', Cmd, self.cmd_callback)
         self.cmd_lock = threading.Lock()
         self.cmds = list()
-        self.rate = rospy.Rate(100)
+
+        self.rate = rospy.Rate(sim_parameters['realtime_multiplier'] * 1.0/sim_parameters['delta_time'])
 
     def cmd_callback(self, cmd):
         self.cmd_lock.acquire()
@@ -50,7 +51,7 @@ if __name__ == "__main__":
     rospy.init_node('Simulator')
     parameters = rospy.get_param('pendulum')
     sim_parameters = parameters['simulation']
-    node = Node()
+    node = Node(sim_parameters)
     model = PendulumModel(
             start_cartx = parameters['start_cartx'],
             start_angle = parameters['start_angle'],
