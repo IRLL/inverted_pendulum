@@ -1,5 +1,0 @@
-#!/bin/bash
-
-python -m cProfile -o profile_data.tmp uc_interface.py
-runsnake profile_data.tmp
-
