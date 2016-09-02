@@ -1,3 +1,0 @@
-[submodule "ROSIntegration/src/dqn_ros"]
-	path = ROSIntegration/src/dqn_ros
-	url = https://github.com/IRLL/dqn_ros.git
