@@ -4,6 +4,6 @@
 	<node name="Visuals" pkg="inverted_pendulum" type="Visuals.py" required="false"/>
 
 	<!-- settings file -->
-	<rosparam command="load" file="$(find inverted_pendulum)/settings/sim_settings.yaml" />
+	<rosparam command="load" file="$(find inverted_pendulum)/param/sim_settings.yaml" />
 
 </launch>
