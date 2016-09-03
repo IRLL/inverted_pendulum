@@ -1,18 +1,24 @@
 #!/usr/bin/env python
 
 import rospy
+import actionlib
 from inverted_pendulum.msg import PendulumPose, Cmd
+from inverted_pendulum.msg import ResetAction, ResetResult
 import threading
 from math import pi
 
 from model import Pendulum as PendulumModel
 
 class Node():
-    def __init__(self, sim_parameters):
+    def __init__(self, sim_parameters, model):
         self.sensor_pub = rospy.Publisher('/inverted_pendulum/sensors', PendulumPose, queue_size=1)
         self.cmd_sub = rospy.Subscriber('/inverted_pendulum/cmd', Cmd, self.cmd_callback)
+        self.reset_as = actionlib.SimpleActionServer('inverted_pendulum/reset',
+                ResetAction, execute_cb=self.reset_callback, auto_start=False)
+        self.reset_as.start()
         self.cmd_lock = threading.Lock()
         self.cmds = list()
+        self.model = model
 
         self.rate = rospy.Rate(sim_parameters['realtime_multiplier'] * 1.0/sim_parameters['delta_time'])
 
@@ -24,7 +30,7 @@ class Node():
             self.cmd_lock.release()
 
 
-    def update(self, model):
+    def update(self):
         self.cmd_lock.acquire()
         try:
             if self.cmds: #check if list has an item
@@ -35,8 +41,8 @@ class Node():
         finally:
             self.cmd_lock.release()
 
-        model.update(cmd.cmd)
-        state = model.get_state()
+        self.model.update(cmd.cmd)
+        state = self.model.get_state()
         pose = PendulumPose()
 
         pose.x, pose.theta, pose.xDot, pose.thetaDot, _ = state
@@ -45,13 +51,21 @@ class Node():
         pose.header.stamp = rospy.Time.now()
         return pose
 
+    def reset_callback(self, goal):
+        rospy.loginfo("action called:\n%f\n%f", goal.angle, goal.position)
+        result = ResetResult(goal.angle, goal.position)
+        self.model.reset(goal.angle, goal.position)
+
+        self.reset_as.set_succeeded(result)
+
+
+
 
 
 if __name__ == "__main__":
     rospy.init_node('Simulator')
     parameters = rospy.get_param('pendulum')
     sim_parameters = parameters['simulation']
-    node = Node(sim_parameters)
     model = PendulumModel(
             start_cartx = parameters['start_cartx'],
             start_angle = parameters['start_angle'],
@@ -64,8 +78,10 @@ if __name__ == "__main__":
             pfriction = sim_parameters['pole_friction']
             )
 
+    node = Node(sim_parameters, model)
+
     while not rospy.is_shutdown():
-        status = node.update(model)
+        status = node.update()
         node.sensor_pub.publish(status)
 
         node.rate.sleep()
