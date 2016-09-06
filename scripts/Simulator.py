@@ -13,8 +13,10 @@ class Node():
     def __init__(self, sim_parameters, model):
         self.sensor_pub = rospy.Publisher('/sensors', PendulumPose, queue_size=1)
         self.cmd_sub = rospy.Subscriber('/cmd', Cmd, self.cmd_callback)
-        self.reset_as = actionlib.SimpleActionServer('inverted_pendulum/reset',
-                ResetAction, execute_cb=self.reset_callback, auto_start=False)
+        self.reset_as = actionlib.SimpleActionServer(
+            'inverted_pendulum/reset',
+            ResetAction, execute_cb=self.reset_callback, auto_start=False
+        )
         self.reset_as.start()
         self.cmd_lock = threading.Lock()
         self.cmds = list()
@@ -54,12 +56,9 @@ class Node():
     def reset_callback(self, goal):
         rospy.loginfo("action called:\n%f\n%f", goal.angle, goal.position)
         result = ResetResult(goal.angle, goal.position)
-        self.model.reset(goal.angle, goal.position)
+        self.model.reset(start_cartx=goal.position, start_angle=goal.angle)
 
         self.reset_as.set_succeeded(result)
-
-
-
 
 
 if __name__ == "__main__":
@@ -67,16 +66,16 @@ if __name__ == "__main__":
     parameters = rospy.get_param('pendulum')
     sim_parameters = parameters['simulation']
     model = PendulumModel(
-            start_cartx = parameters['start_cartx'],
-            start_angle = parameters['start_angle'],
-            track_length = parameters['track_length'],
-            dt = sim_parameters['delta_time'],
-            g = sim_parameters['gravity'],
-            l = sim_parameters['pole_length'],
-            m = sim_parameters['mass'],
-            cfriction = sim_parameters['cart_friction'],
-            pfriction = sim_parameters['pole_friction']
-            )
+        start_cartx = parameters['start_cartx'],
+        start_angle = parameters['start_angle'],
+        track_length = parameters['track_length'],
+        dt = sim_parameters['delta_time'],
+        g = sim_parameters['gravity'],
+        l = sim_parameters['pole_length'],
+        m = sim_parameters['mass'],
+        cfriction = sim_parameters['cart_friction'],
+        pfriction = sim_parameters['pole_friction']
+    )
 
     node = Node(sim_parameters, model)
 
