@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-	<node name="Simulator" pkg="inverted_pendulum" type="Simulator.py" required="true"/>
+	<node name="Simulator" pkg="inverted_pendulum" type="Simulator.py" required="true" output="screen"/>
 	<node name="Visuals" pkg="inverted_pendulum" type="Visuals.py" required="false"/>
 
 	<!-- settings file -->

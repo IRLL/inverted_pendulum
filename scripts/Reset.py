@@ -11,7 +11,7 @@ if __name__ == '__main__':
     client = actionlib.SimpleActionClient('inverted_pendulum/reset', ResetAction)
     client.wait_for_server()
 
-    goal = ResetGoal
+    goal = ResetGoal()
     goal.angle = 0.0
     goal.position = 0.0
 
