@@ -54,7 +54,7 @@ class Node():
         return pose
 
     def reset_callback(self, goal):
-        rospy.loginfo("action called:\n%f\n%f", goal.angle, goal.position)
+        rospy.loginfo("resetting angle=%f x=%f", goal.angle, goal.position)
         result = ResetResult(goal.angle, goal.position)
         self.model.reset(start_cartx=goal.position, start_angle=goal.angle)
 
