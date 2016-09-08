@@ -14,6 +14,9 @@ import time
 
 from inverted_pendulum.msg import PendulumPose
 from inverted_pendulum.msg import MotorInfo
+from inverted_pendulum.msg import MotorError
+from inverted_pendulum.msg import SerialError
+from inverted_pendulum.msg import LimitStatus
 from inverted_pendulum.msg import Cmd
 
 class Status():
@@ -27,9 +30,9 @@ class Status():
         self.tDot = 0.0
         self.right = False
         self.left = False
-        self.errorStatus = 0x0
-        self.SerialError = 0x0
-        self.limitStatus = 0
+        self.errorStatus = MotorError()
+        self.serialError = SerialError()
+        self.limitStatus = LimitStatus() 
         self.targetSpeed = 0
         self.speed = 0
         self.brakeAmt = 0
@@ -48,9 +51,31 @@ class Status():
         print "    Right: ", self.right
         print "    Left: ", self.left
         print "Motor Status:"
-        print "  Error Status: ", hex(self.errorStatus)
-        print "  Serial Error: ", hex(self.SerialError)
-        print "  Limit Status: ", self.limitStatus
+        print "  Error Status:"
+        print "    Safe Start: ", self.errorStatus.safeStart
+        print "    Serial Error: ", self.errorStatus.serialError
+        print "    Command Timeout: ", self.errorStatus.cmdTimeout
+        print "    Limit Switch: ", self.errorStatus.limitSwitch
+        print "    Low Vin: ", self.errorStatus.lowVin
+        print "    High Vin: ", self.errorStatus.highVin
+        print "    Over Temp: ", self.errorStatus.overTemp
+        print "    Driver Error: ", self.errorStatus.driverError
+        print "    Error Line High: ", self.errorStatus.errorLineHigh
+        print "  Serial Error: "
+        print "    Framing Error: ", self.serialError.framing
+        print "    Noise: ", self.serialError.noise
+        print "    RX Overrun: ", self.serialError.rxOverrun
+        print "    Format Error: ", self.serialError.format
+        print "    CRC Error: ", self.serialError.crc
+        print "  Limit Status: "
+        print "    Error Line or Safe Start: ", self.limitStatus.errorOrSafeStart
+        print "    Temperature Limiter: ", self.limitStatus.tempLimiter
+        print "    High Target Speed: ", self.limitStatus.highTargetSpeed
+        print "    Low Target Speed: ", self.limitStatus.lowTargetSpeed
+        print "    Acceleration/Decceleration/Brake limiter: ", self.limitStatus.accelDeccelLimiter
+        print "    AN1 Limit Switch: ", self.limitStatus.an1Limit
+        print "    AN2 Limit Switch: ", self.limitStatus.an2Limit
+        print "    USB Kill Switch: ", self.limitStatus.usbKill
         print "  Target Speed: ", self.targetSpeed
         print "  Speed: ", self.speed
         print "  Brake Amount: ", self.brakeAmt
@@ -59,7 +84,7 @@ class Status():
 
     def info_callback(self, data):
         self.errorStatus = data.errorStatus
-        self.SerialError = data.SerialError
+        self.serialError = data.SerialError
         self.limitStatus = data.limitStatus
         self.targetSpeed = data.targetSpeed
         self.speed = data.speed

@@ -17,6 +17,9 @@ import threading
 #import our messages
 from inverted_pendulum.msg import Cmd
 from inverted_pendulum.msg import MotorInfo
+from inverted_pendulum.msg import MotorError
+from inverted_pendulum.msg import SerialError
+from inverted_pendulum.msg import LimitStatus
 from std_msgs.msg import Header
 
 #define variables for changing later
@@ -99,7 +102,7 @@ class Motor():
 			self.ser.write(chr(32))
 		finally:
 			self.lock.release()
-	
+
 	def Enable(self):
 		self.lock.acquire()
 		try:
@@ -129,7 +132,7 @@ def signed16(val):
 	else:
 		return val
 
-	
+
 
 if __name__ == '__main__':
 	#initialize the ros node
@@ -161,9 +164,31 @@ if __name__ == '__main__':
 		motor_info = MotorInfo()
 		motor_info.header = Header()
 		motor_info.header.stamp = rospy.Time.now()
-		motor_info.errorStatus = motor.ReadVar(1)
-		motor_info.serialError  = motor.ReadVar(2) 
-		motor_info.limitStatus = motor.ReadVar(3)
+		errorStatus = motor.ReadVar(1)
+		motor_info.errorStatus = MotorError()
+		motor_info.errorStatus.safeStart = (errorStatus & 0b1) != 0
+		motor_info.errorStatus.serialError = (errorStatus & 0b100) != 0
+		motor_info.errorStatus.cmdTimeout = (errorStatus & 0b1000) != 0
+		motor_info.errorStatus.limitSwitch = (errorStatus & 0b10000) != 0
+		motor_info.errorStatus.lowVin = (errorStatus & 0b100000) != 0
+		motor_info.errorStatus.highVin = (errorStatus & 0b1000000) != 0
+		motor_info.errorStatus.overTemp = (errorStatus & 0b10000000) != 0
+		motor_info.errorStatus.driverError = (errorStatus & 0b100000000) != 0
+		motor_info.errorStatus.errorLineHigh = (errorStatus & 0b1000000000) != 0
+		serialError	 = motor.ReadVar(2)
+		motor_info.serialError.framing = (serialError & 0b10) != 0
+		motor_info.serialError.noise = (serialError & 0b100) != 0
+		motor_info.serialError.rxOverrun = (serialError & 0b1000) != 0
+		motor_info.serialError.format = (serialError & 0b10000) != 0
+		motor_info.serialError.crc = (serialError & 0b100000) != 0
+		limitStatus = motor.ReadVar(3)
+		motor_info.limitStatus.errorOrSafeStart = (serialError & 0b1) != 0
+		motor_info.limitStatus.tempLimiter = (serialError & 0b10) != 0
+		motor_info.limitStatus.highTargetSpeed = (serialError & 0b100) != 0
+		motor_info.limitStatus.lowTargetSpeed = (serialError & 0b1000) != 0
+		motor_info.limitStatus.an1Limit = (serialError & 0b10000) != 0
+		motor_info.limitStatus.an2Limit = (serialError & 0b100000) != 0
+		motor_info.limitStatus.usbKill = (serialError & 0b1000000) != 0
 		motor_info.targetSpeed = signed16(motor.ReadVar(20))
 		motor_info.speed = signed16(motor.ReadVar(21))
 		motor_info.brakeAmt = motor.ReadVar(22)
@@ -172,11 +197,11 @@ if __name__ == '__main__':
 		rospy.logdebug("finished read")
 
 		pub.publish(motor_info)
-		
+
 		if motor.timer.isExpired():
 			motor.Stop()
-		
-		r.sleep() 
+
+		r.sleep()
 
 	#stop the motor
 	motor.Stop()
