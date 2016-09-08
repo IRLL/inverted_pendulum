@@ -1,7 +1,7 @@
 Header header
-uint16 errorStatus
-uint16 SerialError
-uint16 limitStatus
+MotorError errorStatus
+SerialError serialError
+LimitStatus limitStatus
 int16 targetSpeed
 int16 speed
 int16 brakeAmt

@@ -162,7 +162,7 @@ if __name__ == '__main__':
 		motor_info.header = Header()
 		motor_info.header.stamp = rospy.Time.now()
 		motor_info.errorStatus = motor.ReadVar(1)
-		motor_info.SerialError  = motor.ReadVar(2) 
+		motor_info.serialError  = motor.ReadVar(2) 
 		motor_info.limitStatus = motor.ReadVar(3)
 		motor_info.targetSpeed = signed16(motor.ReadVar(20))
 		motor_info.speed = signed16(motor.ReadVar(21))
