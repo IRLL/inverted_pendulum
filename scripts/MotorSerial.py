@@ -77,7 +77,6 @@ class Motor():
 		self.lock.acquire()
 		try:
 			self.ser.write(chr(0x85) + speed1 + speed2)
-			rospy.loginfo("writing %s %s", hex(ord(speed1)), hex(ord(speed2)))
 		finally:
 			self.lock.release()
 
@@ -90,7 +89,6 @@ class Motor():
 		self.lock.acquire()
 		try:
 			self.ser.write(chr(0x86) + speed1 + speed2)
-			rospy.loginfo("writing %s %s", hex(ord(speed1)), hex(ord(speed2)))
 		finally:
 			self.lock.release()
 
@@ -125,6 +123,14 @@ class Motor():
 		result = (ord(hbyte) << 8) | ord(lbyte)
 		return result
 
+def signed16(val):
+	if(val & 0x8000): #if val is negative
+		return -((~val & 0xEFFF) + 1)
+	else:
+		return val
+
+	
+
 if __name__ == '__main__':
 	#initialize the ros node
 	rospy.init_node('MotorSerial')
@@ -158,11 +164,11 @@ if __name__ == '__main__':
 		motor_info.errorStatus = motor.ReadVar(1)
 		motor_info.SerialError  = motor.ReadVar(2) 
 		motor_info.limitStatus = motor.ReadVar(3)
-		motor_info.targetSpeed = motor.ReadVar(20) & 0xFFFF
-		motor_info.speed = motor.ReadVar(21) & 0xFFFF
-		motor_info.brakeAmt = motor.ReadVar(22) & 0xFFFF
-		motor_info.vin = motor.ReadVar(23)/1000 & 0xFFFF
-		motor_info.temp = motor.ReadVar(24)/10 & 0xFFFF
+		motor_info.targetSpeed = signed16(motor.ReadVar(20))
+		motor_info.speed = signed16(motor.ReadVar(21))
+		motor_info.brakeAmt = motor.ReadVar(22)
+		motor_info.vin = motor.ReadVar(23)/1000
+		motor_info.temp = motor.ReadVar(24)/10
 		rospy.logdebug("finished read")
 
 		pub.publish(motor_info)
