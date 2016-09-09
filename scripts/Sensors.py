@@ -5,13 +5,19 @@ import rospy
 from inverted_pendulum.msg import PendulumPose
 from std_msgs.msg import Int16MultiArray
 from std_msgs.msg import Header
+import std_srvs.srv
+
+
 
 class Node():
     def __init__(self):
         self.theta_conv = 360.0/4096
         
-        self.sensor_pub = rospy.Publisher('/sensors', PendulumPose, queue_size=1)
-        self.raw_sensor_sub = rospy.Subscriber('/raw_sensors', Int16MultiArray, self.my_callback)
+        self.sensor_pub = rospy.Publisher('sensors', PendulumPose, queue_size=1)
+        self.raw_sensor_sub = rospy.Subscriber('raw_sensors', Int16MultiArray, self.my_callback)
+        self.calibrate_server = rospy.Service('calibrate', std_srvs.srv.Empty, self.calibrate)
+        self.current_unrotated_theta = 0
+        self.angle_calibration = 0
         self.prev_theta = 0
         self.prev_x = 0
         self.prev_time = 0
@@ -37,7 +43,9 @@ class Node():
 
 
         if md:
-            status.theta = data.data[0] * self.theta_conv
+            self.current_unrotated_theta = data.data[0] * self.theta_conv
+            status.theta = self.rotate(self.current_unrotated_theta)
+            
         else:
             status.theta = 0
             rospy.logerr("magnet not detected!")
@@ -58,7 +66,20 @@ class Node():
         self.prev_time = now
         self.prev_theta = status.theta
         self.prev_x = status.x
+
+    def calibrate(self, request):
+        self.angle_calibration = self.current_unrotated_theta
+        rospy.loginfo("calibrating with bottom as %d", self.current_unrotated_theta)
+        return std_srvs.srv.EmptyResponse()
         
+    def rotate(self, theta):
+        theta = theta - self.angle_calibration + 180
+        theta = -theta #+ 180 
+        if theta > 180:
+            theta = theta - 360
+        elif theta < -180:
+            theta = theta + 360
+        return theta 
 
 
 
