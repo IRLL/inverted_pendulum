@@ -140,7 +140,7 @@ class Status():
         self.stdscr.addstr(28,6, "Temperature Limiter:")
         self.stdscr.addstr(29,3, "High Target Speed:")
         self.stdscr.addstr(30,6, "Low Target Speed:")
-        self.stdscr.addstr(31,6, "Acceleration/Decceleration/Brake limiter:")
+        self.stdscr.addstr(31,6, "Accel/Deccel/Brake limiter:")
         self.stdscr.addstr(32,6, "AN1 Limit Switch:")
         self.stdscr.addstr(33,6, "AN2 Limit Switch:")
         self.stdscr.addstr(34,6, "USB Kill Switch:")
