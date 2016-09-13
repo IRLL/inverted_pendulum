@@ -16,6 +16,13 @@ class Node():
         self.sensor_pub = rospy.Publisher('sensors', PendulumPose, queue_size=1)
         self.raw_sensor_sub = rospy.Subscriber('raw_sensors', Int16MultiArray, self.my_callback)
         self.calibrate_server = rospy.Service('calibrate', std_srvs.srv.Empty, self.calibrate)
+		
+		self.pot_settings = rospy.get_param('pendulum/potentiometer')
+
+		self.resistance_high = self.pot_settings['high']
+		self.resistance_low = self.pot_settings['low']
+		self.resistance_mid = (self.resistance_high + self.resistance_low)/2
+		
         self.current_unrotated_theta = 0
         self.angle_calibration = 0
         self.prev_theta = 0
