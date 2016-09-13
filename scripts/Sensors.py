@@ -17,11 +17,15 @@ class Node():
         self.raw_sensor_sub = rospy.Subscriber('raw_sensors', Int16MultiArray, self.my_callback)
         self.calibrate_server = rospy.Service('calibrate', std_srvs.srv.Empty, self.calibrate)
         
-        self.pot_settings = rospy.get_param('pendulum/potentiometer')
 
+        #position calculations
+        self.pot_settings = rospy.get_param('pendulum/potentiometer')
+        self.track_length = rospy.getparam('pendulum/track_length')
         self.resistance_high = self.pot_settings['high']
         self.resistance_low = self.pot_settings['low']
-        self.resistance_mid = (self.resistance_high + self.resistance_low)/2
+        resistance_mid = (self.resistance_high + self.resistance_low)/2
+        self.pos_scalar = 2*(self.resistance_high-self.resistance_mid)/self.track_length
+        self.pos_offset = self.resistance_mid
         
         self.current_unrotated_theta = 0
         self.angle_calibration = 0
@@ -37,7 +41,10 @@ class Node():
         now = rospy.get_time()
         delta = now - self.prev_time
 
-        status.x = data.data[1]
+        status.x = self.get_position(data.data[1])
+
+        if(data.data[1] > self.resistance_high):
+            rospy.logerr("position wiper not detected")
         
         status.leftLim = True if data.data[2] & 0x02 else False
         status.rightLim = True if data.data[2] & 0x01 else False
@@ -87,7 +94,9 @@ class Node():
         elif theta < -180:
             theta = theta + 360
         return theta 
-
+    
+    def get_position(self, raw_position):
+        return (raw_position - self.pos_offset) * self.pos_scaler
 
 
 if __name__ == "__main__":
