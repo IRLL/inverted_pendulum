@@ -22,8 +22,6 @@ from inverted_pendulum.msg import SerialError
 from inverted_pendulum.msg import LimitStatus
 from std_msgs.msg import Header
 
-#define variables for changing later
-port = '/dev/ttyACM0'
 
 class Timeout:
     def __init__(self, timeout_period):
@@ -38,11 +36,11 @@ class Timeout:
 
 
 class Motor():
-    def __init__(self, Port='/dev/ttyACM0', baudrate=115200):
+    def __init__(self, baudrate=115200):
         self.ser = serial.Serial()
         self.ser.timeout = 1
         self.ser.baudrate = baudrate
-        self.ser.port = Port
+        self.ser.port = rospy.get_param('pendulum/motor/port')
         self.ser.open()
         self.timer = Timeout(2)
 
