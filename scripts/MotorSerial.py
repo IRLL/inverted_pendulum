@@ -42,7 +42,7 @@ class Motor():
         self.ser.baudrate = baudrate
         self.ser.port = rospy.get_param('pendulum/motor/port')
         self.ser.open()
-        self.timer = Timeout(2)
+        self.timer = Timeout(0.2)
 
         self.update_period = .5
 
@@ -180,7 +180,7 @@ if __name__ == '__main__':
         motor_info.serialError.format = (serialError & 0b10000) != 0
         motor_info.serialError.crc = (serialError & 0b100000) != 0
         limitStatus = motor.ReadVar(3)
-	rospy.logdebug("limitStatus" + str(limitStatus))
+        rospy.logdebug("limitStatus" + str(limitStatus))
         motor_info.limitStatus.errorOrSafeStart = (limitStatus & 0b1) != 0
         motor_info.limitStatus.tempLimiter = (limitStatus & 0b10) != 0
         motor_info.limitStatus.highTargetSpeed = (limitStatus & 0b100) != 0
