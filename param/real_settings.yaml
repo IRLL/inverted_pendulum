@@ -1,0 +1,21 @@
+pendulum:
+    start_cartx: 0
+    start_angle: 1
+    track_length: 1.5
+    gui_update_frequency: 20
+    motor:
+        port: "/dev/pololu_motor_controller"
+    potentiometer:
+        high: 1020
+        low: 60
+    pid:
+        update_frequency: 10
+        angle:
+            p: 4
+            i: 0.0
+            d: 1
+        cart:
+            p: -10
+            i: 0.0
+            d: 10
+
