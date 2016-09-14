@@ -6,7 +6,25 @@ from inverted_pendulum.msg import PendulumPose, MotorInfo
 from std_msgs.msg import Int16MultiArray
 from std_msgs.msg import Header
 import std_srvs.srv
+from collections import deque
 
+class avg_filter:
+    def __init__(self, window_size):
+        self.window_size = window_size
+        self.queue = deque()
+        self.total = 0
+
+    def run(self, new_item):
+        self.queue.append(new_item)
+        if(len(self.queue) > self.window_size):
+            old_item = self.queue.popleft()
+        else:
+            old_item = 0
+
+        self.total -= old_item
+        self.total += new_item
+
+        return self.total/len(self.queue)
 
 
 class Node():
@@ -35,6 +53,7 @@ class Node():
         self.prev_time = 0
         self.rightLim = False
         self.leftLim = False
+        self.pos_filter = avg_filter(10)
 
     def motor_callback(self, data):
         self.rightLim = data.limitStatus.an2Limit
@@ -48,7 +67,7 @@ class Node():
         now = rospy.get_time()
         delta = now - self.prev_time
 
-        status.x = self.get_position(data.data[1])
+        status.x = self.pos_filter.run(self.get_position(data.data[1]))
 
         status.leftLim = self.leftLim
         status.rightLim = self.rightLim
