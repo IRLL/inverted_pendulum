@@ -2,7 +2,7 @@
 
 import rospy
 
-from inverted_pendulum.msg import PendulumPose
+from inverted_pendulum.msg import PendulumPose, MotorInfo
 from std_msgs.msg import Int16MultiArray
 from std_msgs.msg import Header
 import std_srvs.srv
@@ -14,9 +14,10 @@ class Node():
         self.theta_conv = 360.0/4096
         
         self.sensor_pub = rospy.Publisher('sensors', PendulumPose, queue_size=1)
-        self.raw_sensor_sub = rospy.Subscriber('raw_sensors', Int16MultiArray, self.my_callback)
+        self.raw_sensor_sub = rospy.Subscriber('raw_sensors', Int16MultiArray, self.sensor_callback)
+        self.motor_info_sub = rospy.Subscriber('motor/info', MotorInfo, self.motor_callback)
         self.calibrate_server = rospy.Service('calibrate', std_srvs.srv.Empty, self.calibrate)
-        
+                
 
         #position calculations
         self.pot_settings = rospy.get_param('pendulum/potentiometer')
@@ -32,8 +33,14 @@ class Node():
         self.prev_theta = 0
         self.prev_x = 0
         self.prev_time = 0
+        self.rightLim = False
+        self.leftLim = False
 
-    def my_callback(self, data):
+    def motor_callback(self, data):
+        self.rightLim = data.limitStatus.an2Limit
+        self.leftLim = data.limitStatus.an1Limit
+
+    def sensor_callback(self, data):
         status = PendulumPose()
         status.header = Header()
         status.header.stamp = rospy.Time.now()
@@ -43,11 +50,14 @@ class Node():
 
         status.x = self.get_position(data.data[1])
 
-        if(data.data[1] > self.resistance_high):
-            rospy.logerr("position wiper not detected")
-        
-        status.leftLim = True if data.data[2] & 0x02 else False
-        status.rightLim = True if data.data[2] & 0x01 else False
+        status.leftLim = self.leftLim
+        status.rightLim = self.rightLim
+    
+        if status.leftLim:
+            status.x = -self.track_length/2
+        if status.rightLim:
+            status.x = self.track_length/2
+    
         
         status_bits = data.data[2] >> 8;
 

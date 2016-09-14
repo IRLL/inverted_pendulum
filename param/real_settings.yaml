@@ -6,8 +6,8 @@ pendulum:
     motor:
         port: "/dev/pololu_motor_controller"
     potentiometer:
-        high: 1020
-        low: 60
+        high: 948
+        low: 70
     pid:
         update_frequency: 10
         angle:

@@ -180,13 +180,14 @@ if __name__ == '__main__':
         motor_info.serialError.format = (serialError & 0b10000) != 0
         motor_info.serialError.crc = (serialError & 0b100000) != 0
         limitStatus = motor.ReadVar(3)
-        motor_info.limitStatus.errorOrSafeStart = (serialError & 0b1) != 0
-        motor_info.limitStatus.tempLimiter = (serialError & 0b10) != 0
-        motor_info.limitStatus.highTargetSpeed = (serialError & 0b100) != 0
-        motor_info.limitStatus.lowTargetSpeed = (serialError & 0b1000) != 0
-        motor_info.limitStatus.an1Limit = (serialError & 0b10000) != 0
-        motor_info.limitStatus.an2Limit = (serialError & 0b100000) != 0
-        motor_info.limitStatus.usbKill = (serialError & 0b1000000) != 0
+	rospy.logdebug("limitStatus" + str(limitStatus))
+        motor_info.limitStatus.errorOrSafeStart = (limitStatus & 0b1) != 0
+        motor_info.limitStatus.tempLimiter = (limitStatus & 0b10) != 0
+        motor_info.limitStatus.highTargetSpeed = (limitStatus & 0b100) != 0
+        motor_info.limitStatus.lowTargetSpeed = (limitStatus & 0b1000) != 0
+        motor_info.limitStatus.an1Limit = (limitStatus & 0b10000000) != 0
+        motor_info.limitStatus.an2Limit = (limitStatus & 0b100000000) != 0
+        motor_info.limitStatus.usbKill = (limitStatus  & 0b1000000000) != 0
         motor_info.targetSpeed = signed16(motor.ReadVar(20))
         motor_info.speed = signed16(motor.ReadVar(21))
         motor_info.brakeAmt = motor.ReadVar(22)
