@@ -82,11 +82,11 @@ class Status():
         self.colors['usbKill'] = curses.color_pair(self.limitStatus.usbKill + 2)
 
     def redraw(self, time):
-        self.stdscr.addstr(0,23,   "{}   ".format(self.cmd))
-        self.stdscr.addstr(2,23,  "{}   ".format(self.x))
-        self.stdscr.addstr(3,23,  "{}   ".format(self.vel))
-        self.stdscr.addstr(4,23,  "{}   ".format(self.theta))
-        self.stdscr.addstr(5,23,  "{}   ".format(self.tDot))
+        self.stdscr.addstr(0,23,  "{: 10.3f}".format(self.cmd))
+        self.stdscr.addstr(2,23,  "{: 10.3f}".format(self.x))
+        self.stdscr.addstr(3,23,  "{: 10.3f}".format(self.vel))
+        self.stdscr.addstr(4,23,  "{: 10.3f}".format(self.theta))
+        self.stdscr.addstr(5,23,  "{: 10.3f}".format(self.tDot))
         self.stdscr.addstr(7,23,  "{}   ".format(self.right), self.colors['rightLim'])
         self.stdscr.addstr(8,23,  "{}   ".format(self.left), self.colors['leftLim'])
         self.stdscr.addstr(11,23, "{}   ".format(self.errorStatus.safeStart), self.colors['safeStart'])
