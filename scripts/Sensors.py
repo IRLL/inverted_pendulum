@@ -20,12 +20,12 @@ class Node():
 
         #position calculations
         self.pot_settings = rospy.get_param('pendulum/potentiometer')
-        self.track_length = rospy.getparam('pendulum/track_length')
+        self.track_length = rospy.get_param('pendulum/track_length')
         self.resistance_high = self.pot_settings['high']
         self.resistance_low = self.pot_settings['low']
         resistance_mid = (self.resistance_high + self.resistance_low)/2
-        self.pos_scalar = 2*(self.resistance_high-self.resistance_mid)/self.track_length
-        self.pos_offset = self.resistance_mid
+        self.pos_scalar = 1/(2*(self.resistance_high-resistance_mid)/self.track_length)
+        self.pos_offset = resistance_mid
         
         self.current_unrotated_theta = 0
         self.angle_calibration = 0
@@ -96,7 +96,7 @@ class Node():
         return theta 
     
     def get_position(self, raw_position):
-        return (raw_position - self.pos_offset) * self.pos_scaler
+        return (raw_position - self.pos_offset) * self.pos_scalar
 
 
 if __name__ == "__main__":
