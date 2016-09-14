@@ -17,5 +17,5 @@ pendulum:
         cart:
             p: 70
             i: 0.1
-            d: 20
+            d: 50
 
