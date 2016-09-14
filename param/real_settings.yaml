@@ -11,11 +11,11 @@ pendulum:
     pid:
         update_frequency: 10
         angle:
-            p: 4
+            p: 0
             i: 0.0
-            d: 1
+            d: 0
         cart:
-            p: -10
-            i: 0.0
-            d: 10
+            p: 70
+            i: 0.1
+            d: 20
 
