@@ -1,0 +1,9 @@
+bool safeStart
+bool serialError
+bool cmdTimeout
+bool limitSwitch
+bool lowVin
+bool highVin
+bool overTemp
+bool driverError
+bool errorLineHigh

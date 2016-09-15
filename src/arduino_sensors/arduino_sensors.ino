@@ -25,7 +25,6 @@ void setup() {
 
   m_msg.data = m_msg_data;
   m_msg.data_length = MSG_SIZE;
-  next_error_time = 0;
 
 }
 
@@ -67,6 +66,5 @@ void loop() {
 
 	m_publisher.publish(&m_msg);
 	roshandle.spinOnce();
-	delay(50);
 }
 
