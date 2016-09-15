@@ -6,12 +6,12 @@ import sys
 
 
 class Visualizer:
-    def __init__(self, track_length, screen_size=(640, 480),
+    def __init__(self, track_length, screen_size=(350, 350),
                  exit_handler=None):
         pygame.init()
 
         # How much of the screen should the rod length be
-        self.rod_length_factor = 0.2
+        self.rod_length_factor = 0.15
 
         (self.xsize, self.ysize) = screen_size
         self.track_length = track_length
