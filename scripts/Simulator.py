@@ -53,11 +53,21 @@ class Node():
         pose.header.stamp = rospy.Time.now()
         return pose
 
+    def get_state(self):
+        state = self.model.get_state()
+        pose = PendulumPose()
+
+        pose.x, pose.theta, pose.xDot, pose.thetaDot, _ = state
+        pose.theta = pose.theta * 180.0/pi
+        pose.thetaDot = pose.thetaDot * 180.0/pi
+        pose.header.stamp = rospy.Time.now()
+        return pose
+
     def reset_callback(self, goal):
         rospy.loginfo("resetting angle=%f x=%f", goal.angle, goal.position)
         result = ResetResult(goal.angle, goal.position)
         self.model.reset(start_cartx=goal.position, start_angle=goal.angle)
-
+        self.sensor_pub.publish(self.get_state())
         self.reset_as.set_succeeded(result)
 
 
