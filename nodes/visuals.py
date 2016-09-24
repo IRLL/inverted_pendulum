@@ -4,7 +4,7 @@ import rospy
 from sensor_msgs.msg import Image
 from inverted_pendulum.msg import PendulumPose, Cmd
 from math import pi
-from visualizer import Visualizer
+from inverted_pendulum.visualizer import Visualizer
 from cv_bridge import CvBridge, CvBridgeError
 
 class Node():

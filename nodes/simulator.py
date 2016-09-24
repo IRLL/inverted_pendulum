@@ -7,7 +7,7 @@ from inverted_pendulum.msg import ResetAction, ResetResult
 import threading
 from math import pi
 
-from model import Pendulum as PendulumModel
+from inverted_pendulum.model import Pendulum as PendulumModel
 
 class Node():
     def __init__(self, sim_parameters, model):

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-	<node name="Simulator" pkg="inverted_pendulum" type="Simulator.py" required="true" output="screen"/>
-	<node name="Visuals" pkg="inverted_pendulum" type="Visuals.py" required="false"/>
+	<node name="simulator" pkg="inverted_pendulum" type="simulator.py" required="true" output="screen"/>
+	<node name="visuals" pkg="inverted_pendulum" type="visuals.py" required="false"/>
 
 	<!-- settings file -->
 	<rosparam command="load" file="$(find inverted_pendulum)/param/sim_settings.yaml" />
