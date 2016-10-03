@@ -1,16 +1,17 @@
 pendulum:
     start_cartx: 0
     start_angle: 1
-    track_length: 1.5
+    track_length: 1.0
     gui_update_frequency: 20
     simulation:
-        realtime_multiplier: 1 
-        cart_friction: 0.1
+        realtime_multiplier: 1
+        cart_friction: 0.08
         delta_time: 0.01
         gravity: 9.81
-        pole_friction: 0.1
-        mass: 1.0
-        pole_length: 1.0
+        pole_friction: 0.002
+        #mass: 0.0335
+        mass: 0.1
+        pole_length: 0.2
     pid:
         update_frequency: 10
         angle:
@@ -21,4 +22,3 @@ pendulum:
             p: -10
             i: 0.0
             d: 10
-
