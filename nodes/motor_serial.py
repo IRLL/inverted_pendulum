@@ -20,19 +20,8 @@ from inverted_pendulum.msg import MotorInfo
 from inverted_pendulum.msg import MotorError
 from inverted_pendulum.msg import SerialError
 from inverted_pendulum.msg import LimitStatus
+from inverted_pendulum.timeout import Timeout
 from std_msgs.msg import Header
-
-
-class Timeout:
-    def __init__(self, timeout_period):
-        self.timeout_duration = rospy.Duration.from_sec(timeout_period)
-        self.time_expire = rospy.Time.now() + self.timeout_duration
-
-    def reset(self):
-        self.time_expire = rospy.Time.now() + self.timeout_duration
-
-    def isExpired(self):
-        return rospy.Time.now() > self.time_expire
 
 
 class Motor():
@@ -43,8 +32,6 @@ class Motor():
         self.ser.port = rospy.get_param('pendulum/motor/port')
         self.ser.open()
         self.timer = Timeout(0.2)
-
-        self.update_period = .5
 
         self.error_codes = 0
         self.supply_voltage = 0
