@@ -2,18 +2,18 @@
 
 import rospy
 from inverted_pendulum.msg import Cmd
-
-magnitude = 10
+from std_msgs.msg import Header
+magnitude = 40
 
 
 class keyboard_controller:
     def __init__(self):
         self.keymap = {}
         #support for wsad keys
-        self.keymap['w'] = "UP"	
-        self.keymap['s'] = "DOWN"	
-        self.keymap['a'] = "LEFT"	
-        self.keymap['d'] = "RIGHT"	
+        self.keymap['w'] = "UP"
+        self.keymap['s'] = "DOWN"
+        self.keymap['a'] = "LEFT"
+        self.keymap['d'] = "RIGHT"
 
         #support for arrow keys
         self.keymap['\x41'] = "UP"
@@ -58,13 +58,13 @@ if __name__ == "__main__":
 
     while not rospy.is_shutdown():
         cmd = Cmd()
+        cmd.header = Header()
+        cmd.header.stamp = rospy.Time.now()
         action = kb.get_action()
-        
+
         if(action == "LEFT"):
             cmd.cmd = -magnitude
         if(action == "RIGHT"):
             cmd.cmd = magnitude
-        
-        cmd_pub.publish(cmd)
-    
 
+        cmd_pub.publish(cmd)

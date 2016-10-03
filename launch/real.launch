@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <launch>
-	<node name="MotorController" pkg="inverted_pendulum" type="MotorSerial.py" required="true"/>
-	<node name="SensorConverter" pkg="inverted_pendulum" type="Sensors.py" required="true"/>
+	<node name="MotorController" pkg="inverted_pendulum" type="motor_serial.py" required="true">
+		<remap from="cmd" to="cmd_safe" />
+	</node>
+	<node name="SensorConverter" pkg="inverted_pendulum" type="sensors.py" required="true"/>
+	<!-- <node name="SafetyController" pkg="inverted_pendulum" type="safety_controller.py" required="true"/> -->
 	<node name="RawSensors" pkg="rosserial_python" type="serial_node.py" args="/dev/sensor_arduino" required="true"/>
 
 	<!-- settings file -->
