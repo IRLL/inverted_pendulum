@@ -54,6 +54,7 @@ class Node():
         self.rightLim = False
         self.leftLim = False
         self.pos_filter = avg_filter(10)
+        self.vel_filter = avg_filter(10)
 
     def motor_callback(self, data):
         self.rightLim = data.limitStatus.an2Limit
@@ -99,7 +100,7 @@ class Node():
 
         try:
             status.thetaDot = (status.theta - self.prev_theta)/delta
-            status.xDot = (status.x - self.prev_x)/delta
+            status.xDot = self.vel_filter.run((status.x - self.prev_x)/delta)
         except ZeroDivisionError:
             rospy.logwarning("delta is 0, no time passed?")
 

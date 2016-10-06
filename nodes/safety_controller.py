@@ -22,7 +22,7 @@ class Node():
 
         #pid_parameters = rospy.get_param('pendulum/safety/')
         self.max_cmd = 30
-        self.brake_location = 0.3
+        self.brake_location = 0.5
 
     def sensor_callback(self, data):
         self.sensor_lock.acquire()
@@ -86,7 +86,16 @@ class Node():
             safe_msg = Cmd()
             safe_msg.header = Header()
             safe_msg.header.stamp = rospy.Time.now()
-            safe_msg.cmd  = 0
+            reverse_factor = -40
+
+            #something better than brake
+            if(current_sensors.xDot > 0.1) and (current_sensors.x > self.brake_location):
+                safe_msg.cmd = current_sensors.xDot * reverse_factor
+            elif(current_sensors.xDot < -0.1) and (current_sensors.x < -self.brake_location):
+                safe_msg.cmd = current_sensors.xDot * reverse_factor
+            else:
+                safe_msg.cmd  = 0
+
             self.cmd_pub.publish(safe_msg)
             return
 

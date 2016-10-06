@@ -52,7 +52,7 @@ class Motor():
             cmd = max(-100, cmd)
             self.MoveLeft(abs(cmd))
         elif cmd == 0:
-            self.Stop()
+            self.MoveRight(cmd)
 
         self.timer.reset()
 
