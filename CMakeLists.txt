@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   message_generation
   actionlib_msgs
+  rosserial_arduino
+  rosserial_client
 )
 
 ## System dependencies are found with CMake's conventions
