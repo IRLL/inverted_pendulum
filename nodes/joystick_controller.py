@@ -16,7 +16,7 @@ class Node:
         cmd = Cmd()
         cmd.header = Header()
         cmd.header.stamp = rospy.Time.now()
-        cmd.cmd = joystick.axisZ * magnitude 
+        cmd.cmd = joystick.axisZ * magnitude
         self.cmd_pub.publish(cmd)
 
 if __name__ == "__main__":

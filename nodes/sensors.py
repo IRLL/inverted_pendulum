@@ -30,12 +30,12 @@ class avg_filter:
 class Node():
     def __init__(self):
         self.theta_conv = 360.0/4096
-        
+
         self.sensor_pub = rospy.Publisher('sensors', PendulumPose, queue_size=1)
         self.raw_sensor_sub = rospy.Subscriber('raw_sensors', Int16MultiArray, self.sensor_callback)
         self.motor_info_sub = rospy.Subscriber('motor/info', MotorInfo, self.motor_callback)
         self.calibrate_server = rospy.Service('calibrate', std_srvs.srv.Empty, self.calibrate)
-                
+
 
         #position calculations
         self.pot_settings = rospy.get_param('pendulum/potentiometer')
@@ -45,7 +45,7 @@ class Node():
         resistance_mid = (self.resistance_high + self.resistance_low)/2
         self.pos_scalar = 1/(2*(self.resistance_high-resistance_mid)/self.track_length)
         self.pos_offset = resistance_mid
-        
+
         self.current_unrotated_theta = 0
         self.angle_calibration = 0
         self.prev_theta = 0
@@ -72,13 +72,13 @@ class Node():
 
         status.leftLim = self.leftLim
         status.rightLim = self.rightLim
-    
+
         if status.leftLim:
             status.x = -self.track_length/2
         if status.rightLim:
             status.x = self.track_length/2
-    
-        
+
+
         status_bits = data.data[2] >> 8;
 
         md = status_bits & (1 << 5);
@@ -89,14 +89,14 @@ class Node():
         if md:
             self.current_unrotated_theta = data.data[0] * self.theta_conv
             status.theta = self.rotate(self.current_unrotated_theta)
-            
+
         else:
             status.theta = 0
             rospy.logerr("magnet not detected!")
 
         if ml: rospy.loginfo("magnet strength low")
         if mh: rospy.loginfo("magnet strength high")
-            
+
 
         try:
             status.thetaDot = (status.theta - self.prev_theta)/delta
@@ -115,16 +115,16 @@ class Node():
         self.angle_calibration = self.current_unrotated_theta
         rospy.loginfo("calibrating with bottom as %d", self.current_unrotated_theta)
         return std_srvs.srv.EmptyResponse()
-        
+
     def rotate(self, theta):
         theta = theta - self.angle_calibration + 180
-        theta = -theta #+ 180 
+        theta = -theta #+ 180
         if theta > 180:
             theta = theta - 360
         elif theta < -180:
             theta = theta + 360
-        return theta 
-    
+        return theta
+
     def get_position(self, raw_position):
         return (raw_position - self.pos_offset) * self.pos_scalar
 
@@ -134,4 +134,3 @@ if __name__ == "__main__":
     node = Node()
 
     rospy.spin()
-
