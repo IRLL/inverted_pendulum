@@ -16,13 +16,15 @@ class Node():
         self.sensor_data = list()
         self.last_sensor = PendulumPose()
         self.sensor_timeout = Timeout(0.1)
+        self.vel_history = 0
+
 
         self.cmd_data = list()
         self.cmd_lock = threading.Lock()
 
         #pid_parameters = rospy.get_param('pendulum/safety/')
         self.max_cmd = 30
-        self.brake_location = 0.5
+        self.brake_location = 0.45
 
     def sensor_callback(self, data):
         self.sensor_lock.acquire()
@@ -86,7 +88,9 @@ class Node():
             safe_msg = Cmd()
             safe_msg.header = Header()
             safe_msg.header.stamp = rospy.Time.now()
-            reverse_factor = -40
+            reverse_factor = -45
+            if(abs(current_sensor.xDot) > self.vel_history):
+            self.reverse_speed 
 
             #something better than brake
             if(current_sensors.xDot > 0.1) and (current_sensors.x > self.brake_location):
@@ -107,6 +111,7 @@ class Node():
             if(abs(current_cmd.cmd) > self.max_cmd):
                 current_cmd.cmd = math.copysign(self.max_cmd, current_cmd.cmd)
             self.cmd_pub.publish(current_cmd)
+            self.vel_history = 0
 
 
 
