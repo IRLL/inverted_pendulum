@@ -10,7 +10,7 @@ magnitude = 40
 class Node:
     def __init__(self):
         self.cmd_pub = rospy.Publisher('/cmd', Cmd, queue_size=1)
-        self.joy_sub = rospy.Subscriber('/joystick_driver/joystick_driver', joystick, self.callback);
+        self.joy_sub = rospy.Subscriber('joystick_driver', joystick, self.callback);
 
     def callback(self, joystick):
         cmd = Cmd()
