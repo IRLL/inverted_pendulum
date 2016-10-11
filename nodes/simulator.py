@@ -4,6 +4,7 @@ import rospy
 import actionlib
 from inverted_pendulum.msg import PendulumPose, Cmd
 from inverted_pendulum.msg import ResetAction, ResetResult
+import std_srvs.srv
 import threading
 from math import pi
 
@@ -18,11 +19,20 @@ class Node():
             ResetAction, execute_cb=self.reset_callback, auto_start=False
         )
         self.reset_as.start()
+        self.clear_edge_server = rospy.Service('clear_edge', std_srvs.srv.Empty,
+                self.clear_edge)
         self.cmd_lock = threading.Lock()
         self.cmds = list()
         self.model = model
+        self.edge = rospy.get_param('pendulum/edge')
+        self.edge_hit = False
 
         self.rate = rospy.Rate(sim_parameters['realtime_multiplier'] * 1.0/sim_parameters['delta_time'])
+
+    def clear_edge(self, request):
+        rospy.loginfo("clearing edge flag")
+        self.edge_hit = False
+        return std_srvs.srv.EmptyResponse()
 
     def cmd_callback(self, cmd):
         self.cmd_lock.acquire()
@@ -47,9 +57,13 @@ class Node():
         state = self.model.get_state()
         pose = PendulumPose()
 
+
         pose.x, pose.theta, pose.xDot, pose.thetaDot, _ = state
         pose.theta = pose.theta * 180.0/pi
         pose.thetaDot = pose.thetaDot * 180.0/pi
+        if(abs(pose.x) >= self.edge):
+            self.edge_hit = True
+        pose.edge = self.edge_hit
         pose.header.stamp = rospy.Time.now()
         return pose
 

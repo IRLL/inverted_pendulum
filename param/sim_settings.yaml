@@ -2,6 +2,7 @@ pendulum:
     start_cartx: 0
     start_angle: 1
     track_length: 1.0
+    edge: 0.5
     gui_update_frequency: 20
     simulation:
         realtime_multiplier: 1
