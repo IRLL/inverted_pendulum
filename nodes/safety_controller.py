@@ -22,7 +22,7 @@ class Node():
 
         #pid_parameters = rospy.get_param('pendulum/safety/')
         self.max_cmd = 30
-        self.brake_location = 0.5
+        self.brake_location = rospy.get_param('pendulum/edge')
 
     def sensor_callback(self, data):
         self.sensor_lock.acquire()

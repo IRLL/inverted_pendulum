@@ -35,6 +35,7 @@ class Node():
         self.raw_sensor_sub = rospy.Subscriber('raw_sensors', Int16MultiArray, self.sensor_callback)
         self.motor_info_sub = rospy.Subscriber('motor/info', MotorInfo, self.motor_callback)
         self.calibrate_server = rospy.Service('calibrate', std_srvs.srv.Empty, self.calibrate)
+        self.edge_reset_server = rospy.Service('clear_edge', std_srvs.srv.Empty, self.clear_edge)
 
 
         #position calculations
@@ -45,14 +46,14 @@ class Node():
         resistance_mid = (self.resistance_high + self.resistance_low)/2
         self.pos_scalar = 1/(2*(self.resistance_high-resistance_mid)/self.track_length)
         self.pos_offset = resistance_mid
+        self.soft_edge = rospy.get_param('pendulum/edge')
 
         self.current_unrotated_theta = 0
         self.angle_calibration = 0
         self.prev_theta = 0
         self.prev_x = 0
         self.prev_time = 0
-        self.rightLim = False
-        self.leftLim = False
+        self.edge_hit = False
         self.pos_filter = avg_filter(10)
         self.vel_filter = avg_filter(10)
 
@@ -69,6 +70,11 @@ class Node():
         delta = now - self.prev_time
 
         status.x = self.pos_filter.run(self.get_position(data.data[1]))
+        if(abs(status.x > self.soft_edge)):
+            self.edge_hit = True
+
+        status.edge = self.edge_hit
+
 
         status.leftLim = self.leftLim
         status.rightLim = self.rightLim
@@ -114,6 +120,11 @@ class Node():
     def calibrate(self, request):
         self.angle_calibration = self.current_unrotated_theta
         rospy.loginfo("calibrating with bottom as %d", self.current_unrotated_theta)
+        return std_srvs.srv.EmptyResponse()
+
+    def clear_edge(self, request):
+        rospy.loginfo("clearing edge flag")
+        self.edge_hit = False
         return std_srvs.srv.EmptyResponse()
 
     def rotate(self, theta):
