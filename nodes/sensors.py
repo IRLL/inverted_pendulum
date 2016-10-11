@@ -70,18 +70,17 @@ class Node():
         delta = now - self.prev_time
 
         status.x = self.pos_filter.run(self.get_position(data.data[1]))
-        if(abs(status.x > self.soft_edge)):
+
+        if(abs(status.x) > self.soft_edge):
             self.edge_hit = True
 
         status.edge = self.edge_hit
 
 
-        status.leftLim = self.leftLim
-        status.rightLim = self.rightLim
 
-        if status.leftLim:
+        if self.leftLim:
             status.x = -self.track_length/2
-        if status.rightLim:
+        if self.rightLim:
             status.x = self.track_length/2
 
 
