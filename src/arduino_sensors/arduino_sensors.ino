@@ -1,6 +1,7 @@
-#include <Wire.h>
+#include <WSWire.h>
 #include <ros.h>
 #include <std_msgs/Int16MultiArray.h>
+#include <avr/wdt.h>
 
 
 #define LIN_POS_PIN A0
@@ -12,9 +13,10 @@ int m_msg_data[MSG_SIZE];
 
 ros::Publisher m_publisher("raw_sensors", &m_msg);
 
-
-
 void setup() {
+
+  wdt_disable();
+
   Wire.begin();
 
   roshandle.initNode();
@@ -22,6 +24,8 @@ void setup() {
 
   m_msg.data = m_msg_data;
   m_msg.data_length = MSG_SIZE;
+
+  wdt_enable(WDTO_500MS);
 
 }
 
@@ -58,6 +62,7 @@ void loop() {
 
 	m_publisher.publish(&m_msg);
 	roshandle.spinOnce();
-  delay(10);
+  wdt_reset();
+  delay(20);
 }
 
