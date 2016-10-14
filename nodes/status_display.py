@@ -29,8 +29,7 @@ class Status():
         self.theta = 0.0
         self.vel = 0.0
         self.tDot = 0.0
-        self.right = False
-        self.left = False
+        self.edge_hit = False
         self.errorStatus = MotorError()
         self.serialError = SerialError()
         self.limitStatus = LimitStatus()
@@ -56,8 +55,7 @@ class Status():
         self.print_headers()
 
     def init_colors(self):
-        self.colors['rightLim'] = curses.color_pair(self.right + 2)
-        self.colors['leftLim']  = curses.color_pair(self.left + 2)
+        self.colors['edgeHit']  = curses.color_pair(self.edge_hit + 2)
         self.colors['safeStart'] = curses.color_pair(self.errorStatus.safeStart + 2)
         self.colors['serialError'] = curses.color_pair(self.errorStatus.serialError + 2)
         self.colors['cmdTimeout'] = curses.color_pair(self.errorStatus.cmdTimeout + 2)
@@ -87,8 +85,7 @@ class Status():
         self.stdscr.addstr(3,23,  "{: 10.3f}".format(self.vel))
         self.stdscr.addstr(4,23,  "{: 10.3f}".format(self.theta))
         self.stdscr.addstr(5,23,  "{: 10.3f}".format(self.tDot))
-        self.stdscr.addstr(7,23,  "{}   ".format(self.right), self.colors['rightLim'])
-        self.stdscr.addstr(8,23,  "{}   ".format(self.left), self.colors['leftLim'])
+        self.stdscr.addstr(7,23,  "{}   ".format(self.edge_hit), self.colors['edgeHit'])
         self.stdscr.addstr(11,23, "{}   ".format(self.errorStatus.safeStart), self.colors['safeStart'])
         self.stdscr.addstr(12,23, "{}   ".format(self.errorStatus.serialError), self.colors['serialError'])
         self.stdscr.addstr(13,23, "{}   ".format(self.errorStatus.cmdTimeout), self.colors['cmdTimeout'])
@@ -158,10 +155,8 @@ class Status():
         self.vel = data.xDot
         self.theta = data.theta
         self.tDot = data.thetaDot
-        self.right = data.rightLim
-        self.colors['rightLim'] = curses.color_pair(self.right + 2)
-        self.left = data.leftLim
-        self.colors['leftLim'] = curses.color_pair(self.left + 2)
+        self.edge_hit = data.edge
+        self.colors['edgeHit'] = curses.color_pair(self.edge_hit + 2)
 
     def print_headers(self):
         self.stdscr.addstr(0,0,  "CMD:")
@@ -171,8 +166,7 @@ class Status():
         self.stdscr.addstr(4,3,  u"\u03B8:".encode('utf-8'))
         self.stdscr.addstr(5,3,  u"d\u03B8/dt:".encode('utf-8'))
         self.stdscr.addstr(6,3,  "Limits:", self.header_color)
-        self.stdscr.addstr(7,5,  "Right:")
-        self.stdscr.addstr(8,5,  "Left:")
+        self.stdscr.addstr(7,5,  "Edge Hit:")
         self.stdscr.addstr(9,0,  "Motor Status:", self.header_color)
         self.stdscr.addstr(10,3, "Error Status:", self.header_color)
         self.stdscr.addstr(11,6, "Safe Start:")
