@@ -29,7 +29,7 @@ class avg_filter:
 
 class Node():
     def __init__(self):
-        self.theta_conv = 360.0/4096
+        self.theta_conv = 360.0/1024
 
         self.sensor_pub = rospy.Publisher('sensors', PendulumPose, queue_size=1)
         self.raw_sensor_sub = rospy.Subscriber('raw_sensors', Int16MultiArray, self.sensor_callback)
@@ -91,13 +91,16 @@ class Node():
         mh = status_bits & (1 << 3);
 
 
+        #override magnet detection
+        md = 1   
+
         if md:
-            self.current_unrotated_theta = data.data[0] * self.theta_conv
+            self.current_unrotated_theta = (data.data[0] & 0xFFFF) * self.theta_conv
             status.theta = self.rotate(self.current_unrotated_theta)
 
         else:
             status.theta = 0
-            rospy.logerr("magnet not detected!")
+#rospy.logerr("magnet not detected!")
 
         if ml: rospy.loginfo("magnet strength low")
         if mh: rospy.loginfo("magnet strength high")
