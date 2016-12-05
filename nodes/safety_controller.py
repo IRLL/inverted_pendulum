@@ -21,7 +21,7 @@ class Node():
         self.cmd_lock = threading.Lock()
 
         #pid_parameters = rospy.get_param('pendulum/safety/')
-        self.max_cmd = 30
+        self.max_cmd = 40
         self.brake_location = rospy.get_param('pendulum/edge')
 
     def sensor_callback(self, data):
@@ -66,41 +66,43 @@ class Node():
             self.cmd_lock.release()
 
 
-        #perform safety_checks, halt cart if necessary
-        halt = False
 
-        #limit max position of the cart
-        if(current_sensors.x > self.brake_location):
-            if(current_cmd.cmd > 0):
-                halt = True
-        if(current_sensors.x < -self.brake_location):
-            if(current_cmd.cmd < 0):
-                halt = True
+
+        
+        safe_msg = Cmd()
+        safe_msg.header = Header()
+        safe_msg.header.stamp = rospy.Time.now()
+        reverse_factor = -40
+        switch_speed = 70
 
         #if we aren't getting sensor data, we definitely need to not move
         if(self.sensor_timeout.isExpired()):
             rospy.logerr("stale sensor data!")
-            halt = True
-
-        if halt == True:
-            safe_msg = Cmd()
-            safe_msg.header = Header()
-            safe_msg.header.stamp = rospy.Time.now()
-            reverse_factor = -40
-
-            #something better than brake
-            if(current_sensors.xDot > 0.1) and (current_sensors.x > self.brake_location):
-                safe_msg.cmd = current_sensors.xDot * reverse_factor
-            elif(current_sensors.xDot < -0.1) and (current_sensors.x < -self.brake_location):
-                safe_msg.cmd = current_sensors.xDot * reverse_factor
-            else:
-                safe_msg.cmd  = 0
-
+            safe_msg.cmd  = 0
             self.cmd_pub.publish(safe_msg)
             return
 
+        #something better than brake
+        if current_sensors.x >= 0.75:
+            safe_msg.cmd = -switch_speed;
+            self.cmd_pub.publish(safe_msg)
+            return
+        elif current_sensors.x <= -0.75:
+            safe_msg.cmd = switch_speed;
+            self.cmd_pub.publish(safe_msg)
+            return
+        elif(current_sensors.xDot > 0.1) and (current_sensors.x > self.brake_location):
+            safe_msg.cmd = current_sensors.xDot * reverse_factor
+            self.cmd_pub.publish(safe_msg)
+            return
+        elif(current_sensors.xDot < -0.1) and (current_sensors.x < -self.brake_location):
+            safe_msg.cmd = current_sensors.xDot * reverse_factor
+            self.cmd_pub.publish(safe_msg)
+            return
+         
 
 
+        current_cmd.header = safe_msg.header
         #if we get here, all safety checks passed and we can send new commands
         if(new_cmd == True):
             #limit the maximum command of the cart
@@ -114,7 +116,7 @@ class Node():
 if __name__ == "__main__":
     rospy.init_node('safety_controller')
     node = Node()
-    rate = rospy.Rate(100)
+    rate = rospy.Rate(200)
     while not rospy.is_shutdown():
         node.update()
         rate.sleep()

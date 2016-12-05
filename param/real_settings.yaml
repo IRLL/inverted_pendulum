@@ -2,7 +2,7 @@ pendulum:
     start_cartx: 0
     start_angle: 1
     track_length: 1.5
-    edge: 0.5
+    edge: 0.4
     gui_update_frequency: 20
     motor:
         port: "/dev/pololu_motor_controller"
